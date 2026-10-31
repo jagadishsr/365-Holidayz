@@ -1,0 +1,6 @@
+{
+  "name": "365Holidayz - Curated Bespoke Travel",
+  "description": "Your world, expertly curated. 30+ years of travel expertise combining thoughtfully designed destinations, bespoke holiday experiences, and personalised planning.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
