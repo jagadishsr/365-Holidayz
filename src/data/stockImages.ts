@@ -49,7 +49,7 @@ export const CLIENT_ASSETS = {
     phone1: '+91 89399 58899',
     phone2: '+91 94441 79215',
     email: '24x7support@365holidayz.com',
-    whatsappCommunity: 'https://chat.whatsapp.com/Hdc8BSDpoOo6su5V5qSQxG',
+    whatsappCommunity: 'https://wa.me/918939958899?text=Hi%20365Holidayz,%20I%20would%20like%20to%20plan%20a%20holiday%20and%20join%20the%20travel%20group.',
     website: 'www.365holidayz.com',
     deskLabel: 'Booking Desk India'
   }

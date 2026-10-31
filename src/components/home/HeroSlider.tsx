@@ -51,12 +51,14 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nextSlide, prevSlide]);
 
-  // Scroll active location pill into view
+  // Scroll active location pill horizontally inside container only (NEVER touch window scroll)
   useEffect(() => {
     if (pillsContainerRef.current) {
       const activeBtn = pillsContainerRef.current.querySelector<HTMLButtonElement>(`[data-slide-index="${currentSlide}"]`);
       if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        const container = pillsContainerRef.current;
+        const scrollLeft = activeBtn.offsetLeft - container.offsetWidth / 2 + activeBtn.offsetWidth / 2;
+        container.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
       }
     }
   }, [currentSlide]);
@@ -139,38 +141,38 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
         );
       })}
 
-      {/* Slide Content Layer - Text encapsulated in a frosted glass card for flawless legibility */}
-      <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
-        <div className="max-w-2xl bg-[#010048]/75 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-2xl border border-[#c59b27]/30 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      {/* Slide Content Layer - Open and visible directly over main pictures without any blocking blue box */}
+      <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center pb-20 sm:pb-24">
+        <div className="max-w-3xl space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {/* Eyebrow & Tag */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="px-3 py-1 rounded-full bg-[#c59b27]/30 border border-[#c59b27]/60 text-xs font-bold text-[#f3e098] uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+            <span className="px-3 py-1 rounded-full bg-[#010048]/80 border border-[#c59b27]/70 text-xs font-bold text-[#f3e098] uppercase tracking-wider flex items-center gap-1.5 shadow-md backdrop-blur-xs">
               <Sparkles className="w-3.5 h-3.5 text-[#f3e098]" />
               <span>{activeSlide.eyebrow}</span>
             </span>
 
-            <span className="text-xs text-white font-bold px-3 py-1 rounded bg-[#c9182b] border border-red-400/40 shadow-sm">
+            <span className="text-xs text-white font-bold px-3 py-1 rounded bg-[#c9182b] border border-red-400/40 shadow-md">
               {activeSlide.tag}
             </span>
           </div>
 
-          {/* Large Bold Sans-Serif Title (Strictly no serif) */}
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight drop-shadow-md">
+          {/* Large Bold Sans-Serif Title with strong text shadow */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
             {activeSlide.title}
           </h1>
 
-          {/* Concise Factual Text */}
-          <p className="text-sm sm:text-base md:text-lg text-slate-100 font-normal leading-relaxed">
+          {/* Concise Factual Text with strong shadow */}
+          <p className="text-sm sm:text-base md:text-lg text-white font-medium max-w-2xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
             {activeSlide.summary}
           </p>
 
           {/* Action CTAs */}
-          <div className="pt-2 flex items-center gap-3.5 flex-wrap">
+          <div className="pt-3 flex items-center gap-3.5 flex-wrap">
             {onOpenEnquiry ? (
               <button
                 type="button"
                 onClick={onOpenEnquiry}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-sm tracking-wide shadow-xl transition-all hover:-translate-y-0.5 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-sm tracking-wide shadow-2xl transition-all hover:-translate-y-0.5 cursor-pointer"
               >
                 <Calendar className="w-4 h-4 text-[#010048]" />
                 <span>Plan Your Trip</span>
@@ -178,7 +180,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
             ) : (
               <Link
                 to={`/plan-your-trip?destination=${encodeURIComponent(activeSlide.destination)}`}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-sm tracking-wide shadow-xl transition-all hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-sm tracking-wide shadow-2xl transition-all hover:-translate-y-0.5"
               >
                 <Calendar className="w-4 h-4 text-[#010048]" />
                 <span>Plan Your Trip</span>
@@ -187,7 +189,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
 
             <Link
               to={activeSlide.ctaLink}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded bg-white/15 hover:bg-white/25 text-white font-bold text-sm border border-[#c59b27]/50 backdrop-blur-sm transition-all"
+              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-lg bg-[#010048]/85 hover:bg-[#080562] text-white font-bold text-sm border border-[#c59b27]/60 shadow-xl backdrop-blur-xs transition-all"
             >
               <span>{activeSlide.ctaText}</span>
               <ArrowRight className="w-4 h-4 text-[#f3e098]" />

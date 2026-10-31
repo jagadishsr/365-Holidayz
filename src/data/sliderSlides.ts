@@ -16,7 +16,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destination: 'Philippines',
     destinationSlug: 'philippines',
     imageSubject: 'Chocolate Hills and tropical limestone coast in Bohol and Cebu Philippines',
-    tag: '6 Nights / 7 Days • USD 715 PP • For 6 Pax',
+    tag: '6 Nights / 7 Days • ₹59,999 PP • For 6 Pax',
     ctaText: 'View Philippines Itinerary',
     ctaLink: '/packages'
   },
@@ -28,7 +28,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destination: 'Singapore & Malaysia',
     destinationSlug: 'singapore',
     imageSubject: 'Singapore Marina Bay Sands and Kuala Lumpur Petronas Twin Towers skyline',
-    tag: '4 Nights / 5 Days • USD 375 PP • Min 4 Pax',
+    tag: '4 Nights / 5 Days • ₹31,500 PP • Min 4 Pax',
     ctaText: 'View Twin Country Tour',
     ctaLink: '/packages'
   },
@@ -53,7 +53,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'bali',
     packageId: 'pkg-09',
     imageSubject: 'Bali emerald green stepped rice terraces with morning mist in Ubud',
-    tag: '5 Nights / 6 Days • From INR 46,800',
+    tag: '5 Nights / 6 Days • From ₹46,800',
     ctaText: 'Explore Bali Packages',
     ctaLink: '/packages?destination=Bali'
   },
@@ -66,7 +66,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'maldives',
     packageId: 'pkg-01',
     imageSubject: 'Maldives overwater lagoon bungalow with direct turquoise ocean access',
-    tag: '4 Nights / 5 Days • From USD 1,850',
+    tag: '4 Nights / 5 Days • From ₹1,55,400',
     ctaText: 'View Maldives Haven',
     ctaLink: '/packages?destination=Maldives'
   },
@@ -79,7 +79,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'thailand',
     packageId: 'pkg-14',
     imageSubject: 'Phuket longtail boat floating on emerald green water beside limestone karst cliffs',
-    tag: '5 Nights / 6 Days • From INR 42,500',
+    tag: '5 Nights / 6 Days • From ₹42,500',
     ctaText: 'Discover Thailand Escapes',
     ctaLink: '/packages?destination=Thailand'
   },
@@ -92,7 +92,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'jordan',
     packageId: 'pkg-25',
     imageSubject: 'Petra Al-Khazneh Treasury carved into pink rose sandstone canyon through the Siq in Jordan',
-    tag: '5 Nights / 6 Days • Twin Sharing • USD 1,380',
+    tag: '5 Nights / 6 Days • Twin Sharing • From ₹1,15,900',
     ctaText: 'Explore Jordan Circuit',
     ctaLink: '/packages?destination=Jordan'
   },
@@ -105,7 +105,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'sri-lanka',
     packageId: 'pkg-03',
     imageSubject: 'Sri Lanka misty green rolling tea hills and colonial mountain train',
-    tag: '6 Nights / 7 Days • From INR 68,500',
+    tag: '6 Nights / 7 Days • From ₹68,500',
     ctaText: 'View Sri Lanka Odyssey',
     ctaLink: '/packages?destination=Sri+Lanka'
   },
@@ -118,7 +118,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'dubai',
     packageId: 'pkg-19',
     imageSubject: 'Burj Khalifa soaring above shimmering Dubai skyline and dancing fountain lake',
-    tag: '4 Nights / 5 Days • From INR 64,900',
+    tag: '4 Nights / 5 Days • From ₹64,900',
     ctaText: 'Discover Dubai Luxury',
     ctaLink: '/packages?destination=Dubai'
   },
@@ -131,7 +131,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'vietnam',
     packageId: 'pkg-17',
     imageSubject: 'Traditional wooden cruise junk sailing between dramatic misty karst pillars in Ha Long Bay Vietnam',
-    tag: '6 Nights / 7 Days • From USD 1,240',
+    tag: '6 Nights / 7 Days • From ₹1,04,200',
     ctaText: 'View Vietnam Heritage',
     ctaLink: '/packages?destination=Vietnam'
   },
@@ -144,7 +144,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'mauritius',
     packageId: 'pkg-05',
     imageSubject: 'Mauritius Le Morne Brabant mountain and turquoise ocean lagoon',
-    tag: '6 Nights / 7 Days • From EUR 1,220',
+    tag: '6 Nights / 7 Days • From ₹1,11,000',
     ctaText: 'View Mauritius Packages',
     ctaLink: '/packages?destination=Mauritius'
   },
@@ -157,7 +157,7 @@ export const HERO_SLIDES: SliderSlide[] = [
     destinationSlug: 'azerbaijan',
     packageId: 'pkg-31',
     imageSubject: 'Baku modern illuminated Flame Towers and Caspian seaside boulevard',
-    tag: '4 Nights / 5 Days • From USD 590',
+    tag: '4 Nights / 5 Days • From ₹49,500',
     ctaText: 'View Baku Itinerary',
     ctaLink: '/packages?destination=Azerbaijan'
   }

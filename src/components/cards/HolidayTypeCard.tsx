@@ -1,19 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, Play, Clock } from 'lucide-react';
 import { HolidayType } from '../../types';
 import { ImagePlaceholder } from '../common/ImagePlaceholder';
 import { HOLIDAY_TYPE_STOCK_IMAGES } from '../../data/stockImages';
+import { DESTINATION_VIDEOS, DestinationVideo } from '../../data/destinationVideos';
 
 interface HolidayTypeCardProps {
   holidayType: HolidayType;
   className?: string;
+  onWatchVideo?: (video: DestinationVideo) => void;
 }
 
-export const HolidayTypeCard: React.FC<HolidayTypeCardProps> = ({ holidayType, className = '' }) => {
+export const HolidayTypeCard: React.FC<HolidayTypeCardProps> = ({ holidayType, className = '', onWatchVideo }) => {
+  // Find matching destination video for this holiday type
+  const matchingVideo = DESTINATION_VIDEOS.find((v) => v.holidayTypeId === holidayType.id) || DESTINATION_VIDEOS[0];
+
   return (
-    <article className={`flex flex-col rounded-lg bg-white border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden group hover:-translate-y-1 ${className}`}>
-      {/* Visual Placeholder */}
+    <article className={`flex flex-col rounded-xl bg-white border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-1 ${className}`}>
+      {/* Visual Placeholder with 1-Min Video Play Button */}
       <div className="relative">
         <ImagePlaceholder
           src={HOLIDAY_TYPE_STOCK_IMAGES[holidayType.id]}
@@ -24,10 +29,23 @@ export const HolidayTypeCard: React.FC<HolidayTypeCardProps> = ({ holidayType, c
         />
 
         <div className="absolute top-3 left-3 z-20">
-          <span className="px-2.5 py-1 rounded bg-[#010048]/95 text-[#f3e098] text-[10px] font-bold uppercase tracking-wider border border-[#c59b27]/40 shadow-md backdrop-blur-xs">
+          <span className="px-2.5 py-1 rounded-full bg-[#010048]/95 text-[#f3e098] text-[10px] font-bold uppercase tracking-wider border border-[#c59b27]/40 shadow-md backdrop-blur-xs">
             {holidayType.badge}
           </span>
         </div>
+
+        {/* 1-Min Video Quick Play Button Overlay */}
+        {onWatchVideo && (
+          <button
+            type="button"
+            onClick={() => onWatchVideo(matchingVideo)}
+            className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#010048]/90 hover:bg-[#c9182b] text-white text-[11px] font-black uppercase tracking-wider shadow-lg border border-[#c59b27]/40 transition-all hover:scale-105 cursor-pointer backdrop-blur-xs"
+            title={`Watch 1-minute video tour for ${matchingVideo.destination}`}
+          >
+            <Play className="w-3.5 h-3.5 fill-white" />
+            <span>1-Min Video</span>
+          </button>
+        )}
       </div>
 
       {/* Content */}

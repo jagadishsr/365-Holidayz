@@ -18,16 +18,16 @@ export const Footer: React.FC = () => {
               <div className="relative w-14 h-14 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
                 <img
                   src={CLIENT_ASSETS.logo}
-                  alt="365Holidayz Premium Tours & Travels"
+                  alt="365Holidayz Premium Tours and Travel"
                   className="w-full h-full object-contain filter drop-shadow-md rounded-full"
                 />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-black tracking-tight text-white">
-                  365<span className="text-[#f3e098]">Holidayz</span>
+                  365Holidayz
                 </span>
-                <span className="text-[10px] uppercase tracking-widest text-[#f3e098]/80 font-bold">
-                  PREMIUM TOURS & TRAVELS
+                <span className="text-[10px] uppercase tracking-widest text-[#f3e098] font-bold">
+                  PREMIUM TOURS AND TRAVEL
                 </span>
               </div>
             </Link>
@@ -67,7 +67,7 @@ export const Footer: React.FC = () => {
                     className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 hover:text-emerald-300"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
-                    <span>Join Official WhatsApp Community →</span>
+                    <span>Chat on WhatsApp (+91 89399 58899) →</span>
                   </a>
                 </div>
               </div>

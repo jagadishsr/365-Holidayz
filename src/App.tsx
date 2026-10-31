@@ -66,7 +66,7 @@ export default function App() {
             <Route path="/" element={<HomePage onOpenEnquiry={handleOpenEnquiry} />} />
             <Route path="/destinations" element={<DestinationsPage />} />
             <Route path="/destinations/:slug" element={<DestinationDetailPage />} />
-            <Route path="/holiday-types" element={<HolidayTypesPage />} />
+            <Route path="/holiday-types" element={<HolidayTypesPage onOpenEnquiry={handleOpenEnquiry} />} />
             <Route path="/holiday-types/:slug" element={<HolidayTypeDetailPage />} />
             <Route path="/packages" element={<PackagesPage />} />
             <Route path="/packages/:id" element={<PackageDetailPage />} />

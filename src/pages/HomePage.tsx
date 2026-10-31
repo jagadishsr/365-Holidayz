@@ -1,32 +1,84 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Compass, Heart, Shield, Users, Sparkles, Clock, Calendar, Phone, MessageCircle, Star, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Compass, Heart, Shield, Users, Sparkles, Clock, Calendar, Phone, MessageCircle, Star, CheckCircle2, Search, Play } from 'lucide-react';
 import { HeroSlider } from '../components/home/HeroSlider';
 import { ALL_PACKAGES } from '../data/packages';
 import { ALL_DESTINATIONS } from '../data/destinations';
 import { ALL_HOLIDAY_TYPES } from '../data/holidayTypes';
 import { CLIENT_ASSETS } from '../data/stockImages';
+import { DESTINATION_VIDEOS, DestinationVideo } from '../data/destinationVideos';
 import { PackageCard } from '../components/cards/PackageCard';
 import { DestinationCard } from '../components/cards/DestinationCard';
 import { HolidayTypeCard } from '../components/cards/HolidayTypeCard';
 import { CTASection } from '../components/common/CTASection';
+import { VideoModal } from '../components/common/VideoModal';
 
 interface HomePageProps {
   onOpenEnquiry?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
+  const [activeVideo, setActiveVideo] = useState<DestinationVideo | null>(null);
+  const [searchInput, setSearchInput] = useState('');
   const featuredPackages = ALL_PACKAGES.filter((p) => p.isFeatured).slice(0, 6);
   const featuredDestinations = ALL_DESTINATIONS.filter((d) => d.isFeatured);
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onOpenEnquiry) onOpenEnquiry();
+  };
+
   return (
-    <div className="space-y-20 pb-16">
+    <div className="space-y-16 pb-16">
       {/* 1. Full-Screen Hero Slider with Curated Stock Photography */}
       <HeroSlider onOpenEnquiry={onOpenEnquiry} />
 
-      {/* Special Festive / Client Departures Banner inspired by Diwali Poster */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-30">
-        <div className="bg-gradient-to-r from-[#010048] via-[#080562] to-[#010048] rounded-2xl p-6 sm:p-8 border-2 border-[#c59b27]/40 shadow-2xl text-white">
+      {/* 2. Customer Search Bar -> Pops up Enquiry Form on Click or Enter */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 -mt-8 sm:-mt-10">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-[#c59b27]/40">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="w-11 h-11 rounded-xl bg-[#010048] text-[#f3e098] flex items-center justify-center shrink-0 shadow-md">
+                <Search className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#c59b27] block">
+                  Find Your Dream Holiday
+                </span>
+                <span className="text-sm font-black text-[#010048]">
+                  Search International Destinations & Packages
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 w-full md:w-auto flex-1 max-w-xl">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onClick={() => onOpenEnquiry && onOpenEnquiry()}
+                  placeholder="Where do you want to travel? (e.g. Maldives, Bali, Türkiye...)"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#c59b27] bg-slate-50/70 cursor-pointer"
+                />
+              </div>
+
+              <button
+                type="submit"
+                onClick={() => onOpenEnquiry && onOpenEnquiry()}
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer shrink-0"
+              >
+                Search & Enquire
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {/* 3. Special Festive / Client Departures Showcase */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+        <div className="bg-gradient-to-r from-[#010048] via-[#080562] to-[#010048] rounded-2xl p-6 sm:p-8 border-2 border-[#c59b27]/40 shadow-xl text-white">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="space-y-2 text-center lg:text-left">
               <div className="flex items-center justify-center lg:justify-start gap-2">
@@ -40,7 +92,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
               <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 Best All-Inclusive International Packages
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
                 Return Flights • Visa Facilitation • Indian Meals • Handpicked Stays • Sightseeing with Local Transport • Hindi Speaking Tour Guides
               </p>
             </div>
@@ -51,9 +103,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition-all"
+                title="Direct WhatsApp chat with 365Holidayz (+91 89399 58899)"
               >
                 <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp Group</span>
+                <span>Chat on WhatsApp</span>
               </a>
 
               <a
@@ -68,7 +121,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
         </div>
       </section>
 
-      {/* 2. Client Poster Specials Showcase (Philippines, Türkiye & Georgia, Singapore & Malaysia) */}
+      {/* 4. Client Poster Specials Showcase (Philippines, Türkiye & Georgia, Singapore & Malaysia) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
           <div className="space-y-2 max-w-2xl">
@@ -80,7 +133,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
               Spotlight Client Departures & Offers
             </h2>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              Curated directly from our latest official marketing editions: Philippines island retreats, Diwali departures for Türkiye & Georgia, and Singapore-Malaysia twin city specials.
+              Curated directly from our latest official marketing editions with all prices displayed in INR (₹): Philippines island retreats, Diwali departures for Türkiye & Georgia, and Singapore-Malaysia twin city specials.
             </p>
           </div>
 
@@ -103,8 +156,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
                 alt="Philippines 6N/7D Tropical Vibes Bigger Dreams Poster"
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-3 left-3 bg-[#010048]/90 border border-[#c59b27]/50 text-[#f3e098] px-2.5 py-1 rounded text-xs font-black uppercase">
-                USD 715 PP • 6N / 7D
+              <div className="absolute top-3 left-3 bg-[#010048]/90 border border-[#c59b27]/50 text-[#f3e098] px-2.5 py-1 rounded text-xs font-black uppercase shadow-md">
+                ₹59,999 PP • 6N / 7D
               </div>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
@@ -121,12 +174,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
               </div>
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700">For 6 Pax • Double Sharing</span>
-                <Link
-                  to="/plan-your-trip?destination=Philippines"
-                  className="px-3.5 py-1.5 rounded bg-[#010048] hover:bg-[#080562] text-[#f3e098] text-xs font-bold uppercase tracking-wide transition-colors"
+                <button
+                  type="button"
+                  onClick={onOpenEnquiry}
+                  className="px-3.5 py-1.5 rounded bg-[#010048] hover:bg-[#080562] text-[#f3e098] text-xs font-bold uppercase tracking-wide transition-colors cursor-pointer"
                 >
                   Enquire Now
-                </Link>
+                </button>
               </div>
             </div>
           </div>
@@ -176,7 +230,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute top-3 left-3 bg-[#c59b27] text-[#010048] px-2.5 py-1 rounded text-xs font-black uppercase shadow-md">
-                USD 375/- PP • 5 Days
+                ₹31,500/- PP • 5 Days
               </div>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
@@ -232,10 +286,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {ALL_HOLIDAY_TYPES.slice(0, 3).map((ht) => (
-            <HolidayTypeCard key={ht.id} holidayType={ht} />
+            <HolidayTypeCard
+              key={ht.id}
+              holidayType={ht}
+              onWatchVideo={(vid) => setActiveVideo(vid)}
+            />
           ))}
           {ALL_HOLIDAY_TYPES.slice(3, 5).map((ht) => (
-            <HolidayTypeCard key={ht.id} holidayType={ht} className="md:col-span-1 lg:col-span-1.5" />
+            <HolidayTypeCard
+              key={ht.id}
+              holidayType={ht}
+              className="md:col-span-1 lg:col-span-1.5"
+              onWatchVideo={(vid) => setActiveVideo(vid)}
+            />
           ))}
         </div>
       </section>
@@ -401,6 +464,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
 
       {/* 8. Plan My Trip CTA Band */}
       <CTASection onOpenEnquiry={onOpenEnquiry} />
+
+      {/* Video Preview Modal */}
+      {activeVideo && (
+        <VideoModal
+          video={activeVideo}
+          onClose={() => setActiveVideo(null)}
+          onOpenEnquiry={onOpenEnquiry}
+        />
+      )}
     </div>
   );
 };

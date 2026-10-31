@@ -190,23 +190,10 @@ export const PackageFilters: React.FC<PackageFiltersProps> = ({
             <span>Urgent Booking (Ends 31 Oct 2026)</span>
           </label>
 
-          {/* Currency Filter */}
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-md border border-slate-200">
-            <span className="text-[10px] text-slate-500 font-bold px-1.5">Currency:</span>
-            {['', 'INR', 'USD', 'EUR', 'SGD'].map((curr) => (
-              <button
-                key={curr}
-                type="button"
-                onClick={() => onChange({ ...filters, currency: curr })}
-                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                  filters.currency === curr
-                    ? 'bg-[#010048] text-[#f3e098] shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {curr || 'All'}
-              </button>
-            ))}
+          {/* Pricing Currency Status: All in INR */}
+          <div className="flex items-center gap-1.5 bg-[#010048]/5 px-3 py-1.5 rounded-full border border-[#c59b27]/30 text-xs text-[#010048] font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Prices in INR (₹)</span>
           </div>
         </div>
 

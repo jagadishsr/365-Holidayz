@@ -120,44 +120,125 @@ export const TravelGuidePage: React.FC = () => {
 
         {/* Tab 2: Travel Tips */}
         {activeTab === 'tips' && (
-          <div className="space-y-8 animate-in fade-in max-w-4xl">
+          <div className="space-y-8 animate-in fade-in max-w-5xl">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-[#010048]">Expert Travel Tips & Planning Etiquette</h2>
-              <p className="text-sm text-slate-600">
-                Insights earned over three decades of moving travellers smoothly across international borders.
+              <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27] block">
+                30+ Years of Ground Wisdom
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#010048]">
+                Essential Travel Tips & On-Ground Etiquette
+              </h2>
+              <p className="text-sm text-slate-600 max-w-3xl leading-relaxed">
+                Practical insights earned over three decades of moving travellers smoothly across international borders — curated to ensure your holiday is serene, seamless, and completely stress-free.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-9 h-9 rounded bg-[#c8a97e]/15 text-[#c8a97e] flex items-center justify-center font-bold">1</div>
-                <h3 className="text-base font-bold text-[#010048]">The "Slow First Morning" Principle</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Never pack back-to-back excursions on Day 1. After long-haul flights or evening arrivals, we always curate an unhurried morning with breakfast by the water to let your body acclimate naturally.
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Tip 1 */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                    01
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                    Arrival Rhythm
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white leading-snug">
+                  The "Slow First Morning" Principle
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                  Never pack back-to-back excursions on Day 1. After international flights or late evening arrivals, we always curate an unhurried morning with breakfast by the pool or lagoon to let your body acclimate naturally before exploring.
                 </p>
               </div>
 
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-9 h-9 rounded bg-[#c8a97e]/15 text-[#c8a97e] flex items-center justify-center font-bold">2</div>
-                <h3 className="text-base font-bold text-[#010048]">Private Chauffeur Seamlessness</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Navigating unfamiliar roads in Sri Lanka, Bali, or Jordan can induce fatigue. Having a verified private driver allows you to gaze out at tea trails or desert peaks without navigation stress.
+              {/* Tip 2 */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                    02
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                    Logistics & Ease
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white leading-snug">
+                  Private Chauffeur Seamlessness
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                  Navigating unfamiliar mountain curves in Sri Lanka, Bali, or Jordan can cause fatigue. Having a verified private driver allows you to gaze out at tea trails or desert peaks without navigation stress or parking hassles.
                 </p>
               </div>
 
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-9 h-9 rounded bg-[#c8a97e]/15 text-[#c8a97e] flex items-center justify-center font-bold">3</div>
-                <h3 className="text-base font-bold text-[#010048]">Cultural Reverence & Dress Codes</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  From the marble halls of Muscat’s Grand Mosque to Bali’s sacred sea temples, modest attire (covering shoulders and knees) is essential and respectful. Keep a lightweight cotton pashmina accessible.
+              {/* Tip 3 */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                    03
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                    Cultural Respect
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white leading-snug">
+                  Cultural Reverence & Dress Codes
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                  From the marble courtyards of Muscat’s Grand Mosque to Bali’s sacred sea temples, modest attire (covering shoulders and knees) is essential and appreciated. Keep a lightweight cotton pashmina easily accessible in your day pack.
                 </p>
               </div>
 
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <div className="w-9 h-9 rounded bg-[#c8a97e]/15 text-[#c8a97e] flex items-center justify-center font-bold">4</div>
-                <h3 className="text-base font-bold text-[#010048]">Preserving Room Contingency</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              {/* Tip 4 */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                    04
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                    Smart Stays
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white leading-snug">
+                  Preserving Room Contingency & Split Stays
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
                   When booking split stays (such as 2N jungle + 3N beach in Bali or 3N Istanbul + 3N Cappadocia), coordinate transfers around standard hotel check-out (11 AM) and check-in (3 PM) with scenic lunch stops along the way.
+                </p>
+              </div>
+
+              {/* Tip 5 */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                    05
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                    Dining Comfort
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white leading-snug">
+                  Indian Meals & Dietary Preferences
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                  Travelling abroad doesn't mean compromising on food. In all our international circuits (Türkiye, Georgia, Far East, Dubai), we pre-arrange authentic Indian meals, vegetarian cuisine, and Jain options with verified partner restaurants.
+                </p>
+              </div>
+
+              {/* Tip 6 */}
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                    06
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                    Connectivity & Forex
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white leading-snug">
+                  Forex Card & Dual SIM Security
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                  Always carry a pre-loaded multi-currency Forex card along with a small amount of local currency cash for market bazaars and tipping. Install an international eSIM before departure for seamless WhatsApp connectivity.
                 </p>
               </div>
             </div>
