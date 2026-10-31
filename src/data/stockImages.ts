@@ -3,12 +3,48 @@
  * Includes direct integration with the uploaded transparent PNG client logo and promotional posters.
  */
 
+// Dynamically imported assets for Vite bundling & relative subdirectory resolution
+import clientLogoImg from '../assets/aistudio/365-Logo-circle.png';
+import posterPhilippinesImg from '../assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.04_4bf6a70f.jpeg';
+import posterTurkiyeGeorgiaImg from '../assets/aistudio/WhatsApp_Image_2026-09-22_at_16.38.41_e96733ea.jpeg';
+import posterSingaporeMalaysiaImg from '../assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.03_99832391.jpeg';
+
+/**
+ * Resolves static asset paths safely whether hosted at root domain or any subdirectory (e.g. /365/).
+ * Guarantees that even on deep client-side routes, assets resolve without broken links.
+ */
+export function resolveAssetUrl(path: string): string {
+  if (!path) return '';
+  if (/^(?:https?:|\/\/|data:|blob:)/i.test(path)) {
+    return path;
+  }
+  const clean = path.replace(/^(\.\/|\/)+/, '');
+
+  if (typeof window !== 'undefined') {
+    const knownRoutes = ['destinations', 'holiday-types', 'packages', 'travel-guide', 'about', 'plan-your-trip'];
+    const segments = window.location.pathname.split('/').filter(Boolean);
+    if (segments.length > 0 && !knownRoutes.includes(segments[0])) {
+      return `/${segments[0]}/${clean}`;
+    }
+  }
+
+  return `./${clean}`;
+}
+
 export const CLIENT_ASSETS = {
   // Transparent PNG Logo provided by the client with circle masked and outer white removed
-  logo: '/assets/aistudio/365-Logo-circle.png',
-  posterPhilippines: '/assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.04_4bf6a70f.jpeg',
-  posterTurkiyeGeorgia: '/assets/aistudio/WhatsApp_Image_2026-09-22_at_16.38.41_e96733ea.jpeg',
-  posterSingaporeMalaysia: '/assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.03_99832391.jpeg',
+  // Uses dynamic import and relative ./ path for zero-breakage hosting in /365/ or subdirectories
+  logo: clientLogoImg || './assets/aistudio/365-Logo-circle.png',
+  posterPhilippines: posterPhilippinesImg || './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.04_4bf6a70f.jpeg',
+  posterTurkiyeGeorgia: posterTurkiyeGeorgiaImg || './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.38.41_e96733ea.jpeg',
+  posterSingaporeMalaysia: posterSingaporeMalaysiaImg || './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.03_99832391.jpeg',
+  // Explicit relative paths with ./ for static setups
+  relativePaths: {
+    logo: './assets/aistudio/365-Logo-circle.png',
+    posterPhilippines: './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.04_4bf6a70f.jpeg',
+    posterTurkiyeGeorgia: './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.38.41_e96733ea.jpeg',
+    posterSingaporeMalaysia: './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.03_99832391.jpeg',
+  },
   verifiedContacts: {
     phone1: '+91 89399 58899',
     phone2: '+91 94441 79215',

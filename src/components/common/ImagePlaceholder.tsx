@@ -160,7 +160,7 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
   const handleCopyPath = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    const path = localPathSuggestion || `/assets/images/${subject.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
+    const path = localPathSuggestion || `./assets/images/${subject.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
     navigator.clipboard.writeText(path);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

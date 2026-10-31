@@ -31,6 +31,17 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+// Dynamically detect subdirectory basename (e.g. /365/) for hosting under arbitrary subfolders
+const getSubdirectoryBasename = (): string | undefined => {
+  if (typeof window === 'undefined') return undefined;
+  const knownRoutes = ['destinations', 'holiday-types', 'packages', 'travel-guide', 'about', 'plan-your-trip'];
+  const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
+  if (firstSegment && !knownRoutes.includes(firstSegment)) {
+    return `/${firstSegment}`;
+  }
+  return undefined;
+};
+
 export default function App() {
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
 
@@ -43,7 +54,7 @@ export default function App() {
   };
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={getSubdirectoryBasename()}>
       <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-[#fbfbf9] text-[#010048] font-sans antialiased selection:bg-[#010048] selection:text-[#f3e098]">
         {/* Approved Navigation Header */}
