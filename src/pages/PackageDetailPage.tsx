@@ -58,7 +58,7 @@ export const PackageDetailPage: React.FC = () => {
   return (
     <div className="pt-20 space-y-12 pb-16">
       {/* 1. Header Banner & Identity */}
-      <div className="bg-[#010048] text-white pt-8 pb-12 border-b border-[#c59b27]/30">
+      <div className="bg-gradient-to-r from-[#eff6ff] via-[#f0fdf4] to-[#f8fafc] text-slate-900 pt-8 pb-12 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <Breadcrumbs
             items={[
@@ -66,48 +66,48 @@ export const PackageDetailPage: React.FC = () => {
               { label: pkg.destination, href: `/packages?destination=${encodeURIComponent(pkg.destination)}` },
               { label: pkg.title }
             ]}
-            className="text-slate-400"
+            className="text-slate-500"
           />
 
           <div className="space-y-4 max-w-4xl">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-[#c8a97e]/25 text-[#e2d4c0] text-xs font-bold uppercase tracking-wider border border-[#c8a97e]/40">
+              <span className="px-3 py-1 rounded-full bg-[#fef3c7] text-amber-900 text-xs font-black uppercase tracking-wider border border-amber-300 shadow-xs">
                 {pkg.region}
               </span>
-              <span className="px-3 py-1 rounded-full bg-white/10 text-slate-200 text-xs font-medium border border-white/10">
+              <span className="px-3 py-1 rounded-full bg-white text-slate-700 text-xs font-bold border border-slate-200 shadow-xs">
                 {pkg.holidayType}
               </span>
               {pkg.isUrgentValidity && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded bg-amber-600 text-white text-xs font-bold shadow-xs">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-600 text-white text-xs font-black shadow-xs">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <span>Urgent: Validity Ends 31 Oct 2026</span>
                 </span>
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               {pkg.title}
             </h1>
 
             {/* Quick stats strip */}
-            <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-xs sm:text-sm text-slate-300 font-medium pt-2">
+            <div className="flex items-center gap-4 sm:gap-6 flex-wrap text-xs sm:text-sm text-slate-600 font-semibold pt-2">
               <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-[#c8a97e]" />
-                <span>{pkg.destination}</span>
+                <MapPin className="w-4 h-4 text-[#ff5a36]" />
+                <span className="text-slate-900">{pkg.destination}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-[#c8a97e]" />
-                <span>{pkg.duration}</span>
+                <Clock className="w-4 h-4 text-[#ff5a36]" />
+                <span className="text-slate-900">{pkg.duration}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-[#c8a97e]" />
-                <span className={pkg.minPax >= 4 ? 'font-bold text-amber-300' : ''}>
+                <Users className="w-4 h-4 text-[#ff5a36]" />
+                <span className={pkg.minPax >= 4 ? 'font-black text-amber-700' : 'text-slate-900'}>
                   {pkg.persons} ({pkg.roomBasis})
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-[#c8a97e]" />
-                <span>{pkg.stayPeriod}</span>
+                <Calendar className="w-4 h-4 text-[#ff5a36]" />
+                <span className="text-slate-900">{pkg.stayPeriod}</span>
               </div>
             </div>
           </div>
@@ -325,9 +325,9 @@ export const PackageDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowEnquiryDrawer(!showEnquiryDrawer)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04825] text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-500/20 transition-all cursor-pointer"
                 >
-                  <Calendar className="w-4 h-4 text-[#010048]" />
+                  <Calendar className="w-4 h-4 text-white" />
                   <span>Enquire / Customise Itinerary</span>
                 </button>
 
@@ -335,14 +335,14 @@ export const PackageDetailPage: React.FC = () => {
                   href={CLIENT_ASSETS.verifiedContacts.whatsappCommunity}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-700 font-bold text-xs border border-emerald-500/40 transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-xs shadow-md transition-colors"
                 >
                   <span>Chat on WhatsApp Group</span>
                 </a>
 
                 <a
                   href="tel:+918939958899"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-[#010048] hover:bg-[#080562] text-white font-bold text-xs transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors"
                 >
                   <span>Call India Desk: +91-8939958899</span>
                 </a>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Pause, Play, Sparkles, ArrowRight, Calendar, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play, Sparkles, ArrowRight, Calendar, MapPin, Tag } from 'lucide-react';
 import { HERO_SLIDES } from '../../data/sliderSlides';
 import { HERO_SLIDER_STOCK_IMAGES, DESTINATION_STOCK_IMAGES } from '../../data/stockImages';
 
@@ -96,7 +96,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
 
   return (
     <div
-      className="relative w-full h-[85vh] min-h-[640px] max-h-[940px] overflow-hidden bg-[#010048] text-white select-none"
+      className="relative w-full h-[80vh] min-h-[580px] max-h-[820px] overflow-hidden bg-slate-900 text-white select-none"
       onMouseEnter={() => setIsPausedHover(true)}
       onMouseLeave={() => setIsPausedHover(false)}
       onFocus={() => setIsPausedHover(true)}
@@ -106,7 +106,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
       role="region"
       aria-label="Featured Destinations Hero Slider"
     >
-      {/* Slide Images Background Layer - Bright & Clear */}
+      {/* Slide Images Background Layer - Bright, Vivid & Clear */}
       {HERO_SLIDES.map((slide, index) => {
         const isCurrent = index === currentSlide;
         const imageUrl = getSlideImageUrl(slide);
@@ -119,13 +119,11 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
             }`}
             aria-hidden={!isCurrent}
           >
-            {/* Vivid Background Photo with zero heavy dark masking */}
             <img
               src={imageUrl}
               alt={slide.title}
               onLoad={() => setLoadedImages((prev) => ({ ...prev, [slide.id]: true }))}
               onError={(e) => {
-                // Guaranteed fallback to high-uptime landscape
                 (e.target as HTMLImageElement).src =
                   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=85';
               }}
@@ -133,66 +131,65 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
               loading={index === 0 ? 'eager' : 'lazy'}
             />
 
-            {/* LIGHT & SUBTLE GRADIENTS:
-                Significantly reduced opacity as requested so destination pictures remain clear, bright and vibrant */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#010048]/50 via-[#010048]/20 to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#010048]/50 via-transparent to-[#010048]/20 z-10 pointer-events-none" />
+            {/* Light, clean gradient overlay for crisp text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/30 to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/20 z-10 pointer-events-none" />
           </div>
         );
       })}
 
-      {/* Slide Content Layer - Open and visible directly over main pictures without any blocking blue box */}
-      <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center pb-20 sm:pb-24">
+      {/* Slide Content Layer - Bold, Bright, Simple (GT Holidays Style) */}
+      <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center pb-24 sm:pb-28">
         <div className="max-w-3xl space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {/* Eyebrow & Tag */}
+          {/* Eyebrow & Tag in Soft Pastel Badges */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="px-3 py-1 rounded-full bg-[#010048]/80 border border-[#c59b27]/70 text-xs font-bold text-[#f3e098] uppercase tracking-wider flex items-center gap-1.5 shadow-md backdrop-blur-xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#f3e098]" />
+            <span className="px-3.5 py-1 rounded-full bg-[#fefce8] text-[#854d0e] border border-yellow-200 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+              <Sparkles className="w-3.5 h-3.5 text-yellow-600" />
               <span>{activeSlide.eyebrow}</span>
             </span>
 
-            <span className="text-xs text-white font-bold px-3 py-1 rounded bg-[#c9182b] border border-red-400/40 shadow-md">
+            <span className="text-xs font-black text-rose-900 px-3.5 py-1 rounded-full bg-[#fff1f2] border border-rose-200 shadow-md">
               {activeSlide.tag}
             </span>
           </div>
 
           {/* Large Bold Sans-Serif Title with strong text shadow */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)]">
             {activeSlide.title}
           </h1>
 
           {/* Concise Factual Text with strong shadow */}
-          <p className="text-sm sm:text-base md:text-lg text-white font-medium max-w-2xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+          <p className="text-sm sm:text-base md:text-lg text-white font-medium max-w-2xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
             {activeSlide.summary}
           </p>
 
-          {/* Action CTAs */}
+          {/* Action CTAs (Simple & Bold) */}
           <div className="pt-3 flex items-center gap-3.5 flex-wrap">
             {onOpenEnquiry ? (
               <button
                 type="button"
                 onClick={onOpenEnquiry}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-sm tracking-wide shadow-2xl transition-all hover:-translate-y-0.5 cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-sm uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer"
               >
-                <Calendar className="w-4 h-4 text-[#010048]" />
+                <Calendar className="w-4 h-4 text-white" />
                 <span>Plan Your Trip</span>
               </button>
             ) : (
               <Link
-                to={`/plan-your-trip?destination=${encodeURIComponent(activeSlide.destination)}`}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-sm tracking-wide shadow-2xl transition-all hover:-translate-y-0.5"
+                to={`/contact?destination=${encodeURIComponent(activeSlide.destination)}`}
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-sm uppercase tracking-wider shadow-xl transition-all hover:scale-105"
               >
-                <Calendar className="w-4 h-4 text-[#010048]" />
+                <Calendar className="w-4 h-4 text-white" />
                 <span>Plan Your Trip</span>
               </Link>
             )}
 
             <Link
               to={activeSlide.ctaLink}
-              className="inline-flex items-center gap-2 px-5 py-3.5 rounded-lg bg-[#010048]/85 hover:bg-[#080562] text-white font-bold text-sm border border-[#c59b27]/60 shadow-xl backdrop-blur-xs transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-extrabold text-sm border border-slate-200 shadow-xl transition-all hover:scale-105"
             >
               <span>{activeSlide.ctaText}</span>
-              <ArrowRight className="w-4 h-4 text-[#f3e098]" />
+              <ArrowRight className="w-4 h-4 text-[#ff5a36]" />
             </Link>
           </div>
         </div>
@@ -200,7 +197,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
 
       {/* Location Navigation Strip & Slider Controls */}
       <div className="absolute bottom-5 left-0 right-0 z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-        {/* All Slider Locations Quick-Picker Bar */}
+        {/* All Slider Locations Quick-Picker Bar in Pastel Pills */}
         <div
           ref={pillsContainerRef}
           className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth"
@@ -215,14 +212,14 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
                 type="button"
                 data-slide-index={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   isSelected
-                    ? 'bg-[#c59b27] text-[#010048] shadow-lg scale-105 ring-2 ring-[#f3e098]'
-                    : 'bg-[#000032]/85 hover:bg-[#080562] text-white/95 border border-white/20 backdrop-blur-md'
+                    ? 'bg-[#ff5a36] text-white shadow-lg scale-105 ring-2 ring-white'
+                    : 'bg-white/90 hover:bg-white text-slate-800 border border-slate-200 shadow-sm'
                 }`}
                 title={`View ${slide.destination}`}
               >
-                <MapPin className={`w-3 h-3 ${isSelected ? 'text-[#010048]' : 'text-[#f3e098]'}`} />
+                <MapPin className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-[#ff5a36]'}`} />
                 <span>{slide.destination}</span>
               </button>
             );
@@ -232,7 +229,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
         {/* Counter, Dots & Navigation Arrows */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-[#f3e098] bg-[#000032]/90 px-2.5 py-1 rounded-md border border-[#c59b27]/30 backdrop-blur-xs">
+            <span className="font-mono text-xs font-bold text-slate-800 bg-white/90 px-3 py-1 rounded-full border border-slate-200 shadow-sm">
               {String(currentSlide + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
             </span>
 
@@ -244,7 +241,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
                   type="button"
                   onClick={() => setCurrentSlide(i)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === currentSlide ? 'w-6 bg-[#c59b27]' : 'w-2 bg-white/40 hover:bg-white/70'
+                    i === currentSlide ? 'w-6 bg-[#ff5a36]' : 'w-2 bg-white/50 hover:bg-white'
                   }`}
                   aria-label={`Go to slide ${i + 1}`}
                 />
@@ -255,7 +252,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
             <button
               type="button"
               onClick={() => setIsPlaying(!isPlaying)}
-              className="p-1.5 rounded bg-[#000032]/80 text-slate-200 hover:text-white border border-[#c59b27]/30 transition-colors cursor-pointer"
+              className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:text-slate-950 border border-slate-200 transition-colors cursor-pointer shadow-sm"
               title={isPlaying ? 'Pause autoplay' : 'Resume autoplay'}
               aria-label={isPlaying ? 'Pause autoplay' : 'Resume autoplay'}
             >
@@ -268,7 +265,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
             <button
               type="button"
               onClick={prevSlide}
-              className="p-2.5 sm:p-3 rounded-full bg-[#000032]/85 hover:bg-[#080562] text-white border border-[#c59b27]/40 backdrop-blur-md transition-all hover:scale-105 cursor-pointer shadow-lg"
+              className="p-2.5 sm:p-3 rounded-full bg-white/95 hover:bg-white text-slate-900 border border-slate-200 transition-all hover:scale-105 cursor-pointer shadow-lg"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -276,7 +273,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
             <button
               type="button"
               onClick={nextSlide}
-              className="p-2.5 sm:p-3 rounded-full bg-[#000032]/85 hover:bg-[#080562] text-white border border-[#c59b27]/40 backdrop-blur-md transition-all hover:scale-105 cursor-pointer shadow-lg"
+              className="p-2.5 sm:p-3 rounded-full bg-white/95 hover:bg-white text-slate-900 border border-slate-200 transition-all hover:scale-105 cursor-pointer shadow-lg"
               aria-label="Next slide"
             >
               <ChevronRight className="w-5 h-5" />

@@ -124,10 +124,10 @@ export const HolidayTypeDetailPage: React.FC = () => {
 
             <div className="pt-2">
               <Link
-                to={`/plan-your-trip?holidayType=${encodeURIComponent(holidayType.title)}`}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-[#c8a97e] hover:bg-[#d8b98e] text-[#010048] font-bold text-xs uppercase tracking-wider shadow-sm transition-all"
+                to={`/contact?holidayType=${encodeURIComponent(holidayType.title)}`}
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04825] text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-500/20 transition-all"
               >
-                <Calendar className="w-4 h-4 text-[#010048]" />
+                <Calendar className="w-4 h-4 text-white" />
                 <span>Enquire For {holidayType.title}</span>
               </Link>
             </div>

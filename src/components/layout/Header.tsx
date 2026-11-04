@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calendar, MessageCircle, Phone, Mail, Sparkles, Users, Search } from 'lucide-react';
+import { Menu, X, Calendar, MessageCircle, Phone, Mail, Search, Sparkles } from 'lucide-react';
 import { CLIENT_ASSETS } from '../../data/stockImages';
 
 interface HeaderProps {
@@ -12,15 +12,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  const isHome = location.pathname === '/';
-
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -38,51 +32,58 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
     { label: 'Holiday Types', href: '/holiday-types' },
     { label: 'Packages', href: '/packages' },
     { label: 'Travel Guide', href: '/travel-guide' },
-    { label: 'About', href: '/about' }
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' }
   ];
-
-  const headerBg = isHome && !isScrolled
-    ? 'bg-gradient-to-b from-[#010048]/95 via-[#010048]/80 to-transparent text-white'
-    : 'bg-[#010048] text-white shadow-xl border-b border-[#c59b27]/30';
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${headerBg}`}>
-        {/* Top Mini Bar with Verified Booking Desk Contacts */}
-        <div className="bg-[#000032]/95 border-b border-[#c59b27]/25 text-[11px] text-slate-300 py-1.5 px-4 hidden sm:block">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 bg-white/95 backdrop-blur-md border-b border-slate-200/90 ${
+          isScrolled ? 'shadow-md' : 'shadow-xs'
+        }`}
+      >
+        {/* Top Pastel Notification & Booking Desk Bar */}
+        <div className="bg-[#f0fdf4] border-b border-[#bbf7d0] text-[12px] text-slate-700 py-1.5 px-4 hidden sm:block">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-[#f3e098] font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="flex items-center gap-1.5 text-emerald-800 font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Booking Desk India:
               </span>
-              <a href="tel:+918939958899" className="hover:text-white transition-colors flex items-center gap-1">
-                <Phone className="w-3 h-3 text-[#c59b27]" />
+              <a
+                href="tel:+918939958899"
+                className="hover:text-emerald-900 transition-colors flex items-center gap-1 font-semibold text-slate-800"
+              >
+                <Phone className="w-3.5 h-3.5 text-emerald-600" />
                 <span>+91-8939958899</span>
               </a>
-              <span className="text-slate-600">|</span>
-              <a href="tel:+919444179215" className="hover:text-white transition-colors">
+              <span className="text-slate-300">|</span>
+              <a href="tel:+919444179215" className="hover:text-emerald-900 transition-colors font-semibold text-slate-800">
                 <span>9444179215</span>
               </a>
-              <span className="text-slate-600">|</span>
-              <a href="mailto:24x7support@365holidayz.com" className="hover:text-white transition-colors flex items-center gap-1">
-                <Mail className="w-3 h-3 text-[#c59b27]" />
+              <span className="text-slate-300">|</span>
+              <a
+                href="mailto:24x7support@365holidayz.com"
+                className="hover:text-emerald-900 transition-colors flex items-center gap-1 text-slate-600"
+              >
+                <Mail className="w-3.5 h-3.5 text-emerald-600" />
                 <span>24x7support@365holidayz.com</span>
               </a>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-[#f3e098] font-medium tracking-wide">
-                Your Travel, Our Passion. 30+ Yrs Travel Expertise
+              <span className="text-xs text-slate-600 font-medium hidden md:inline">
+                30+ Years Tour Operating Heritage · 100% Customized Holidays
               </span>
               <a
                 href={CLIENT_ASSETS.verifiedContacts.whatsappCommunity}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/60 px-2.5 py-0.5 rounded border border-emerald-500/30 transition-colors"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-[#dcfce7] px-2.5 py-0.5 rounded-full border border-emerald-300 transition-colors shadow-2xs"
               >
-                <MessageCircle className="w-3 h-3" />
-                <span>WhatsApp Desk (+91 89399 58899)</span>
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>WhatsApp Desk</span>
               </a>
             </div>
           </div>
@@ -90,24 +91,24 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
 
         {/* Main Nav Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 sm:h-22">
+          <div className="flex items-center justify-between h-20">
             {/* Brand Logo with Official Circular Emblem */}
             <Link
               to="/"
-              className="flex items-center gap-3 group focus:outline-hidden focus:ring-2 focus:ring-[#c59b27] rounded-md p-1"
+              className="flex items-center gap-3 group focus:outline-hidden focus:ring-2 focus:ring-[#ff5a36] rounded-lg p-1"
             >
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden flex items-center justify-center bg-white shadow-xs border border-slate-200">
                 <img
                   src={CLIENT_ASSETS.logo}
                   alt="365Holidayz Premium Tours and Travel Logo"
-                  className="w-full h-full object-contain filter drop-shadow-md rounded-full group-hover:scale-105 transition-transform"
+                  className="w-full h-full object-contain filter drop-shadow-xs rounded-full group-hover:scale-105 transition-transform"
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center leading-none">
-                  365Holidayz
+                <span className="text-2xl sm:text-2xl font-black tracking-tight text-slate-900 flex items-center leading-none">
+                  365<span className="text-[#ff5a36]">Holidayz</span>
                 </span>
-                <span className="text-[10px] uppercase tracking-widest text-[#f3e098] font-bold mt-1">
+                <span className="text-[10px] uppercase tracking-widest text-slate-500 font-extrabold mt-1">
                   PREMIUM TOURS AND TRAVEL
                 </span>
               </div>
@@ -121,10 +122,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
                   <Link
                     key={link.href}
                     to={link.href}
-                    className={`px-3 py-2 rounded text-sm font-semibold tracking-wide transition-colors ${
+                    className={`px-3.5 py-2 rounded-lg text-sm font-bold tracking-normal transition-colors ${
                       isActive
-                        ? 'text-[#f3e098] bg-[#080562] shadow-xs border-b-2 border-[#c59b27]'
-                        : 'text-slate-200 hover:text-white hover:bg-white/5'
+                        ? 'bg-[#fff1eb] text-[#c2410c] border border-[#fed7aa] shadow-2xs'
+                        : 'text-slate-700 hover:text-[#ff5a36] hover:bg-[#fff7ed]'
                     }`}
                   >
                     {link.label}
@@ -134,16 +135,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
             </nav>
 
             {/* Desktop Action CTAs: Search Trigger, WhatsApp & Plan Your Trip */}
-            <div className="hidden sm:flex items-center gap-3">
-              {/* Quick Search Trigger Button -> Pops up Enquiry Form */}
+            <div className="hidden sm:flex items-center gap-2.5">
+              {/* Quick Search Button -> Pops up Enquiry Form */}
               <button
                 type="button"
                 onClick={onOpenEnquiry}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/15 border border-[#c59b27]/40 text-xs text-slate-200 hover:text-white transition-all cursor-pointer shadow-xs"
-                title="Search tours & open enquiry form"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#f0f7ff] hover:bg-[#e0f2fe] border border-[#bae6fd] text-xs font-bold text-[#0369a1] transition-all cursor-pointer shadow-2xs"
+                title="Search destinations & packages"
               >
-                <Search className="w-3.5 h-3.5 text-[#f3e098]" />
-                <span className="text-slate-300">Search Tours...</span>
+                <Search className="w-3.5 h-3.5" />
+                <span>Search</span>
               </button>
 
               {/* Direct WhatsApp Chat with client's phone number */}
@@ -151,29 +152,29 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
                 href={CLIENT_ASSETS.verifiedContacts.whatsappCommunity}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-300 font-bold text-xs border border-emerald-500/40 transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#ecfdf5] hover:bg-[#dcfce7] text-[#15803d] font-bold text-xs border border-[#bbf7d0] transition-colors shadow-2xs"
                 title="Direct WhatsApp chat with 365Holidayz (+91 89399 58899)"
               >
-                <MessageCircle className="w-4 h-4 text-emerald-400" />
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                 <span>WhatsApp Us</span>
               </a>
 
-              {/* Persistent Primary CTA */}
+              {/* Persistent Primary CTA (GT Holidays Style Bold Coral Button) */}
               {onOpenEnquiry ? (
                 <button
                   type="button"
                   onClick={onOpenEnquiry}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
-                  <Calendar className="w-4 h-4 text-[#010048]" />
+                  <Calendar className="w-4 h-4 text-white" />
                   <span>Plan Your Trip</span>
                 </button>
               ) : (
                 <Link
                   to="/plan-your-trip"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all"
                 >
-                  <Calendar className="w-4 h-4 text-[#010048]" />
+                  <Calendar className="w-4 h-4 text-white" />
                   <span>Plan Your Trip</span>
                 </Link>
               )}
@@ -184,17 +185,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
               <button
                 type="button"
                 onClick={onOpenEnquiry}
-                className="p-2 rounded text-slate-200 hover:text-white hover:bg-white/10"
+                className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100"
                 aria-label="Search tours and open enquiry"
                 title="Search tours"
               >
-                <Search className="w-5 h-5 text-[#f3e098]" />
+                <Search className="w-5 h-5 text-[#ff5a36]" />
               </button>
 
               <button
                 type="button"
                 onClick={onOpenEnquiry}
-                className="inline-flex sm:hidden items-center gap-1 px-3 py-1.5 rounded bg-[#c59b27] text-[#010048] font-bold text-xs"
+                className="inline-flex sm:hidden items-center gap-1 px-3 py-1.5 rounded-lg bg-[#ff5a36] text-white font-bold text-xs shadow-xs"
               >
                 <span>Plan Trip</span>
               </button>
@@ -202,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded text-slate-200 hover:text-white hover:bg-white/10 focus:outline-hidden focus:ring-2 focus:ring-[#c59b27]"
+                className="p-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a36]"
                 aria-label="Toggle navigation menu"
                 aria-expanded={mobileMenuOpen}
               >
@@ -214,14 +215,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#010048] border-b border-[#c59b27]/30 px-4 pt-3 pb-6 space-y-4 shadow-2xl animate-in slide-in-from-top duration-200">
+          <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
             {/* Quick Mobile Contact Header */}
-            <div className="p-3 bg-[#000032] rounded-lg border border-[#c59b27]/30 text-xs text-slate-300 space-y-1">
-              <span className="font-bold text-[#f3e098] block">Booking Desk India:</span>
-              <div className="flex items-center gap-3 text-slate-200">
-                <a href="tel:+918939958899" className="hover:text-white">+91-8939958899</a>
+            <div className="p-3 bg-[#f0fdf4] rounded-xl border border-emerald-200 text-xs text-slate-700 space-y-1">
+              <span className="font-bold text-emerald-900 block">Booking Desk India:</span>
+              <div className="flex items-center gap-3 text-slate-800 font-semibold">
+                <a href="tel:+918939958899" className="hover:text-emerald-700">+91-8939958899</a>
                 <span>/</span>
-                <a href="tel:+919444179215" className="hover:text-white">9444179215</a>
+                <a href="tel:+919444179215" className="hover:text-emerald-700">9444179215</a>
               </div>
             </div>
 
@@ -232,13 +233,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
                 setMobileMenuOpen(false);
                 if (onOpenEnquiry) onOpenEnquiry();
               }}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white/10 border border-[#c59b27]/40 text-sm text-slate-200 hover:bg-white/15"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-[#f0f7ff] border border-sky-200 text-sm text-slate-800 hover:bg-sky-100 cursor-pointer"
             >
-              <span className="flex items-center gap-2">
-                <Search className="w-4 h-4 text-[#f3e098]" />
+              <span className="flex items-center gap-2 font-medium">
+                <Search className="w-4 h-4 text-[#0369a1]" />
                 <span>Search destinations & tours...</span>
               </span>
-              <span className="text-[10px] uppercase font-bold text-[#f3e098] bg-[#000032] px-2 py-0.5 rounded">Enquire</span>
+              <span className="text-[10px] uppercase font-bold text-[#0369a1] bg-white px-2 py-0.5 rounded border border-sky-200">Enquire</span>
             </button>
 
             <nav className="flex flex-col space-y-1">
@@ -248,10 +249,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
                   <Link
                     key={link.href}
                     to={link.href}
-                    className={`px-3 py-2.5 rounded text-base font-semibold transition-colors ${
+                    className={`px-3 py-2.5 rounded-lg text-base font-bold transition-colors ${
                       isActive
-                        ? 'bg-[#080562] text-[#f3e098]'
-                        : 'text-slate-200 hover:bg-white/5 hover:text-white'
+                        ? 'bg-[#fff1eb] text-[#c2410c] border border-orange-200'
+                        : 'text-slate-800 hover:bg-slate-50'
                     }`}
                   >
                     {link.label}
@@ -260,14 +261,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
               })}
             </nav>
 
-            <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
+            <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   if (onOpenEnquiry) onOpenEnquiry();
                 }}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded bg-gradient-to-r from-[#d4af37] to-[#aa820a] text-[#010048] font-black text-sm tracking-wide shadow-md cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#ff5a36] text-white font-black text-sm tracking-wide shadow-md cursor-pointer"
               >
                 <Calendar className="w-4 h-4" />
                 <span>Plan Your Trip</span>
@@ -277,9 +278,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry }) => {
                 href={CLIENT_ASSETS.verifiedContacts.whatsappCommunity}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-emerald-600/30 text-emerald-300 font-bold text-sm border border-emerald-500/40"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#ecfdf5] text-emerald-800 font-bold text-sm border border-emerald-300"
               >
-                <MessageCircle className="w-4 h-4" />
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
                 <span>Chat on WhatsApp (+91 89399 58899)</span>
               </a>
             </div>

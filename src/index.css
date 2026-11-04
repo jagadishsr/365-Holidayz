@@ -2,26 +2,42 @@
 
 @layer base {
   :root {
-    /* 365Holidayz Brand Colors derived from official logo, client posters & Indian royal dark navy #010048 */
-    --navy-primary: #010048;
-    --navy-secondary: #080562;
-    --navy-deep: #000032;
-    --navy-muted: #17127d;
-    
-    --brand-gold: #c59b27;
-    --brand-gold-light: #e6c86e;
-    --brand-gold-dark: #9a7615;
-    
-    --accent-red: #c9182b;
-    --accent-red-dark: #a11120;
-    
-    --accent-cyan: #0284c7;
-    --accent-amber: #f59e0b;
-    
-    --bg-warm: #faf9f5;
-    --bg-cream: #f4f1ea;
-    --text-dark: #010048;
-    --text-muted: #4b5563;
+    /* 365Holidayz Fresh Pastel Palette with High-Contrast Text */
+    --pastel-bg-main: #f8fafc;
+    --pastel-bg-cream: #faf9f6;
+    --pastel-card-white: #ffffff;
+
+    /* Pastel Accent Hues */
+    --pastel-sky: #f0f7ff;
+    --pastel-sky-border: #bae6fd;
+    --pastel-sky-text: #0369a1;
+
+    --pastel-mint: #f0fdf4;
+    --pastel-mint-border: #bbf7d0;
+    --pastel-mint-text: #15803d;
+
+    --pastel-peach: #fff7ed;
+    --pastel-peach-border: #fed7aa;
+    --pastel-peach-text: #c2410c;
+
+    --pastel-lavender: #faf5ff;
+    --pastel-lavender-border: #e9d5ff;
+    --pastel-lavender-text: #6b21a8;
+
+    --pastel-butter: #fefce8;
+    --pastel-butter-border: #fef08a;
+    --pastel-butter-text: #854d0e;
+
+    --pastel-rose: #fff1f2;
+    --pastel-rose-border: #fecdd3;
+    --pastel-rose-text: #9f1239;
+
+    /* Bold Brand Accent (GT Holidays Inspired) */
+    --brand-coral: #ff5a36;
+    --brand-coral-hover: #e04422;
+    --brand-teal: #0891b2;
+    --brand-navy-text: #0f172a;
+    --brand-body-text: #334155;
   }
 
   * {
@@ -29,8 +45,8 @@
   }
 
   body {
-    background-color: var(--bg-warm);
-    color: var(--text-dark);
+    background-color: var(--pastel-bg-main);
+    color: var(--brand-navy-text);
     overflow-x: hidden;
   }
 }

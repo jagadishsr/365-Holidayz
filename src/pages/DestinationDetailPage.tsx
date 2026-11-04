@@ -191,10 +191,10 @@ export const DestinationDetailPage: React.FC = () => {
 
               <div className="pt-2">
                 <Link
-                  to={`/plan-your-trip?destination=${encodeURIComponent(destination.name)}`}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-bold text-xs uppercase tracking-wider shadow-sm transition-all"
+                  to={`/contact?destination=${encodeURIComponent(destination.name)}`}
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04825] text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-500/20 transition-all"
                 >
-                  <Calendar className="w-4 h-4 text-[#010048]" />
+                  <Calendar className="w-4 h-4 text-white" />
                   <span>Plan Trip to {destination.name}</span>
                 </Link>
               </div>

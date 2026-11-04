@@ -10,19 +10,19 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="pt-24 pb-16 space-y-16">
       {/* Header */}
-      <div className="bg-[#010048] text-white py-14 sm:py-18 border-b border-[#c59b27]/30">
+      <div className="bg-gradient-to-r from-[#eff6ff] via-[#f0fdf4] to-[#f8fafc] text-slate-900 py-12 sm:py-16 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <Breadcrumbs items={[{ label: 'About Us' }]} className="text-slate-400" />
+          <Breadcrumbs items={[{ label: 'About Us' }]} className="text-slate-500" />
 
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#f3e098] flex items-center gap-1.5">
-              <Compass className="w-3.5 h-3.5 text-[#c59b27]" />
+            <span className="text-xs font-black uppercase tracking-widest text-[#ff5a36] flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 text-[#ff5a36]" />
               <span>30+ Years of Dedication</span>
             </span>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900">
               The Story of 365Holidayz
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
               Combining three decades of travel expertise with thoughtfully designed destinations, holiday experiences, and deeply personalised travel planning.
             </p>
           </div>
@@ -41,11 +41,11 @@ export const AboutPage: React.FC = () => {
                 category="Founder & Director"
                 aspectRatio="team"
                 recommendedDimensions="800 × 1000 px"
-                className="rounded-2xl shadow-2xl border-2 border-[#c59b27]/40"
+                className="rounded-2xl shadow-xl border-2 border-slate-200"
               />
-              <div className="absolute -bottom-4 -right-4 p-4 rounded-xl bg-[#010048] text-white border-2 border-[#c59b27]/50 shadow-2xl hidden sm:block">
-                <span className="text-3xl font-black text-[#f3e098] block">30+</span>
-                <span className="text-[10px] uppercase tracking-wider text-slate-200 font-bold">Years Experience</span>
+              <div className="absolute -bottom-4 -right-4 p-4 rounded-2xl bg-white text-slate-900 border-2 border-slate-200 shadow-xl hidden sm:block">
+                <span className="text-3xl font-black text-[#ff5a36] block">30+</span>
+                <span className="text-[10px] uppercase tracking-wider text-slate-600 font-black">Years Experience</span>
               </div>
             </div>
           </div>
@@ -128,30 +128,30 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* 365Eventz Connection per brief */}
-        <section className="bg-gradient-to-br from-[#010048] via-[#080562] to-[#000032] text-white rounded-2xl p-8 sm:p-12 border border-[#c59b27]/30 space-y-6">
+        <section className="bg-gradient-to-br from-[#f5f3ff] via-[#f8fafc] to-[#eff6ff] text-slate-900 rounded-3xl p-8 sm:p-12 border border-purple-200/90 shadow-md space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c59b27]/20 text-[#f3e098] text-xs font-bold uppercase tracking-wider border border-[#c59b27]/30">
-                <Building className="w-3.5 h-3.5 text-[#c59b27]" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-100 text-purple-900 text-xs font-black uppercase tracking-wider border border-purple-200 shadow-xs">
+                <Building className="w-3.5 h-3.5 text-purple-700" />
                 <span>Sister Enterprise Synergy</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 In Association with 365Eventz
               </h2>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
                 Beyond leisure travel, 365Holidayz operates in seamless synergy with <strong>365Eventz</strong>, our dedicated sister division for milestone celebrations, destination weddings, executive corporate retreats, and international MICE delegations.
               </p>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                 Whether orchestrating a 30-delegate leadership summit in Dubai and Bahrain or an intimate 100-guest beachfront union in Bali, our combined infrastructure manages airline charter logistics, gala banquets, and audiovisual staging with flawless precision.
               </p>
 
               <div className="pt-2">
                 <Link
                   to="/packages?holidayType=MICE+%26+Corporate"
-                  className="inline-flex items-center gap-2 text-xs font-bold text-[#f3e098] hover:text-white"
+                  className="inline-flex items-center gap-2 text-xs font-black text-[#ff5a36] hover:underline"
                 >
                   <span>Explore MICE & Corporate group packages</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-[#ff5a36]" />
                 </Link>
               </div>
             </div>
@@ -163,7 +163,7 @@ export const AboutPage: React.FC = () => {
                 category="Event Setup"
                 aspectRatio="card"
                 recommendedDimensions="1200 × 900 px"
-                className="rounded-xl border border-[#c59b27]/40 shadow-xl"
+                className="rounded-2xl border border-slate-200 shadow-lg"
               />
             </div>
           </div>

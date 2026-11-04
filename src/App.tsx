@@ -17,7 +17,9 @@ import { PackageDetailPage } from './pages/PackageDetailPage';
 import { TravelGuidePage } from './pages/TravelGuidePage';
 import { AboutPage } from './pages/AboutPage';
 import { PlanYourTripPage } from './pages/PlanYourTripPage';
+import { ContactPage } from './pages/ContactPage';
 import { EnquiryForm } from './components/common/EnquiryForm';
+import { EntranceOfferModal } from './components/common/EntranceOfferModal';
 import { X } from 'lucide-react';
 
 // Scroll to top helper on navigation
@@ -34,7 +36,7 @@ const ScrollToTop: React.FC = () => {
 // Dynamically detect subdirectory basename (e.g. /365/) for hosting under arbitrary subfolders
 const getSubdirectoryBasename = (): string | undefined => {
   if (typeof window === 'undefined') return undefined;
-  const knownRoutes = ['destinations', 'holiday-types', 'packages', 'travel-guide', 'about', 'plan-your-trip'];
+  const knownRoutes = ['destinations', 'holiday-types', 'packages', 'travel-guide', 'about', 'contact', 'plan-your-trip'];
   const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
   if (firstSegment && !knownRoutes.includes(firstSegment)) {
     return `/${firstSegment}`;
@@ -56,7 +58,7 @@ export default function App() {
   return (
     <BrowserRouter basename={getSubdirectoryBasename()}>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col bg-[#fbfbf9] text-[#010048] font-sans antialiased selection:bg-[#010048] selection:text-[#f3e098]">
+      <div className="min-h-screen flex flex-col bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-[#fed7aa] selection:text-[#7c2d12]">
         {/* Approved Navigation Header */}
         <Header onOpenEnquiry={handleOpenEnquiry} />
 
@@ -72,7 +74,8 @@ export default function App() {
             <Route path="/packages/:id" element={<PackageDetailPage />} />
             <Route path="/travel-guide" element={<TravelGuidePage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/plan-your-trip" element={<PlanYourTripPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/plan-your-trip" element={<ContactPage />} />
             {/* Fallback route */}
             <Route path="*" element={<HomePage onOpenEnquiry={handleOpenEnquiry} />} />
           </Routes>
@@ -80,6 +83,9 @@ export default function App() {
 
         {/* Brand Footer */}
         <Footer />
+
+        {/* Catchy Entrance Offer Popup (GT Holidays Style) */}
+        <EntranceOfferModal onOpenEnquiry={handleOpenEnquiry} />
 
         {/* Global Quick Plan Your Trip Modal */}
         {isEnquiryModalOpen && (

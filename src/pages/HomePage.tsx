@@ -1,6 +1,26 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Compass, Heart, Shield, Users, Sparkles, Clock, Calendar, Phone, MessageCircle, Star, CheckCircle2, Search, Play } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowRight,
+  Compass,
+  Heart,
+  Shield,
+  Users,
+  Sparkles,
+  Clock,
+  Calendar,
+  Phone,
+  MessageCircle,
+  Star,
+  CheckCircle2,
+  Search,
+  Play,
+  Flame,
+  Award,
+  UtensilsCrossed,
+  Headphones,
+  Check
+} from 'lucide-react';
 import { HeroSlider } from '../components/home/HeroSlider';
 import { ALL_PACKAGES } from '../data/packages';
 import { ALL_DESTINATIONS } from '../data/destinations';
@@ -8,9 +28,7 @@ import { ALL_HOLIDAY_TYPES } from '../data/holidayTypes';
 import { CLIENT_ASSETS } from '../data/stockImages';
 import { DESTINATION_VIDEOS, DestinationVideo } from '../data/destinationVideos';
 import { PackageCard } from '../components/cards/PackageCard';
-import { DestinationCard } from '../components/cards/DestinationCard';
 import { HolidayTypeCard } from '../components/cards/HolidayTypeCard';
-import { CTASection } from '../components/common/CTASection';
 import { VideoModal } from '../components/common/VideoModal';
 
 interface HomePageProps {
@@ -18,166 +36,268 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
+  const navigate = useNavigate();
   const [activeVideo, setActiveVideo] = useState<DestinationVideo | null>(null);
-  const [searchInput, setSearchInput] = useState('');
+
+  // Search Widget State
+  const [searchDestination, setSearchDestination] = useState('');
+  const [searchMonth, setSearchMonth] = useState('');
+  const [searchHolidayType, setSearchHolidayType] = useState('');
+  const [searchBudget, setSearchBudget] = useState('');
+
   const featuredPackages = ALL_PACKAGES.filter((p) => p.isFeatured).slice(0, 6);
-  const featuredDestinations = ALL_DESTINATIONS.filter((d) => d.isFeatured);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onOpenEnquiry) onOpenEnquiry();
+    if (onOpenEnquiry) {
+      onOpenEnquiry();
+    } else {
+      navigate('/packages');
+    }
   };
 
+  // Quick category tiles in soft pastel colors
+  const quickCategories = [
+    {
+      label: 'Island Holidays',
+      sub: 'Maldives, Bali, Mauritius',
+      icon: '🏝️',
+      color: 'bg-[#f0f9ff] border-sky-200 text-[#0369a1] hover:bg-sky-100',
+      link: '/packages?region=Islands'
+    },
+    {
+      label: 'Diwali Departures',
+      sub: 'Türkiye, Georgia, Far East',
+      icon: '🪔',
+      color: 'bg-[#fff1f2] border-rose-200 text-[#9f1239] hover:bg-rose-100',
+      link: '/packages?urgent=true'
+    },
+    {
+      label: 'Honeymoon Specials',
+      sub: 'Overwater & Beach Villas',
+      icon: '💑',
+      color: 'bg-[#faf5ff] border-purple-200 text-[#6b21a8] hover:bg-purple-100',
+      link: '/packages?holidayType=Honeymoon'
+    },
+    {
+      label: 'Family & Group Tours',
+      sub: 'Singapore, Malaysia, Sri Lanka',
+      icon: '👨‍👩‍👧',
+      color: 'bg-[#f0fdf4] border-emerald-200 text-[#15803d] hover:bg-emerald-100',
+      link: '/packages?holidayType=Family+%26+Group'
+    },
+    {
+      label: 'Adventure Circuits',
+      sub: 'Cappadocia, Kazbegi, Sigiriya',
+      icon: '🏔️',
+      color: 'bg-[#fefce8] border-yellow-200 text-[#854d0e] hover:bg-yellow-100',
+      link: '/packages?holidayType=Adventure'
+    },
+    {
+      label: 'Twin City Escapes',
+      sub: 'Singapore + Malaysia 5D',
+      icon: '✈️',
+      color: 'bg-[#fff7ed] border-orange-200 text-[#c2410c] hover:bg-orange-100',
+      link: '/packages/pkg-12'
+    }
+  ];
+
   return (
-    <div className="space-y-16 pb-16">
-      {/* 1. Full-Screen Hero Slider with Curated Stock Photography */}
+    <div className="space-y-14 sm:space-y-20 pb-20 bg-[#f8fafc]">
+      {/* 1. Full-Screen Bright Hero Slider */}
       <HeroSlider onOpenEnquiry={onOpenEnquiry} />
 
-      {/* 2. Customer Search Bar -> Pops up Enquiry Form on Click or Enter */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 -mt-8 sm:-mt-10">
-        <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-[#c59b27]/40">
-          <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="w-11 h-11 rounded-xl bg-[#010048] text-[#f3e098] flex items-center justify-center shrink-0 shadow-md">
-                <Search className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#c59b27] block">
-                  Find Your Dream Holiday
-                </span>
-                <span className="text-sm font-black text-[#010048]">
-                  Search International Destinations & Packages
-                </span>
-              </div>
+      {/* 2. GT Holidays Style Simple & Bold Holiday Search Widget */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 -mt-12 sm:-mt-16">
+        <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-2xl border-2 border-slate-200/90">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5a36] animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                Plan Your International Vacation
+              </span>
+            </div>
+            <span className="text-xs text-slate-500 font-medium hidden sm:inline">
+              Instant Pricing in INR (₹) · 100% Tailor-Made
+            </span>
+          </div>
+
+          <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {/* Field 1: Destination */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Destination
+              </label>
+              <select
+                value={searchDestination}
+                onChange={(e) => setSearchDestination(e.target.value)}
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a36] bg-[#f8fafc]"
+              >
+                <option value="">Where to? (All Destinations)</option>
+                <option value="Maldives">Maldives</option>
+                <option value="Bali">Bali (Indonesia)</option>
+                <option value="Philippines">Philippines (Tropical Special)</option>
+                <option value="Singapore & Malaysia">Singapore + Malaysia</option>
+                <option value="Türkiye & Georgia">Türkiye & Georgia (Diwali)</option>
+                <option value="Dubai">Dubai & UAE</option>
+                <option value="Sri Lanka">Sri Lanka</option>
+                <option value="Europe">European Countries</option>
+              </select>
             </div>
 
-            <div className="flex items-center gap-2.5 w-full md:w-auto flex-1 max-w-xl">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onClick={() => onOpenEnquiry && onOpenEnquiry()}
-                  placeholder="Where do you want to travel? (e.g. Maldives, Bali, Türkiye...)"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#c59b27] bg-slate-50/70 cursor-pointer"
-                />
-              </div>
+            {/* Field 2: Month / Departure */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Month of Travel
+              </label>
+              <select
+                value={searchMonth}
+                onChange={(e) => setSearchMonth(e.target.value)}
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a36] bg-[#f8fafc]"
+              >
+                <option value="">Anytime</option>
+                <option value="Nov 2026">November 2026 (Diwali)</option>
+                <option value="Dec 2026">December 2026 (Winter)</option>
+                <option value="Jan 2027">January 2027 (New Year)</option>
+                <option value="Feb-Apr 2027">Spring / Summer 2027</option>
+              </select>
+            </div>
 
+            {/* Field 3: Holiday Style */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Holiday Style
+              </label>
+              <select
+                value={searchHolidayType}
+                onChange={(e) => setSearchHolidayType(e.target.value)}
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a36] bg-[#f8fafc]"
+              >
+                <option value="">All Styles</option>
+                <option value="Honeymoon">Honeymoon & Romance</option>
+                <option value="Family & Group">Family & Group</option>
+                <option value="Adventure">Adventure & Explorer</option>
+                <option value="Luxury Escapes">Curated Luxury</option>
+                <option value="Women Solo">Women Solo Journeys</option>
+              </select>
+            </div>
+
+            {/* Field 4: Budget Range */}
+            <div className="space-y-1">
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                Budget / Person
+              </label>
+              <select
+                value={searchBudget}
+                onChange={(e) => setSearchBudget(e.target.value)}
+                className="w-full px-3.5 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#ff5a36] bg-[#f8fafc]"
+              >
+                <option value="">Any Budget</option>
+                <option value="Under ₹50,000">Under ₹50,000</option>
+                <option value="₹50,000 - ₹1,00,000">₹50,000 - ₹1,00,000</option>
+                <option value="₹1,00,000 - ₹2,00,000">₹1,00,000 - ₹2,00,000</option>
+                <option value="₹2,00,000+">₹2,00,000+ (Ultra Luxury)</option>
+              </select>
+            </div>
+
+            {/* Search Button (Bold GT Holidays Style) */}
+            <div className="flex items-end">
               <button
                 type="submit"
-                onClick={() => onOpenEnquiry && onOpenEnquiry()}
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer shrink-0"
+                className="w-full py-3.5 px-6 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-sm uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
               >
-                Search & Enquire
+                <Search className="w-4 h-4" />
+                <span>Search Holidays</span>
               </button>
             </div>
           </form>
         </div>
       </section>
 
-      {/* 3. Special Festive / Client Departures Showcase */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
-        <div className="bg-gradient-to-r from-[#010048] via-[#080562] to-[#010048] rounded-2xl p-6 sm:p-8 border-2 border-[#c59b27]/40 shadow-xl text-white">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="space-y-2 text-center lg:text-left">
-              <div className="flex items-center justify-center lg:justify-start gap-2">
-                <span className="px-3 py-0.5 rounded-full bg-[#c9182b] text-white text-[11px] font-black uppercase tracking-wider animate-pulse">
-                  Special Departures
-                </span>
-                <span className="text-xs text-[#f3e098] font-bold">
-                  Your Trusted Partner in Travel
-                </span>
+      {/* 3. Quick Category Tiles in Soft Pastel Colors */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {quickCategories.map((cat, idx) => (
+            <Link
+              key={idx}
+              to={cat.link}
+              className={`p-4 rounded-2xl border-2 transition-all duration-300 hover:-translate-y-1 shadow-2xs flex flex-col justify-between space-y-2 group ${cat.color}`}
+            >
+              <div className="text-2xl">{cat.icon}</div>
+              <div>
+                <h4 className="text-xs sm:text-sm font-black leading-tight group-hover:underline">
+                  {cat.label}
+                </h4>
+                <p className="text-[11px] opacity-80 line-clamp-1 mt-0.5 font-medium">
+                  {cat.sub}
+                </p>
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Best All-Inclusive International Packages
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-                Return Flights • Visa Facilitation • Indian Meals • Handpicked Stays • Sightseeing with Local Transport • Hindi Speaking Tour Guides
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
-              <a
-                href={CLIENT_ASSETS.verifiedContacts.whatsappCommunity}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition-all"
-                title="Direct WhatsApp chat with 365Holidayz (+91 89399 58899)"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Chat on WhatsApp</span>
-              </a>
-
-              <a
-                href="tel:+918939958899"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] hover:from-[#e5c158] hover:to-[#c59b27] text-[#010048] font-black text-xs uppercase tracking-wider shadow-lg transition-all"
-              >
-                <Phone className="w-4 h-4 text-[#010048]" />
-                <span>Call +91-8939958899</span>
-              </a>
-            </div>
-          </div>
+            </Link>
+          ))}
         </div>
       </section>
 
-      {/* 4. Client Poster Specials Showcase (Philippines, Türkiye & Georgia, Singapore & Malaysia) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
-          <div className="space-y-2 max-w-2xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27] flex items-center gap-1.5">
-              <Star className="w-3.5 h-3.5 fill-[#c59b27] text-[#c59b27]" />
-              <span>Official 365Holidayz Editions</span>
+      {/* 4. Spotlight Special Client Departures (Philippines, Türkiye & Georgia, Singapore & Malaysia) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+          <div className="space-y-1.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#fff1f2] border border-rose-200 text-xs font-bold text-rose-800 uppercase tracking-wider">
+              <Flame className="w-3.5 h-3.5 text-rose-600" />
+              <span>Spotlight Client Specials</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#010048] tracking-tight">
-              Spotlight Client Departures & Offers
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Featured International Departures
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              Curated directly from our latest official marketing editions with all prices displayed in INR (₹): Philippines island retreats, Diwali departures for Türkiye & Georgia, and Singapore-Malaysia twin city specials.
+            <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium">
+              Curated directly from 365Holidayz marketing editions with flights, verified Indian meals, 4-star stays, and guided local tours.
             </p>
           </div>
 
           <Link
             to="/packages"
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#010048] hover:text-[#c59b27] transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#ff5a36] hover:underline shrink-0"
           >
-            <span>Explore All 33 Packages</span>
-            <ArrowRight className="w-4 h-4 text-[#c59b27]" />
+            <span>View All 33 Packages</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
-        {/* 3 Interactive Poster Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Poster 1: Philippines */}
-          <div className="rounded-2xl bg-white border border-[#c59b27]/30 shadow-lg overflow-hidden flex flex-col group hover:-translate-y-1 transition-all duration-300">
+        {/* 3 Simple & Bold Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          {/* Card 1: Philippines */}
+          <div className="rounded-3xl bg-white border-2 border-sky-200/80 shadow-md overflow-hidden flex flex-col group hover:-translate-y-1 transition-all duration-300">
             <div className="relative aspect-[3/4] overflow-hidden bg-slate-900">
               <img
                 src={CLIENT_ASSETS.posterPhilippines}
-                alt="Philippines 6N/7D Tropical Vibes Bigger Dreams Poster"
+                alt="Philippines 6N/7D Tropical Vibes Poster"
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-3 left-3 bg-[#010048]/90 border border-[#c59b27]/50 text-[#f3e098] px-2.5 py-1 rounded text-xs font-black uppercase shadow-md">
-                ₹59,999 PP • 6N / 7D
+              <div className="absolute top-3 left-3 bg-white/95 text-slate-900 px-3 py-1 rounded-full text-xs font-black uppercase shadow-md border border-slate-200">
+                ₹59,999 PP · 6N / 7D
+              </div>
+              <div className="absolute top-3 right-3 bg-[#ff5a36] text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase shadow-md">
+                For 6 Pax
               </div>
             </div>
-            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div className="p-5 flex-1 flex flex-col justify-between space-y-4 bg-[#f0f9ff]/40">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#c59b27]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#0369a1]">
                   Manila • Cebu • Bohol
                 </span>
-                <h3 className="text-lg font-black text-[#010048]">
+                <h3 className="text-lg font-black text-slate-900">
                   Philippines: Tropical Vibes, Bigger Dreams
                 </h3>
-                <p className="text-xs text-slate-600 line-clamp-2">
-                  Oslob whale shark encounter, Moalboal sardine run, Kawasan falls adventure, Bohol Chocolate Hills, and Tagaytay volcano view.
+                <p className="text-xs text-slate-600 line-clamp-2 font-medium">
+                  Oslob whale sharks, Kawasan falls adventure, Bohol Chocolate Hills, and Tagaytay volcano views.
                 </p>
               </div>
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">For 6 Pax • Double Sharing</span>
+
+              <div className="pt-3 border-t border-sky-100 flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700">Double Sharing</span>
                 <button
                   type="button"
                   onClick={onOpenEnquiry}
-                  className="px-3.5 py-1.5 rounded bg-[#010048] hover:bg-[#080562] text-[#f3e098] text-xs font-bold uppercase tracking-wide transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white text-xs font-extrabold uppercase tracking-wide transition-all shadow-xs cursor-pointer"
                 >
                   Enquire Now
                 </button>
@@ -185,73 +305,81 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
             </div>
           </div>
 
-          {/* Poster 2: Türkiye & Georgia */}
-          <div className="rounded-2xl bg-white border border-[#c59b27]/30 shadow-lg overflow-hidden flex flex-col group hover:-translate-y-1 transition-all duration-300">
+          {/* Card 2: Türkiye & Georgia */}
+          <div className="rounded-3xl bg-white border-2 border-rose-200/80 shadow-md overflow-hidden flex flex-col group hover:-translate-y-1 transition-all duration-300">
             <div className="relative aspect-[3/4] overflow-hidden bg-slate-900">
               <img
                 src={CLIENT_ASSETS.posterTurkiyeGeorgia}
                 alt="Türkiye and Georgia Special Departures Poster"
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-3 left-3 bg-[#c9182b] text-white px-2.5 py-1 rounded text-xs font-black uppercase shadow-md">
+              <div className="absolute top-3 left-3 bg-[#ff5a36] text-white px-3 py-1 rounded-full text-xs font-black uppercase shadow-md">
                 Diwali Special Departures
               </div>
+              <div className="absolute top-3 right-3 bg-white/95 text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-black uppercase shadow-md">
+                Fixed Dates
+              </div>
             </div>
-            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div className="p-5 flex-1 flex flex-col justify-between space-y-4 bg-[#fff1f2]/30">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#c59b27]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
                   Istanbul • Cappadocia • Tbilisi • Batumi
                 </span>
-                <h3 className="text-lg font-black text-[#010048]">
+                <h3 className="text-lg font-black text-slate-900">
                   Türkiye & Georgia Grand Circuit
                 </h3>
-                <p className="text-xs text-slate-600 line-clamp-2">
+                <p className="text-xs text-slate-600 line-clamp-2 font-medium">
                   All-inclusive flights, visa, Indian meals, 4-star stays, Bosphorus cruise, and Kazbegi Caucasus mountain excursions.
                 </p>
               </div>
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+
+              <div className="pt-3 border-t border-rose-100 flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700">Departures Nov 2026</span>
                 <Link
                   to="/packages?destination=Istanbul+%26+Turkey"
-                  className="px-3.5 py-1.5 rounded bg-[#010048] hover:bg-[#080562] text-[#f3e098] text-xs font-bold uppercase tracking-wide transition-colors"
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold uppercase tracking-wide transition-all shadow-xs"
                 >
-                  View Packages
+                  View Circuit
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* Poster 3: Singapore + Malaysia */}
-          <div className="rounded-2xl bg-white border border-[#c59b27]/30 shadow-lg overflow-hidden flex flex-col group hover:-translate-y-1 transition-all duration-300">
+          {/* Card 3: Singapore + Malaysia */}
+          <div className="rounded-3xl bg-white border-2 border-orange-200/80 shadow-md overflow-hidden flex flex-col group hover:-translate-y-1 transition-all duration-300">
             <div className="relative aspect-[3/4] overflow-hidden bg-slate-900">
               <img
                 src={CLIENT_ASSETS.posterSingaporeMalaysia}
                 alt="Singapore and Malaysia 5 Days Poster"
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute top-3 left-3 bg-[#c59b27] text-[#010048] px-2.5 py-1 rounded text-xs font-black uppercase shadow-md">
-                ₹31,500/- PP • 5 Days
+              <div className="absolute top-3 left-3 bg-white/95 text-slate-900 px-3 py-1 rounded-full text-xs font-black uppercase shadow-md border border-slate-200">
+                ₹31,500/- PP · 5 Days
+              </div>
+              <div className="absolute top-3 right-3 bg-emerald-600 text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase shadow-md">
+                Min 4 Pax
               </div>
             </div>
-            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div className="p-5 flex-1 flex flex-col justify-between space-y-4 bg-[#fff7ed]/40">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#c59b27]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#c2410c]">
                   Singapore • Genting • Kuala Lumpur
                 </span>
-                <h3 className="text-lg font-black text-[#010048]">
+                <h3 className="text-lg font-black text-slate-900">
                   Singapore + Malaysia In 5 Days
                 </h3>
-                <p className="text-xs text-slate-600 line-clamp-2">
-                  Hotel Boss Singapore, Ramada Encore Chinatown KL, Night Safari with dinner, Sentosa Cable Car & Wings of Time, Genting Cable Car.
+                <p className="text-xs text-slate-600 line-clamp-2 font-medium">
+                  Hotel Boss Singapore, Ramada Encore Chinatown KL, Night Safari with dinner, Sentosa Cable Car & Genting Cable Car.
                 </p>
               </div>
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-700">Unbeatable Package Rate</span>
+
+              <div className="pt-3 border-t border-orange-100 flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700">Best Value Tour</span>
                 <Link
                   to="/packages/pkg-12"
-                  className="px-3.5 py-1.5 rounded bg-[#010048] hover:bg-[#080562] text-[#f3e098] text-xs font-bold uppercase tracking-wide transition-colors"
+                  className="px-4 py-2 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white text-xs font-extrabold uppercase tracking-wide transition-all shadow-xs"
                 >
-                  View Package
+                  View Details
                 </Link>
               </div>
             </div>
@@ -259,28 +387,58 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
         </div>
       </section>
 
-      {/* 3. Signature Holiday Types */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
-          <div className="space-y-2 max-w-2xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#c59b27]" />
-              <span>Curated Travel Rhythms</span>
+      {/* 5. Trending International Holiday Packages (GT Holidays Style Grid) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+          <div className="space-y-1.5">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#ff5a36]">
+              Handcrafted International Holidays
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#010048] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Trending Holiday Packages
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 max-w-xl font-medium">
+              Transparent per-person pricing in INR (₹) with guaranteed 4-star stays, curated daily sightseeing, and verified chauffeur travel.
+            </p>
+          </div>
+
+          <Link
+            to="/packages"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#ff5a36] hover:underline shrink-0"
+          >
+            <span>Explore All Packages</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {featuredPackages.map((pkg) => (
+            <PackageCard key={pkg.id} pkg={pkg} onOpenEnquiry={onOpenEnquiry} />
+          ))}
+        </div>
+      </section>
+
+      {/* 6. Signature Holiday Types with 1-Min Video Reels */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-5">
+          <div className="space-y-1.5">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-800">
+              Travel Styles & Video Tours
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Signature Holiday Types
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              Every traveller journeys with a distinct pulse. Explore our five signature categories, sculpted around your aspirations and pace.
+            <p className="text-xs sm:text-sm text-slate-600 max-w-xl font-medium">
+              Click "1-Min Video" on any card below to experience a 60-second high-definition preview of our signature itineraries.
             </p>
           </div>
 
           <Link
             to="/holiday-types"
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#010048] hover:text-[#c59b27] transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#ff5a36] hover:underline shrink-0"
           >
-            <span>View All Categories</span>
-            <ArrowRight className="w-4 h-4 text-[#c59b27]" />
+            <span>View All Themes</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -303,169 +461,115 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenEnquiry }) => {
         </div>
       </section>
 
-      {/* 4. Featured Destinations */}
-      <section className="bg-[#f4f1ea]/70 py-16 sm:py-20 border-y border-[#c59b27]/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-300 pb-6">
-            <div className="space-y-2 max-w-2xl">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27] flex items-center gap-1.5">
-                <Compass className="w-3.5 h-3.5 text-[#c59b27]" />
-                <span>Handpicked Geographical Sanctuaries</span>
-              </span>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#010048] tracking-tight">
-                Featured Destinations
-              </h2>
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                Prioritised for their evocative storytelling, architectural splendour, and bespoke luxury hospitality.
-              </p>
-            </div>
-
-            <Link
-              to="/destinations"
-              className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#010048] hover:text-[#c59b27] transition-colors shrink-0"
-            >
-              <span>Explore All 17 Destinations</span>
-              <ArrowRight className="w-4 h-4 text-[#c59b27]" />
-            </Link>
+      {/* 7. Why Discerning Travellers Choose 365Holidayz (GT Holidays Trust Elements) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-3xl bg-white border-2 border-slate-200 p-8 sm:p-12 shadow-sm space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-xs font-black uppercase tracking-wider text-[#ff5a36]">
+              Trusted By Thousands of Indian Travellers
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900">
+              Why Book Your Holiday With 365Holidayz?
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium">
+              We eliminate the uncertainty from international vacations with verified logistics, dedicated on-ground concierge, and authentic culinary care.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredDestinations.map((dest) => (
-              <DestinationCard key={dest.id} destination={dest} />
-            ))}
+            {/* Trust 1 (Pastel Sky) */}
+            <div className="p-6 rounded-2xl bg-[#f0f9ff] border border-sky-200 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black shadow-sm">
+                <Award className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-black text-slate-900">
+                30+ Years Tour Heritage
+              </h3>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                Pioneered by founder Aameena with three decades of direct destination relationships and international ground credibility.
+              </p>
+            </div>
+
+            {/* Trust 2 (Pastel Mint) */}
+            <div className="p-6 rounded-2xl bg-[#f0fdf4] border border-emerald-200 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black shadow-sm">
+                <UtensilsCrossed className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-black text-slate-900">
+                Indian & Veg Meals Guaranteed
+              </h3>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                Never worry about food abroad. We pre-coordinate authentic Indian, Jain, and vegetarian meals on every international circuit.
+              </p>
+            </div>
+
+            {/* Trust 3 (Pastel Peach) */}
+            <div className="p-6 rounded-2xl bg-[#fff7ed] border border-orange-200 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#ff5a36] text-white flex items-center justify-center font-black shadow-sm">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-black text-slate-900">
+                100% Customized Itineraries
+              </h3>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                Modify room nights, add private chauffeur excursions, upgrade villas, and travel strictly at your preferred pace.
+              </p>
+            </div>
+
+            {/* Trust 4 (Pastel Lavender) */}
+            <div className="p-6 rounded-2xl bg-[#faf5ff] border border-purple-200 space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black shadow-sm">
+                <Headphones className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-black text-slate-900">
+                24x7 India Concierge Support
+              </h3>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                Round-the-clock telephone and WhatsApp support before departure, at immigration, and throughout your overseas stay.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Featured Packages */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
-          <div className="space-y-2 max-w-2xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#c59b27]" />
-              <span>Verified Client Catalogue</span>
+      {/* 8. Direct Consultation Banner (Pastel Mint) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-[#f0fdf4] rounded-3xl p-8 sm:p-12 border-2 border-emerald-200 text-slate-900 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-2 text-center md:text-left max-w-2xl">
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
+              Need Instant Itinerary Advice?
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#010048] tracking-tight">
-              Featured Travel Packages
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-              Curated journeys with transparent inclusions, verified stay details, and authentic regional pricing from our client master sheet.
-            </p>
-          </div>
-
-          <Link
-            to="/packages"
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#010048] hover:text-[#c59b27] transition-colors shrink-0"
-          >
-            <span>View All 33 Packages</span>
-            <ArrowRight className="w-4 h-4 text-[#c59b27]" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {featuredPackages.map((pkg) => (
-            <PackageCard key={pkg.id} pkg={pkg} />
-          ))}
-        </div>
-      </section>
-
-      {/* 6. Why 365Holidayz (30+ Years Expertise) */}
-      <section className="bg-gradient-to-br from-[#010048] via-[#080562] to-[#000032] text-white py-16 sm:py-20 border-y border-[#c59b27]/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#f3e098]">
-              Legacy of Integrity
-            </span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white">
-              Why Discerning Travellers Choose 365Holidayz
-            </h2>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              We do not mass-produce generic itineraries. We combine thirty years of hands-on global expertise with meticulous, personalised curation.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-3 hover:border-[#c59b27]/60 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[#c59b27]/20 border border-[#c59b27]/40 flex items-center justify-center text-[#f3e098]">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">30+ Years Travel Expertise</h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Founded on three decades of seasoned international navigation, trusted destination partnerships, and deep logistical acumen.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-3 hover:border-[#c59b27]/60 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[#c59b27]/20 border border-[#c59b27]/40 flex items-center justify-center text-[#f3e098]">
-                <Heart className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Personalised Planning</h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Every journey is shaped by a human senior travel specialist who listens to your travel rhythm, family ages, and bespoke desires.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-3 hover:border-[#c59b27]/60 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[#c59b27]/20 border border-[#c59b27]/40 flex items-center justify-center text-[#f3e098]">
-                <Compass className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Curated Experiences</h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                From private Bosphorus yachts to Bedouin starlit camps, we prioritize immersive moments that transcend cookie-cutter tour buses.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl bg-white/5 border border-white/10 space-y-3 hover:border-[#c59b27]/60 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-[#c59b27]/20 border border-[#c59b27]/40 flex items-center justify-center text-[#f3e098]">
-                <Shield className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Dedicated Expert Support</h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Continuous reassurance from departure to return. Our concierge desk ensures smooth handoffs, private chauffeurs, and verified hotel reception.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Traveller Stories (Strictly marked pending verified client testimonials per brief) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27]">
-            Traveller Experiences
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-[#010048] tracking-tight">
-            Traveller Stories & Reflections
-          </h2>
-        </div>
-
-        <div className="p-8 sm:p-10 rounded-xl bg-[#f4f1ea] border border-dashed border-[#c59b27]/40 text-center space-y-4 max-w-3xl mx-auto">
-          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mx-auto text-[#c59b27] shadow-sm">
-            <Users className="w-6 h-6" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-800">
-              Verified Client Testimonials Currently Pending Onboarding
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">
+              Speak Directly With Our Senior Travel Desk
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto leading-relaxed">
-              In accordance with our editorial integrity standard, 365Holidayz does not publish fabricated or AI-generated testimonials. Real client stories and verified post-journey photographs will be published upon guest privacy authorization.
+            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+              Call <strong>+91-8939958899 / 9444179215</strong> or message us on WhatsApp for fast customized quotes, seat availability, and visa guidance.
             </p>
           </div>
-          <div className="pt-2">
-            <Link
-              to="/about"
-              className="text-xs font-bold text-[#010048] hover:text-[#c59b27] underline underline-offset-4"
+
+          <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
+            <a
+              href={CLIENT_ASSETS.verifiedContacts.whatsappCommunity}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-md transition-all"
             >
-              Learn about our 30+ year founder journey →
+              <MessageCircle className="w-4 h-4" />
+              <span>WhatsApp Concierge</span>
+            </a>
+
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white font-extrabold text-xs uppercase tracking-wider shadow-md transition-all"
+            >
+              <Calendar className="w-4 h-4 text-white" />
+              <span>Contact Desk</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 8. Plan My Trip CTA Band */}
-      <CTASection onOpenEnquiry={onOpenEnquiry} />
-
-      {/* Video Preview Modal */}
+      {/* 1-Minute Destination Video Player Modal */}
       {activeVideo && (
         <VideoModal
           video={activeVideo}

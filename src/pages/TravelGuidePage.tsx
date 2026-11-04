@@ -35,19 +35,19 @@ export const TravelGuidePage: React.FC = () => {
   return (
     <div className="pt-24 pb-16 space-y-12">
       {/* Header */}
-      <div className="bg-[#010048] text-white py-14 sm:py-18 border-b border-[#c59b27]/30">
+      <div className="bg-gradient-to-r from-[#eff6ff] via-[#f0fdf4] to-[#f8fafc] text-slate-900 py-12 sm:py-16 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <Breadcrumbs items={[{ label: 'Travel Guide' }]} className="text-slate-400" />
+          <Breadcrumbs items={[{ label: 'Travel Guide' }]} className="text-slate-500" />
 
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#f3e098] flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-[#c59b27]" />
+            <span className="text-xs font-black uppercase tracking-widest text-[#ff5a36] flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-[#ff5a36]" />
               <span>Editorial Knowledge Base</span>
             </span>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900">
               The 365Holidayz Travel Guide
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
               Thirty years of on-ground global navigation distilled into thoughtful guides, packing insights, and realistic planning advice.
             </p>
           </div>
@@ -65,10 +65,10 @@ export const TravelGuidePage: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#010048] text-[#f3e098] shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-[#ff5a36] text-white shadow-md shadow-orange-500/20'
+                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 bg-white border border-slate-200'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -82,34 +82,34 @@ export const TravelGuidePage: React.FC = () => {
         {activeTab === 'destinations' && (
           <div className="space-y-6 animate-in fade-in">
             <div className="space-y-2 max-w-2xl">
-              <h2 className="text-2xl font-bold text-[#010048]">Curated Destination Overviews</h2>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-2xl font-black text-slate-900">Curated Destination Overviews</h2>
+              <p className="text-sm text-slate-600 font-medium">
                 Browse our comprehensive geographical guides detailing cultural nuances, optimal length of stay, and verified best seasons.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {ALL_DESTINATIONS.map((dest) => (
-                <div key={dest.id} className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+                <div key={dest.id} className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span className="font-bold text-[#c8a97e] uppercase tracking-wider">{dest.region}</span>
-                      <span>{dest.practicalInfo.idealDuration}</span>
+                      <span className="font-black text-[#ff5a36] uppercase tracking-wider">{dest.region}</span>
+                      <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{dest.practicalInfo.idealDuration}</span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#010048]">{dest.name}</h3>
-                    <p className="text-xs text-slate-600 line-clamp-2">{dest.tagline}</p>
+                    <h3 className="text-xl font-black text-slate-900">{dest.name}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">{dest.tagline}</p>
                   </div>
 
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-500 font-medium">
+                    <span className="text-[11px] text-slate-500 font-bold">
                       Best: {dest.bestTimeToVisit.split('(')[0]}
                     </span>
                     <Link
                       to={`/destinations/${dest.slug}`}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#010048] hover:text-[#c8a97e]"
+                      className="inline-flex items-center gap-1 text-xs font-black text-[#ff5a36] hover:underline"
                     >
                       <span>Read Guide</span>
-                      <ArrowRight className="w-3 h-3 text-[#c8a97e]" />
+                      <ArrowRight className="w-3 h-3 text-[#ff5a36]" />
                     </Link>
                   </div>
                 </div>
@@ -118,126 +118,126 @@ export const TravelGuidePage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 2: Travel Tips */}
+        {/* Tab 2: Travel Tips (Bright Pastel Boxes with bold visible fonts) */}
         {activeTab === 'tips' && (
-          <div className="space-y-8 animate-in fade-in max-w-5xl">
+          <div className="space-y-8 animate-in fade-in max-w-6xl">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#c59b27] block">
+              <span className="text-xs font-black uppercase tracking-widest text-[#ff5a36] block">
                 30+ Years of Ground Wisdom
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#010048]">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
                 Essential Travel Tips & On-Ground Etiquette
               </h2>
-              <p className="text-sm text-slate-600 max-w-3xl leading-relaxed">
+              <p className="text-sm text-slate-600 max-w-3xl leading-relaxed font-medium">
                 Practical insights earned over three decades of moving travellers smoothly across international borders — curated to ensure your holiday is serene, seamless, and completely stress-free.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Tip 1 */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+              {/* Tip 1 - Pastel Mint */}
+              <div className="p-6 rounded-2xl bg-[#f0fdf4] border-2 border-emerald-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                     01
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
                     Arrival Rhythm
                   </span>
                 </div>
-                <h3 className="text-base font-black text-white leading-snug">
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
                   The "Slow First Morning" Principle
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                   Never pack back-to-back excursions on Day 1. After international flights or late evening arrivals, we always curate an unhurried morning with breakfast by the pool or lagoon to let your body acclimate naturally before exploring.
                 </p>
               </div>
 
-              {/* Tip 2 */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+              {/* Tip 2 - Pastel Sky */}
+              <div className="p-6 rounded-2xl bg-[#f0f9ff] border-2 border-sky-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                     02
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-sky-800 bg-sky-100 px-3 py-1 rounded-full border border-sky-300">
                     Logistics & Ease
                   </span>
                 </div>
-                <h3 className="text-base font-black text-white leading-snug">
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
                   Private Chauffeur Seamlessness
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                   Navigating unfamiliar mountain curves in Sri Lanka, Bali, or Jordan can cause fatigue. Having a verified private driver allows you to gaze out at tea trails or desert peaks without navigation stress or parking hassles.
                 </p>
               </div>
 
-              {/* Tip 3 */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+              {/* Tip 3 - Pastel Peach */}
+              <div className="p-6 rounded-2xl bg-[#fff7ed] border-2 border-orange-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-[#ff5a36] text-white flex items-center justify-center font-black text-sm shadow-sm">
                     03
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-orange-900 bg-orange-100 px-3 py-1 rounded-full border border-orange-300">
                     Cultural Respect
                   </span>
                 </div>
-                <h3 className="text-base font-black text-white leading-snug">
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
                   Cultural Reverence & Dress Codes
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                   From the marble courtyards of Muscat’s Grand Mosque to Bali’s sacred sea temples, modest attire (covering shoulders and knees) is essential and appreciated. Keep a lightweight cotton pashmina easily accessible in your day pack.
                 </p>
               </div>
 
-              {/* Tip 4 */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+              {/* Tip 4 - Pastel Lavender */}
+              <div className="p-6 rounded-2xl bg-[#faf5ff] border-2 border-purple-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                     04
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-purple-900 bg-purple-100 px-3 py-1 rounded-full border border-purple-300">
                     Smart Stays
                   </span>
                 </div>
-                <h3 className="text-base font-black text-white leading-snug">
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
                   Preserving Room Contingency & Split Stays
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                   When booking split stays (such as 2N jungle + 3N beach in Bali or 3N Istanbul + 3N Cappadocia), coordinate transfers around standard hotel check-out (11 AM) and check-in (3 PM) with scenic lunch stops along the way.
                 </p>
               </div>
 
-              {/* Tip 5 */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+              {/* Tip 5 - Pastel Butter */}
+              <div className="p-6 rounded-2xl bg-[#fefce8] border-2 border-amber-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-900 flex items-center justify-center font-black text-sm shadow-sm">
                     05
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
                     Dining Comfort
                   </span>
                 </div>
-                <h3 className="text-base font-black text-white leading-snug">
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
                   Indian Meals & Dietary Preferences
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                   Travelling abroad doesn't mean compromising on food. In all our international circuits (Türkiye, Georgia, Far East, Dubai), we pre-arrange authentic Indian meals, vegetarian cuisine, and Jain options with verified partner restaurants.
                 </p>
               </div>
 
-              {/* Tip 6 */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-[#010048] via-[#050454] to-[#010048] border-2 border-[#c59b27]/40 shadow-xl space-y-4 hover:border-[#c59b27] transition-all duration-300">
+              {/* Tip 6 - Pastel Rose */}
+              <div className="p-6 rounded-2xl bg-[#fff1f2] border-2 border-rose-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f3e098] to-[#aa820a] text-[#010048] flex items-center justify-center font-black text-sm shadow-md">
+                  <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                     06
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#f3e098] bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-rose-900 bg-rose-100 px-3 py-1 rounded-full border border-rose-300">
                     Connectivity & Forex
                   </span>
                 </div>
-                <h3 className="text-base font-black text-white leading-snug">
+                <h3 className="text-lg font-black text-slate-900 leading-snug">
                   Forex Card & Dual SIM Security
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-100 font-normal leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                   Always carry a pre-loaded multi-currency Forex card along with a small amount of local currency cash for market bazaars and tipping. Install an international eSIM before departure for seamless WhatsApp connectivity.
                 </p>
               </div>
