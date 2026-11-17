@@ -311,6 +311,11 @@ function normalizeVideoUrl(raw?: string): string | undefined {
   const val = cleanText(raw);
   if (!val || !/^https?:\/\//i.test(val)) return undefined;
 
+  // Preserve YouTube URLs intact (handled directly by HeroSlider YouTube embedder)
+  if (/youtu\.be\/|youtube\.com\//i.test(val)) {
+    return val;
+  }
+
   // Auto-convert Google Drive file share URLs into direct streamable download URLs
   const driveFileMatch = val.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (driveFileMatch && driveFileMatch[1]) {
@@ -319,6 +324,14 @@ function normalizeVideoUrl(raw?: string): string | undefined {
   const driveOpenMatch = val.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
   if (driveOpenMatch && driveOpenMatch[1]) {
     return `https://drive.google.com/uc?export=download&id=${driveOpenMatch[1]}`;
+  }
+
+  // Auto-convert Pexels download URLs (e.g. https://www.pexels.com/download/video/11397114/) into 720p HD stream
+  const pexelsDownloadMatch = val.match(/pexels\.com\/download\/video\/(\d+)\/?(?:\?(.*))?$/i);
+  if (pexelsDownloadMatch && pexelsDownloadMatch[1]) {
+    return pexelsDownloadMatch[2]
+      ? val
+      : `https://www.pexels.com/download/video/${pexelsDownloadMatch[1]}/?h=720&w=1280`;
   }
 
   // Auto-convert Pexels video page URLs (e.g. https://www.pexels.com/video/slug-33293374/) into direct 720p MP4 stream

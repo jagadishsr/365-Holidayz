@@ -1,10 +1,26 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SliderSlide } from '../../types';
 import { GENERATED_ASSETS, HOLIDAY_TYPE_STOCK_IMAGES, DESTINATION_STOCK_IMAGES } from '../../data/stockImages';
 
 const SLIDE_DURATION_MS = 6000;
+
+function parseYouTubeEmbed(url?: string): { id: string; embedUrl: string } | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  const match = trimmed.match(
+    /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i
+  );
+  if (!match || !match[1]) return null;
+
+  const id = match[1];
+  const startMatch = trimmed.match(/[?&#](?:t|start)=(\d+)/i);
+  const startParam = startMatch ? `&start=${startMatch[1]}` : '';
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=${id}&playsinline=1${startParam}`;
+
+  return { id, embedUrl };
+}
 
 const HERO_SLIDES: SliderSlide[] = [
   {
@@ -104,15 +120,37 @@ interface HeroSliderProps {
   heroVideos?: string[];
 }
 
+function getRandomInitialSlideIndex(totalSlides: number): number {
+  if (totalSlides <= 1) return 0;
+  try {
+    const lastIdxRaw = window.sessionStorage.getItem('365holidayz_hero_last_start');
+    const lastIdx = lastIdxRaw !== null ? Number(lastIdxRaw) : -1;
+    let picked = Math.floor(Math.random() * totalSlides);
+    if (picked === lastIdx) {
+      picked = (picked + 1 + Math.floor(Math.random() * (totalSlides - 1))) % totalSlides;
+    }
+    window.sessionStorage.setItem('365holidayz_hero_last_start', String(picked));
+    return picked;
+  } catch {
+    return Math.floor(Math.random() * totalSlides);
+  }
+}
+
 export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(() =>
+    getRandomInitialSlideIndex(HERO_SLIDES.length)
+  );
+  const [prevIndex, setPrevIndex] = useState<number | null>(null);
+  const [transitionKey, setTransitionKey] = useState(0);
   const [failedVideos, setFailedVideos] = useState<Record<string, boolean>>({});
+  const [readyVideos, setReadyVideos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setFailedVideos({});
+    setReadyVideos({});
   }, [heroVideos]);
 
-  const slides = React.useMemo(
+  const slides = useMemo(
     () =>
       HERO_SLIDES.map((slide, idx) => {
         const sheetVideo = heroVideos[idx]?.trim();
@@ -121,13 +159,37 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
     [heroVideos]
   );
 
+  const transitionTo = useCallback((computeNext: (curr: number) => number) => {
+    setCurrentIndex((curr) => {
+      const next = computeNext(curr);
+      if (next !== curr) {
+        setPrevIndex(curr);
+      }
+      return next;
+    });
+    setTransitionKey((k) => k + 1);
+  }, []);
+
+  useEffect(() => {
+    if (prevIndex === null) return;
+    const clearExit = window.setTimeout(() => setPrevIndex(null), 900);
+    return () => window.clearTimeout(clearExit);
+  }, [prevIndex, transitionKey]);
+
   const goNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % slides.length);
-  }, [slides.length]);
+    transitionTo((curr) => (curr + 1) % slides.length);
+  }, [slides.length, transitionTo]);
 
   const goPrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  }, [slides.length]);
+    transitionTo((curr) => (curr - 1 + slides.length) % slides.length);
+  }, [slides.length, transitionTo]);
+
+  const jumpToSlide = useCallback(
+    (idx: number) => {
+      transitionTo(() => idx);
+    },
+    [transitionTo]
+  );
 
   useEffect(() => {
     const timer = window.setInterval(goNext, SLIDE_DURATION_MS);
@@ -143,27 +205,87 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
     >
       {slides.map((slide, idx) => {
         const isCurrent = idx === currentIndex;
-        const canPlayVideo = Boolean(slide.videoUrl) && !failedVideos[slide.id];
+        const isExiting = idx === prevIndex && !isCurrent;
+        const shouldMountVideo = isCurrent || isExiting;
+        const yt = parseYouTubeEmbed(slide.videoUrl);
+        const canPlayMp4 = Boolean(slide.videoUrl) && !yt && !failedVideos[slide.id];
         const dramaticClass = idx % 2 === 0 ? 'animate-hero-zoom-in' : 'animate-hero-zoom-out';
+        const isVideoReady = Boolean(readyVideos[slide.id]);
 
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-all duration-700 ease-out ${
-              isCurrent ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
+            className={`absolute inset-0 ${
+              isCurrent
+                ? 'z-20 animate-hero-bounce-enter'
+                : isExiting
+                  ? 'z-10 animate-hero-bounce-exit pointer-events-none'
+                  : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
-            {canPlayVideo ? (
-              <div className={`w-full h-full ${isCurrent ? 'animate-hero-video' : ''}`}>
+            {/* Always render animated poster backdrop underneath so there is zero flicker while MP4/YouTube buffers */}
+            <img
+              key={`${slide.id}-poster-${isCurrent ? transitionKey : 'idle'}`}
+              src={slide.posterUrl}
+              alt={slide.visualStoryNote || slide.heading}
+              referrerPolicy="no-referrer"
+              className={`absolute inset-0 w-full h-full object-cover ${isCurrent ? dramaticClass : ''}`}
+            />
+
+            {/* YouTube Full-Bleed Muted Background Loop (mounted on active + exiting slide for smooth crossfade) */}
+            {yt && shouldMountVideo && (
+              <div
+                key={`${slide.id}-yt-wrap`}
+                className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-700 ${
+                  isCurrent ? 'animate-hero-video' : ''
+                } ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}
+              >
+                <iframe
+                  key={`${slide.id}-yt-${yt.id}`}
+                  src={yt.embedUrl}
+                  title={slide.heading || 'Holiday preview video'}
+                  allow="autoplay; encrypted-media; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  onLoad={() =>
+                    setReadyVideos((prev) => ({
+                      ...prev,
+                      [slide.id]: true
+                    }))
+                  }
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full scale-[1.18] border-0 pointer-events-none"
+                />
+              </div>
+            )}
+
+            {/* Direct MP4 Video Layer (Mixkit defaults, Pexels download/video links, Drive/CDN MP4s) */}
+            {canPlayMp4 && (
+              <div
+                key={`${slide.id}-mp4-wrap`}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-700 ${
+                  isCurrent ? 'animate-hero-video' : ''
+                } ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}
+              >
                 <video
-                  key={`${slide.id}-${slide.videoUrl}-${isCurrent ? 'active' : 'idle'}`}
+                  key={`${slide.id}-${slide.videoUrl}`}
                   src={slide.videoUrl}
                   poster={slide.posterUrl}
                   autoPlay
                   muted
                   loop
                   playsInline
-                  preload={isCurrent ? 'auto' : 'metadata'}
+                  preload="auto"
+                  onLoadedData={() =>
+                    setReadyVideos((prev) => ({
+                      ...prev,
+                      [slide.id]: true
+                    }))
+                  }
+                  onPlaying={() =>
+                    setReadyVideos((prev) => ({
+                      ...prev,
+                      [slide.id]: true
+                    }))
+                  }
                   onError={() =>
                     setFailedVideos((prev) => ({
                       ...prev,
@@ -173,25 +295,17 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
                   className="w-full h-full object-cover"
                 />
               </div>
-            ) : (
-              <img
-                key={`${slide.id}-img-${isCurrent ? 'active' : 'idle'}`}
-                src={slide.posterUrl}
-                alt={slide.visualStoryNote || slide.heading}
-                referrerPolicy="no-referrer"
-                className={`w-full h-full object-cover ${isCurrent ? dramaticClass : ''}`}
-              />
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/45" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/45 pointer-events-none" />
           </div>
         );
       })}
 
-      {/* Clean Unobstructed Content: Title, Subtitle & CTA Button Only */}
+      {/* Clean Unobstructed Content with Spring-Bounce Entrance */}
       <div className="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-14 sm:pb-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="max-w-3xl space-y-5">
+          <div key={`${activeSlide.id}-${transitionKey}`} className="max-w-3xl space-y-5 animate-hero-text-bounce">
             <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[0.98] text-balance">
               {activeSlide.heading}
             </h1>
@@ -230,7 +344,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
                 <button
                   key={slide.id}
                   type="button"
-                  onClick={() => setCurrentIndex(idx)}
+                  onClick={() => jumpToSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
                   className={`transition-all duration-300 cursor-pointer ${
                     idx === currentIndex

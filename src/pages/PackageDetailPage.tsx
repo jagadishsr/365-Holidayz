@@ -15,6 +15,7 @@ import { DestinationGallery } from '../components/common/DestinationGallery';
 import { CTASection } from '../components/common/CTASection';
 import { Package } from '../types';
 import { filterActivePackages } from '../services/googleSheetsPackages';
+import { splitPackageTitle } from '../utils/packageTitle';
 
 interface PackageDetailPageProps {
   packages: Package[];
@@ -65,9 +66,19 @@ export const PackageDetailPage: React.FC<PackageDetailPageProps> = ({ packages }
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D94E28] block">
               {pkg.destination} &middot; {pkg.region} &middot; {pkg.holidayType}
             </span>
-            <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[#111827] leading-[1.08]">
-              {pkg.title}
-            </h1>
+            {(() => {
+              const { mainTitle, subTitle } = splitPackageTitle(pkg.title);
+              return (
+                <h1 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-[#111827] leading-[1.08]">
+                  <span className="block">{mainTitle}</span>
+                  {subTitle && (
+                    <span className="block text-lg sm:text-2xl font-normal text-[#4B5563] tracking-normal mt-2">
+                      {subTitle}
+                    </span>
+                  )}
+                </h1>
+              );
+            })()}
             <p className="text-sm sm:text-base text-[#4B5563] font-medium">
               {pkg.duration} &middot; {pkg.persons} &middot; {pkg.roomBasis} &middot; {pkg.stayPeriod}
             </p>

@@ -4,6 +4,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { Package } from '../../types';
 import { ImagePlaceholder } from '../common/ImagePlaceholder';
 import { PACKAGE_STOCK_IMAGES } from '../../data/stockImages';
+import { splitPackageTitle } from '../../utils/packageTitle';
 
 interface PackageCardProps {
   pkg: Package;
@@ -12,6 +13,7 @@ interface PackageCardProps {
 
 export const PackageCard: React.FC<PackageCardProps> = ({ pkg, className = '' }) => {
   const displayPrice = pkg.inrPriceDisplay || pkg.priceDisplay;
+  const { mainTitle, subTitle } = splitPackageTitle(pkg.title);
 
   return (
     <article
@@ -40,8 +42,15 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg, className = '' })
             <span>{pkg.holidayType}</span>
           </div>
 
-          <h3 className="font-display text-xl font-bold text-[#111827] leading-snug group-hover:text-[#010048] transition-colors line-clamp-2">
-            <Link to={`/packages/${pkg.slug}`}>{pkg.title}</Link>
+          <h3 className="font-display text-xl font-extrabold text-[#111827] leading-snug group-hover:text-[#010048] transition-colors">
+            <Link to={`/packages/${pkg.slug}`} className="block">
+              <span className="block line-clamp-1">{mainTitle}</span>
+              {subTitle && (
+                <span className="block text-xs sm:text-sm font-normal text-[#4B5563] mt-0.5 line-clamp-1">
+                  {subTitle}
+                </span>
+              )}
+            </Link>
           </h3>
 
           {/* Concise Top Inclusions */}

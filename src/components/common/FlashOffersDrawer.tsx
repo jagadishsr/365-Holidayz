@@ -3,18 +3,47 @@ import { Link } from 'react-router-dom';
 import { X, ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { Package } from '../../types';
 import { getActiveFlashOffers } from '../../services/googleSheetsPackages';
+import { splitPackageTitle } from '../../utils/packageTitle';
 
 interface FlashOffersDrawerProps {
   packages: Package[];
   onEnquirePackage: (pkg: Package) => void;
 }
 
+const FLASH_INTERVALS_MS = [4000, 7000, 5000, 6000];
+
 export const FlashOffersDrawer: React.FC<FlashOffersDrawerProps> = ({
   packages,
   onEnquirePackage
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFlashing, setIsFlashing] = useState(false);
   const flashOffers = getActiveFlashOffers(packages);
+
+  React.useEffect(() => {
+    let waitTimer: number | undefined;
+    let resetTimer: number | undefined;
+    let step = 0;
+
+    const scheduleNextFlash = () => {
+      const delay = FLASH_INTERVALS_MS[step % FLASH_INTERVALS_MS.length];
+      step += 1;
+      waitTimer = window.setTimeout(() => {
+        setIsFlashing(true);
+        resetTimer = window.setTimeout(() => {
+          setIsFlashing(false);
+          scheduleNextFlash();
+        }, 920);
+      }, delay);
+    };
+
+    scheduleNextFlash();
+
+    return () => {
+      if (waitTimer) window.clearTimeout(waitTimer);
+      if (resetTimer) window.clearTimeout(resetTimer);
+    };
+  }, []);
 
   return (
     <>
@@ -23,7 +52,9 @@ export const FlashOffersDrawer: React.FC<FlashOffersDrawerProps> = ({
         type="button"
         onClick={() => setIsOpen(true)}
         aria-label="Open Flash Offers"
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-2 py-4 px-2.5 sm:px-3 bg-[#010048] hover:bg-[#D94E28] text-white rounded-l-xl shadow-lg transition-all duration-300 cursor-pointer border-y border-l border-white/15"
+        className={`fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-2 py-4 px-2.5 sm:px-3 bg-[#010048] hover:bg-[#D94E28] text-white rounded-l-xl shadow-lg transition-colors duration-300 cursor-pointer border-y border-l border-white/15 ${
+          isFlashing ? 'animate-flash-offers-once' : ''
+        }`}
       >
         <span className="[writing-mode:vertical-rl] rotate-180 text-[11px] font-bold uppercase tracking-[0.2em] whitespace-nowrap flex items-center gap-2">
           FLASH OFFERS
@@ -88,13 +119,25 @@ export const FlashOffersDrawer: React.FC<FlashOffersDrawerProps> = ({
                       <span>{pkg.duration}</span>
                     </div>
 
-                    <h3 className="font-display text-lg font-bold text-[#111827] leading-snug">
+                    <h3 className="font-display text-lg font-extrabold text-[#111827] leading-snug">
                       <Link
                         to={`/packages/${pkg.slug}`}
                         onClick={() => setIsOpen(false)}
-                        className="hover:text-[#D94E28] transition-colors"
+                        className="hover:text-[#D94E28] transition-colors block"
                       >
-                        {pkg.title}
+                        {(() => {
+                          const { mainTitle, subTitle } = splitPackageTitle(pkg.title);
+                          return (
+                            <>
+                              <span className="block">{mainTitle}</span>
+                              {subTitle && (
+                                <span className="block text-xs font-normal text-[#4B5563] mt-0.5">
+                                  {subTitle}
+                                </span>
+                              )}
+                            </>
+                          );
+                        })()}
                       </Link>
                     </h3>
 

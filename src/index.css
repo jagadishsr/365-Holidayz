@@ -97,13 +97,68 @@
 
 @keyframes heroVideoPunch {
   0% {
-    transform: scale(1.02) rotate(-0.5deg);
+    opacity: 0;
+    transform: scale(1.16) rotate(-1.1deg) translate3d(1.5%, -0.8%, 0);
   }
-  50% {
-    transform: scale(1.11) rotate(0.6deg);
+  14% {
+    opacity: 1;
+    transform: scale(1.05) rotate(0.5deg) translate3d(-0.5%, 0.4%, 0);
+  }
+  58% {
+    opacity: 1;
+    transform: scale(1.13) rotate(-0.4deg) translate3d(0.8%, -0.4%, 0);
   }
   100% {
-    transform: scale(1.04) rotate(0deg);
+    opacity: 1;
+    transform: scale(1.06) rotate(0.3deg) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroBounceSlideIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(4.5%, 0, 0) scale(1.14) rotate(0.9deg);
+  }
+  52% {
+    opacity: 1;
+    transform: translate3d(-0.9%, 0, 0) scale(1.0) rotate(-0.35deg);
+  }
+  76% {
+    opacity: 1;
+    transform: translate3d(0.4%, 0, 0) scale(1.03) rotate(0.15deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes heroBounceSlideExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.94) rotate(-0.8deg) translate3d(-3%, 0, 0);
+  }
+}
+
+@keyframes heroBounceTextIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0) scale(0.96);
+  }
+  62% {
+    opacity: 1;
+    transform: translate3d(0, -6px, 0) scale(1.015);
+  }
+  82% {
+    transform: translate3d(0, 2px, 0) scale(0.998);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -119,8 +174,46 @@
 }
 
 .animate-hero-video {
-  animation: heroVideoPunch 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite alternate;
-  will-change: transform;
+  animation: heroVideoPunch 6.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-hero-bounce-enter {
+  animation: heroBounceSlideIn 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-hero-bounce-exit {
+  animation: heroBounceSlideExit 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-hero-text-bounce {
+  animation: heroBounceTextIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes flashOffersPulse {
+  0%,
+  100% {
+    background-color: #010048;
+    box-shadow: 0 10px 25px -5px rgba(1, 0, 72, 0.35);
+    transform: translateY(-50%) translateX(0);
+  }
+  35% {
+    background-color: #D94E28;
+    box-shadow: 0 0 28px 6px rgba(217, 78, 40, 0.75);
+    transform: translateY(-50%) translateX(-5px);
+  }
+  65% {
+    background-color: #ff6940;
+    box-shadow: 0 0 34px 8px rgba(255, 105, 64, 0.85);
+    transform: translateY(-50%) translateX(-2px);
+  }
+}
+
+.animate-flash-offers-once {
+  animation: flashOffersPulse 0.9s ease-in-out forwards;
 }
 
 /* Hide scrollbars cleanly where horizontal sliders appear */
