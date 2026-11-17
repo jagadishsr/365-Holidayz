@@ -47,8 +47,13 @@ function getSubdirectoryBasename(): string {
 export function App() {
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
   const [enquiryPackageContext, setEnquiryPackageContext] = useState<Package | undefined>(undefined);
-  const { packages, loading: packagesLoading, status: sheetStatus, refresh: refreshPackages } =
-    usePackagesData();
+  const {
+    packages,
+    heroVideos,
+    loading: packagesLoading,
+    status: sheetStatus,
+    refresh: refreshPackages
+  } = usePackagesData();
 
   const basename = getSubdirectoryBasename();
 
@@ -75,6 +80,7 @@ export function App() {
               element={
                 <HomePage
                   packages={packages}
+                  heroVideos={heroVideos}
                   onOpenEnquiry={() => handleOpenEnquiry()}
                 />
               }

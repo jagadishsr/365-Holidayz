@@ -100,31 +100,48 @@ const HERO_SLIDES: SliderSlide[] = [
   }
 ];
 
-export const HeroSlider: React.FC = () => {
+interface HeroSliderProps {
+  heroVideos?: string[];
+}
+
+export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [failedVideos, setFailedVideos] = useState<Record<string, boolean>>({});
 
+  useEffect(() => {
+    setFailedVideos({});
+  }, [heroVideos]);
+
+  const slides = React.useMemo(
+    () =>
+      HERO_SLIDES.map((slide, idx) => {
+        const sheetVideo = heroVideos[idx]?.trim();
+        return sheetVideo ? { ...slide, videoUrl: sheetVideo } : slide;
+      }),
+    [heroVideos]
+  );
+
   const goNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
-  }, []);
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
 
   const goPrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  }, []);
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  }, [slides.length]);
 
   useEffect(() => {
     const timer = window.setInterval(goNext, SLIDE_DURATION_MS);
     return () => window.clearInterval(timer);
   }, [currentIndex, goNext]);
 
-  const activeSlide = HERO_SLIDES[currentIndex];
+  const activeSlide = slides[currentIndex];
 
   return (
     <section
       className="relative w-full h-[88vh] min-h-[600px] lg:h-[94vh] overflow-hidden bg-[#111827] text-white"
       aria-label="Signature Holiday Experiences"
     >
-      {HERO_SLIDES.map((slide, idx) => {
+      {slides.map((slide, idx) => {
         const isCurrent = idx === currentIndex;
         const canPlayVideo = Boolean(slide.videoUrl) && !failedVideos[slide.id];
         const dramaticClass = idx % 2 === 0 ? 'animate-hero-zoom-in' : 'animate-hero-zoom-out';
@@ -139,7 +156,7 @@ export const HeroSlider: React.FC = () => {
             {canPlayVideo ? (
               <div className={`w-full h-full ${isCurrent ? 'animate-hero-video' : ''}`}>
                 <video
-                  key={`${slide.id}-${isCurrent ? 'active' : 'idle'}`}
+                  key={`${slide.id}-${slide.videoUrl}-${isCurrent ? 'active' : 'idle'}`}
                   src={slide.videoUrl}
                   poster={slide.posterUrl}
                   autoPlay
@@ -209,7 +226,7 @@ export const HeroSlider: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-1.5" aria-hidden="true">
-              {HERO_SLIDES.map((slide, idx) => (
+              {slides.map((slide, idx) => (
                 <button
                   key={slide.id}
                   type="button"

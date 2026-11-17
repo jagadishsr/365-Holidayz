@@ -13,6 +13,7 @@ import {
 
 interface HomePageProps {
   packages: Package[];
+  heroVideos?: string[];
   onOpenEnquiry: () => void;
 }
 
@@ -64,7 +65,7 @@ function getLowestInrLabel(dest: Destination, activePackages: Package[]): string
   return `₹${Math.round(lowest).toLocaleString('en-IN')}`;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ packages, onOpenEnquiry }) => {
+export const HomePage: React.FC<HomePageProps> = ({ packages, heroVideos, onOpenEnquiry }) => {
   const [showAllDestinations, setShowAllDestinations] = useState(false);
 
   const activePackages = useMemo(() => filterActivePackages(packages), [packages]);
@@ -95,7 +96,7 @@ export const HomePage: React.FC<HomePageProps> = ({ packages, onOpenEnquiry }) =
   return (
     <div className="bg-[#FAF9F6]">
       {/* A. Cinematic Hero Video Slider (Title, Subtitle & CTA Button Only) */}
-      <HeroSlider />
+      <HeroSlider heroVideos={heroVideos} />
 
       {/* B. Intro Section with Southeast Asia Visual */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

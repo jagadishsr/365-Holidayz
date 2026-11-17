@@ -206,3 +206,116 @@ export const ABOUT_TEAM_IMAGES = {
   founder: './assets/aistudio/aameenataj_46a39b42.jpg',
   editorialSpread: introSeAsiaImg
 };
+
+// Verified default gallery albums per destination (3+ distinct travel photographs when sheet img1..img8 are empty)
+export const DESTINATION_GALLERY_FALLBACKS: Record<string, string[]> = {
+  maldives: [
+    'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&fit=crop&w=1400&q=80',
+    heroMaldivesLuxuryImg
+  ],
+  'sri-lanka': [
+    'https://images.unsplash.com/photo-1588598198321-9735fd52455b?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80'
+  ],
+  bali: [
+    'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1400&q=80',
+    heroBaliWellnessImg
+  ],
+  mauritius: [
+    'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1589553416260-f586c8f1514f?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1400&q=80'
+  ],
+  seychelles: [
+    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1400&q=80'
+  ],
+  singapore: [
+    happyClientFamilyImg,
+    'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1400&q=80'
+  ],
+  malaysia: [
+    'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1400&q=80',
+    introSeAsiaImg
+  ],
+  thailand: [
+    'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1400&q=80',
+    introSeAsiaImg
+  ],
+  vietnam: [
+    'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1400&q=80'
+  ],
+  dubai: [
+    'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1546412414-e1885259563a?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1400&q=80'
+  ],
+  'istanbul-turkey': [
+    'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=1400&q=80',
+    heroUzbekistanCultureImg
+  ],
+  bahrain: [
+    'https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1546412414-e1885259563a?auto=format&fit=crop&w=1400&q=80'
+  ],
+  jordan: [
+    'https://images.unsplash.com/photo-1548786811-dd6e453ccca7?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1400&q=80'
+  ],
+  oman: [
+    'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1400&q=80'
+  ],
+  georgia: [
+    'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1400&q=80',
+    heroKazakhstanAdventureImg
+  ],
+  azerbaijan: [
+    'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80'
+  ],
+  switzerland: [
+    'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=1400&q=80',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=80'
+  ]
+};
+
+export function getDefaultGalleryImages(slug: string, excludeCover?: string): string[] {
+  const genericPool = [
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1400&q=80',
+    introSeAsiaImg,
+    happyClientCoupleImg,
+    'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1400&q=80'
+  ];
+
+  const base = DESTINATION_GALLERY_FALLBACKS[slug] || genericPool;
+  const normalizedExclude = excludeCover?.split('?')[0];
+  const filtered = base.filter((img) => img.split('?')[0] !== normalizedExclude);
+  if (filtered.length >= 3) return filtered.slice(0, 3);
+
+  const combined = [...filtered];
+  for (const candidate of genericPool) {
+    if (combined.length >= 3) break;
+    if (!combined.some((x) => x.split('?')[0] === candidate.split('?')[0])) {
+      combined.push(candidate);
+    }
+  }
+  return combined.slice(0, 3);
+}
+

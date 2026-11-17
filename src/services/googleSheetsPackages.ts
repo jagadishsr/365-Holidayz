@@ -36,11 +36,30 @@ export interface SheetSyncStatus {
   errorMessage: string | null;
 }
 
-const CACHE_KEY = '365holidayz_sheets_packages_v3';
+const CACHE_KEY = '365holidayz_sheets_packages_v4';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function filterActivePackages(packages: Package[]): Package[] {
   return packages.filter((pkg) => (pkg.displayStatus ?? 'Active') === 'Active');
+}
+
+function collectDestinationGallery(matchingPkgs: Package[]): string[] | undefined {
+  const seen = new Set<string>();
+  const collected: string[] = [];
+
+  for (const p of matchingPkgs) {
+    if (p.galleryImages && p.galleryImages.length > 0) {
+      for (const url of p.galleryImages) {
+        if (url && !seen.has(url)) {
+          seen.add(url);
+          collected.push(url);
+          if (collected.length >= 8) return collected;
+        }
+      }
+    }
+  }
+
+  return collected.length > 0 ? collected : undefined;
 }
 
 export function getPublishedDestinations(packages: Package[]): Destination[] {
@@ -57,13 +76,18 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
     if (hasMatch) matchedSlugs.add(dest.slug);
     return hasMatch;
   }).map((dest) => {
-    const pkgWithImage = active.find(
+    const matchingPkgs = active.filter(
       (pkg) =>
-        (pkg.destinationSlug === dest.slug ||
-          pkg.destination.toLowerCase().includes(dest.name.toLowerCase())) &&
-        pkg.imageUrl
+        pkg.destinationSlug === dest.slug ||
+        pkg.destination.toLowerCase().includes(dest.name.toLowerCase())
     );
-    return pkgWithImage?.imageUrl ? { ...dest, imageUrl: pkgWithImage.imageUrl } : dest;
+    const pkgWithImage = matchingPkgs.find((pkg) => pkg.imageUrl);
+    const galleryImages = collectDestinationGallery(matchingPkgs);
+    return {
+      ...dest,
+      ...(pkgWithImage?.imageUrl ? { imageUrl: pkgWithImage.imageUrl } : {}),
+      ...(galleryImages ? { galleryImages } : {})
+    };
   });
 
   active.forEach((pkg) => {
@@ -76,6 +100,7 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
     matchedSlugs.add(pkg.destinationSlug);
     const matchingPkgs = active.filter((p) => p.destinationSlug === pkg.destinationSlug);
     const explicitImageUrl = matchingPkgs.find((p) => p.imageUrl)?.imageUrl;
+    const galleryImages = collectDestinationGallery(matchingPkgs);
     synthesized.push({
       id: `dest-${pkg.destinationSlug}`,
       slug: pkg.destinationSlug,
@@ -84,6 +109,7 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
       region: pkg.region,
       tagline: `Curated international holidays across ${pkg.destination}`,
       imageUrl: explicitImageUrl,
+      galleryImages,
       heroImageSubject: `${pkg.destination} ${pkg.title} scenic travel landscape`,
       description: pkg.description,
       whyVisit: pkg.features.slice(0, 4),
@@ -271,7 +297,114 @@ function normalizeImageUrl(raw?: string): string | undefined {
     return `https://drive.google.com/thumbnail?id=${driveOpenMatch[1]}&sz=w1600`;
   }
 
+  // Auto-convert Pexels photo page URLs (e.g. https://www.pexels.com/photo/slug-32514343/) into direct CDN image
+  const pexelsPhotoMatch = val.match(/pexels\.com\/photo\/(?:[^/]*-)?(\d+)\/?/i);
+  if (pexelsPhotoMatch && pexelsPhotoMatch[1]) {
+    const id = pexelsPhotoMatch[1];
+    return `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1400`;
+  }
+
   return val;
+}
+
+function normalizeVideoUrl(raw?: string): string | undefined {
+  const val = cleanText(raw);
+  if (!val || !/^https?:\/\//i.test(val)) return undefined;
+
+  // Auto-convert Google Drive file share URLs into direct streamable download URLs
+  const driveFileMatch = val.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/uc?export=download&id=${driveFileMatch[1]}`;
+  }
+  const driveOpenMatch = val.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if (driveOpenMatch && driveOpenMatch[1]) {
+    return `https://drive.google.com/uc?export=download&id=${driveOpenMatch[1]}`;
+  }
+
+  // Auto-convert Pexels video page URLs (e.g. https://www.pexels.com/video/slug-33293374/) into direct 720p MP4 stream
+  const pexelsVideoMatch = val.match(/pexels\.com\/video\/(?:[^/]*-)?(\d+)\/?/i);
+  if (pexelsVideoMatch && pexelsVideoMatch[1]) {
+    return `https://www.pexels.com/download/video/${pexelsVideoMatch[1]}/?h=720&w=1280`;
+  }
+
+  // Auto-convert Mixkit video page URLs (e.g. https://mixkit.co/free-stock-video/slug-4664/) into direct 720p MP4 stream
+  const mixkitVideoMatch = val.match(/mixkit\.co\/free-stock-video\/(?:[^/]*-)?(\d+)\/?/i);
+  if (mixkitVideoMatch && mixkitVideoMatch[1]) {
+    const id = mixkitVideoMatch[1];
+    return `https://assets.mixkit.co/videos/${id}/${id}-720.mp4`;
+  }
+
+  return val;
+}
+
+function locateHeaderRowIndex(rows: string[][]): number {
+  const idx = rows.findIndex((r) => {
+    const joined = r.map((c) => cleanText(c).toLowerCase()).join('|');
+    return (
+      (joined.includes('package name') || joined.includes('package title') || joined.includes('title')) &&
+      (joined.includes('price') || joined.includes('destination') || joined.includes('features'))
+    );
+  });
+  return idx === -1 ? 0 : idx;
+}
+
+function resolveNumberedColumnIndices(
+  headers: string[],
+  prefixes: string[],
+  maxSlots: number
+): number[] {
+  const slots = new Array<number>(maxSlots).fill(-1);
+
+  // Match explicit numbered headers like img1..img8 or vid1..vid7
+  for (let n = 1; n <= maxSlots; n++) {
+    const patterns = prefixes.flatMap((p) => [`${p}${n}`, `${p} ${n}`, `${p}_${n}`, `${p}-${n}`]);
+    const found = headers.findIndex((h) => patterns.includes(h));
+    if (found !== -1) slots[n - 1] = found;
+  }
+
+  // Also support shorthand consecutive columns right after slot 1: e.g. vid1, 2, 3, 4, 5, 6
+  const firstIdx = slots[0];
+  if (firstIdx !== -1) {
+    for (let n = 2; n <= maxSlots; n++) {
+      if (slots[n - 1] !== -1) continue;
+      const expectedCol = firstIdx + (n - 1);
+      if (expectedCol < headers.length) {
+        const hdr = headers[expectedCol];
+        if (hdr === String(n) || hdr === `#${n}` || hdr === `v${n}`) {
+          slots[n - 1] = expectedCol;
+        }
+      }
+    }
+  }
+
+  return slots;
+}
+
+export function extractHeroVideosFromCsv(csvText: string): string[] {
+  const rows = parseCsvRows(csvText);
+  if (rows.length < 2) return [];
+
+  const headerRowIdx = locateHeaderRowIndex(rows);
+  const headers = rows[headerRowIdx].map((h) => cleanText(h).toLowerCase());
+  const vidSlots = resolveNumberedColumnIndices(headers, ['vid', 'video', 'intro', 'hero vid', 'hero video'], 7);
+
+  if (vidSlots.every((idx) => idx === -1)) return [];
+
+  const result = new Array<string>(7).fill('');
+  for (let slotIdx = 0; slotIdx < vidSlots.length; slotIdx++) {
+    const colIdx = vidSlots[slotIdx];
+    if (colIdx === -1) continue;
+
+    for (let rowIndex = headerRowIdx + 1; rowIndex < rows.length; rowIndex++) {
+      const candidate = normalizeVideoUrl(rows[rowIndex]?.[colIdx]);
+      if (candidate) {
+        result[slotIdx] = candidate;
+        break;
+      }
+    }
+  }
+
+  return result;
 }
 
 function inferDuration(text: string): { duration: string; nights: number; days: number } {
@@ -343,14 +476,7 @@ export function mapCsvToPackages(csvText: string): Package[] {
   if (rows.length < 2) return [];
 
   // Locate the real column header row (row 0 may be "Packages Detail")
-  let headerRowIdx = rows.findIndex((r) => {
-    const joined = r.map((c) => cleanText(c).toLowerCase()).join('|');
-    return (
-      (joined.includes('package name') || joined.includes('package title') || joined.includes('title')) &&
-      (joined.includes('price') || joined.includes('destination') || joined.includes('features'))
-    );
-  });
-  if (headerRowIdx === -1) headerRowIdx = 0;
+  const headerRowIdx = locateHeaderRowIndex(rows);
 
   const headers = rows[headerRowIdx].map((h) => cleanText(h).toLowerCase());
   const colExactOrIncludes = (aliases: string[]) => {
@@ -380,22 +506,35 @@ export function mapCsvToPackages(csvText: string): Package[] {
   const idxFlashOffer = colExactOrIncludes(['flash offer', 'flash']);
   const idxDescription = colExactOrIncludes(['package description', 'description', 'summary']);
   const idxStayDetails = colExactOrIncludes(['stay details', 'hotel', 'resort']);
+
+  const imgGallerySlots = resolveNumberedColumnIndices(headers, ['img', 'image', 'photo', 'gallery'], 8);
+  const vidSlotIndices = resolveNumberedColumnIndices(headers, ['vid', 'video', 'intro', 'hero vid', 'hero video'], 7);
+  const idxGalleryList = colExactOrIncludes(['gallery', 'album', 'gallery images']);
+
+  const reservedMediaIndices = new Set(
+    [...imgGallerySlots, ...vidSlotIndices, idxGalleryList].filter((i) => i !== -1)
+  );
+
   const colExcluding = (aliases: string[], excludeTerms: string[] = []) => {
-    const valid = (h: string) => !excludeTerms.some((ex) => h.includes(ex));
-    const exact = headers.findIndex((h) => valid(h) && aliases.some((a) => h === a));
+    const valid = (h: string, idx: number) =>
+      !reservedMediaIndices.has(idx) &&
+      !excludeTerms.some((ex) => h.includes(ex)) &&
+      !/^(?:img|image|photo|gallery|vid|video)[\s_-]*\d+$/.test(h);
+    const exact = headers.findIndex((h, idx) => valid(h, idx) && aliases.some((a) => h === a));
     if (exact !== -1) return exact;
-    return headers.findIndex((h) => valid(h) && aliases.some((a) => h.includes(a)));
+    return headers.findIndex((h, idx) => valid(h, idx) && aliases.some((a) => h.includes(a)));
   };
 
   const idxImageUrl = colExcluding(
-    ['image url', 'photo url', 'picture url', 'img url', 'image', 'photo', 'picture', 'thumbnail', 'url'],
-    ['video']
+    ['coverimg', 'cover img', 'cover image', 'cover', 'image url', 'photo url', 'picture url', 'img url', 'url', 'thumbnail', 'image', 'photo', 'picture'],
+    ['video', 'vid']
   );
 
   let currentRegion: Region = 'Islands';
   let currentDestination = { name: 'Maldives', slug: 'maldives' };
   let awaitingDestinationAfterRegion = false;
   let currentDestinationImageUrl: string | undefined = undefined;
+  let currentDestinationGalleryImages: string[] = [];
   const parsedPackages: Package[] = [];
 
   for (let rowIndex = headerRowIdx + 1; rowIndex < rows.length; rowIndex++) {
@@ -413,10 +552,30 @@ export function mapCsvToPackages(csvText: string): Package[] {
       Boolean(get(idxOrigPrice)) ||
       Boolean(get(idxDescription));
 
-    const fallbackUrlCell = r.find(
-      (cell) => /^https?:\/\/\S+$/i.test(cleanText(cell)) && !/\.(mp4|webm|mov)(\?|$)/i.test(cleanText(cell))
-    );
+    const fallbackUrlCell = r.find((cell, cellIdx) => {
+      if (reservedMediaIndices.has(cellIdx)) return false;
+      const val = cleanText(cell);
+      return /^https?:\/\/\S+$/i.test(val) && !/\.(mp4|webm|mov)(\?|$)/i.test(val);
+    });
     const rowImageUrl = normalizeImageUrl(get(idxImageUrl) || fallbackUrlCell);
+
+    const rowGallerySet = new Set<string>();
+    for (const slotCol of imgGallerySlots) {
+      if (slotCol === -1) continue;
+      const normalized = normalizeImageUrl(get(slotCol));
+      if (normalized && !rowGallerySet.has(normalized)) {
+        rowGallerySet.add(normalized);
+      }
+    }
+    const rawGalleryCell = get(idxGalleryList);
+    if (rawGalleryCell) {
+      rawGalleryCell
+        .split(/[\s,|;\n]+/)
+        .map((token) => normalizeImageUrl(token))
+        .filter((u): u is string => Boolean(u))
+        .forEach((u) => rowGallerySet.add(u));
+    }
+    const rowGalleryImages = Array.from(rowGallerySet).slice(0, 8);
 
     if (!hasTitleOrPrice && nonEmptyCells.length <= 2) {
       const sectionLabel = nonEmptyCells[0];
@@ -425,10 +584,12 @@ export function mapCsvToPackages(csvText: string): Package[] {
         currentRegion = detectedRegion;
         awaitingDestinationAfterRegion = true;
         currentDestinationImageUrl = undefined;
+        currentDestinationGalleryImages = [];
       } else {
         currentDestination = normalizeDestination(sectionLabel);
         awaitingDestinationAfterRegion = false;
         currentDestinationImageUrl = rowImageUrl;
+        currentDestinationGalleryImages = rowGalleryImages;
       }
       continue;
     }
@@ -559,6 +720,12 @@ export function mapCsvToPackages(csvText: string): Package[] {
       features,
       itineraryStatus: 'Detailed day-wise itinerary available on request',
       imageUrl: rowImageUrl || currentDestinationImageUrl,
+      galleryImages:
+        rowGalleryImages.length > 0
+          ? rowGalleryImages
+          : currentDestinationGalleryImages.length > 0
+            ? currentDestinationGalleryImages
+            : undefined,
       imageSubject: `${destInfo.name} ${displayTitle}`,
       isFeatured: parsedPackages.length < 6,
       displayStatus,
@@ -600,6 +767,7 @@ function getConfiguredSheetUrl(): string {
 
 export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
   packages: Package[];
+  heroVideos: string[];
   status: SheetSyncStatus;
 }> {
   const configuredUrl = getConfiguredSheetUrl();
@@ -609,6 +777,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
     const activeBaseline = filterActivePackages(ALL_PACKAGES);
     return {
       packages: activeBaseline,
+      heroVideos: [],
       status: {
         configured: false,
         mode: 'verified-local-baseline',
@@ -630,13 +799,14 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
       }
       const csvText = await response.text();
       const parsed = mapCsvToPackages(csvText);
+      const heroVideos = extractHeroVideosFromCsv(csvText);
       const activeOnly = filterActivePackages(parsed);
 
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem(
             CACHE_KEY,
-            JSON.stringify({ timestamp: Date.now(), url: endpoint, packages: parsed })
+            JSON.stringify({ timestamp: Date.now(), url: endpoint, packages: parsed, heroVideos })
           );
         } catch {
           // Ignore storage quota issues
@@ -645,6 +815,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
 
       return {
         packages: activeOnly,
+        heroVideos,
         status: {
           configured: true,
           mode: 'live-google-sheet',
@@ -667,10 +838,12 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
           timestamp: number;
           url: string;
           packages: Package[];
+          heroVideos?: string[];
         };
         if (candidates.includes(cached.url) && cached.packages.length > 0) {
           return {
             packages: filterActivePackages(cached.packages),
+            heroVideos: cached.heroVideos || [],
             status: {
               configured: true,
               mode: 'sheet-error-fallback',
@@ -689,6 +862,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
   const message = lastError instanceof Error ? lastError.message : 'Unable to reach Google Sheet CSV';
   return {
     packages: filterActivePackages(ALL_PACKAGES),
+    heroVideos: [],
     status: {
       configured: true,
       mode: 'sheet-error-fallback',
@@ -701,6 +875,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
 
 export function usePackagesData() {
   const [packages, setPackages] = useState<Package[]>(() => filterActivePackages(ALL_PACKAGES));
+  const [heroVideos, setHeroVideos] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(() => Boolean(getConfiguredSheetUrl()));
   const [status, setStatus] = useState<SheetSyncStatus>({
     configured: Boolean(getConfiguredSheetUrl()),
@@ -714,6 +889,7 @@ export function usePackagesData() {
     if (getConfiguredSheetUrl()) setLoading(true);
     const result = await fetchPackagesWithStatus(force);
     setPackages(result.packages);
+    setHeroVideos(result.heroVideos);
     setStatus(result.status);
     setLoading(false);
   }, []);
@@ -730,6 +906,7 @@ export function usePackagesData() {
 
   return {
     packages,
+    heroVideos,
     loading,
     status,
     refresh: () => load(true)

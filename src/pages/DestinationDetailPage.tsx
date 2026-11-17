@@ -1,8 +1,9 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Globe } from 'lucide-react';
-import { DESTINATION_STOCK_IMAGES } from '../data/stockImages';
+import { DESTINATION_STOCK_IMAGES, getDefaultGalleryImages } from '../data/stockImages';
 import { PackageCard } from '../components/cards/PackageCard';
+import { DestinationGallery } from '../components/common/DestinationGallery';
 import { FAQAccordion } from '../components/common/FAQAccordion';
 import { CTASection } from '../components/common/CTASection';
 import { resolveStockImage } from '../components/common/ImagePlaceholder';
@@ -38,6 +39,11 @@ export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ pa
     destination.slug,
     destination.imageUrl || DESTINATION_STOCK_IMAGES[destination.slug]
   );
+
+  const albumImages =
+    destination.galleryImages && destination.galleryImages.length > 0
+      ? destination.galleryImages
+      : getDefaultGalleryImages(destination.slug, heroImage);
 
   return (
     <div className="bg-[#FAF9F6]">
@@ -145,6 +151,15 @@ export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ pa
               <ArrowRight className="w-4 h-4" />
             </Link>
           </aside>
+        </div>
+
+        {/* Scrollable Destination Photo Album (Up to 8 images, driven by img1-img8 or 3 curated defaults) */}
+        <div className="pt-12 border-t border-[#E5E2DC]">
+          <DestinationGallery
+            images={albumImages}
+            title={`${destination.displayLabel || destination.name} in Frames`}
+            eyebrow="Destination Gallery"
+          />
         </div>
 
         {/* Active Packages for Destination */}

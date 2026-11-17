@@ -56,6 +56,7 @@ export interface Package {
   dataReviewNotes?: string[];
   imageUrl?: string;
   imageSubject: string;
+  galleryImages?: string[];
   gallerySubjects?: string[];
   isFeatured?: boolean;
   displayStatus?: PackageDisplayStatus;
@@ -71,6 +72,7 @@ export interface Destination {
   region: Region;
   tagline: string;
   imageUrl?: string;
+  galleryImages?: string[];
   heroImageSubject: string;
   description: string;
   whyVisit: string[];

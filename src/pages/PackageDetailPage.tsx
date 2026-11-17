@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, Check, XCircle, Phone, MessageCircle } from 'lucide-react';
-import { PACKAGE_STOCK_IMAGES, DESTINATION_STOCK_IMAGES, CLIENT_ASSETS } from '../data/stockImages';
+import {
+  PACKAGE_STOCK_IMAGES,
+  DESTINATION_STOCK_IMAGES,
+  CLIENT_ASSETS,
+  getDefaultGalleryImages
+} from '../data/stockImages';
 import { resolveStockImage } from '../components/common/ImagePlaceholder';
 import { PriceDisplay } from '../components/common/PriceDisplay';
 import { EnquiryForm } from '../components/common/EnquiryForm';
 import { PackageCard } from '../components/cards/PackageCard';
+import { DestinationGallery } from '../components/common/DestinationGallery';
 import { CTASection } from '../components/common/CTASection';
 import { Package } from '../types';
 import { filterActivePackages } from '../services/googleSheetsPackages';
@@ -36,6 +42,11 @@ export const PackageDetailPage: React.FC<PackageDetailPageProps> = ({ packages }
     pkg.destinationSlug,
     pkg.imageUrl || PACKAGE_STOCK_IMAGES[pkg.id] || DESTINATION_STOCK_IMAGES[pkg.destinationSlug]
   );
+
+  const albumImages =
+    pkg.galleryImages && pkg.galleryImages.length > 0
+      ? pkg.galleryImages
+      : getDefaultGalleryImages(pkg.destinationSlug, heroImage);
 
   return (
     <div className="bg-[#FAF9F6] pt-24 sm:pt-28 pb-12">
@@ -231,6 +242,15 @@ export const PackageDetailPage: React.FC<PackageDetailPageProps> = ({ packages }
             )}
           </aside>
         </div>
+
+        {/* Scrollable Package & Destination Photo Album */}
+        <section className="pt-12 border-t border-[#E5E2DC]">
+          <DestinationGallery
+            images={albumImages}
+            title={`${pkg.destination} Visual Highlights`}
+            eyebrow="Journey Gallery"
+          />
+        </section>
 
         {/* Related Packages */}
         {relatedPackages.length > 0 && (
