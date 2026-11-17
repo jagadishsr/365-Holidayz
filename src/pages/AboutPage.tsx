@@ -8,7 +8,7 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="bg-[#FAF9F6] pt-28 sm:pt-36">
       {/* Editorial Header */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24 space-y-6">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 space-y-6">
         <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#D94E28] block">
           About 365Holidayz
         </span>
@@ -20,19 +20,8 @@ export const AboutPage: React.FC = () => {
         </p>
       </section>
 
-      {/* Full-Width Destination Photography Spread */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28">
-        <div className="aspect-[16/9] max-h-[600px] w-full rounded-2xl overflow-hidden bg-[#E8E4DC]">
-          <img
-            src={GENERATED_ASSETS.swissHoneymoon}
-            alt="Three decades of curated international travel"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </section>
-
       {/* Approved Founder Narrative: Aameena */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 sm:pb-32">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Attached Founder Portrait */}
           <div className="lg:col-span-5">
@@ -84,6 +73,17 @@ export const AboutPage: React.FC = () => {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Full-Width Destination Photography Spread */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28">
+        <div className="aspect-[16/9] max-h-[600px] w-full rounded-2xl overflow-hidden bg-[#E8E4DC]">
+          <img
+            src={GENERATED_ASSETS.swissHoneymoon}
+            alt="Three decades of curated international travel"
+            className="w-full h-full object-cover"
+          />
         </div>
       </section>
 
