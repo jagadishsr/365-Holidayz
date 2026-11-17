@@ -495,17 +495,43 @@ export function mapCsvToPackages(csvText: string): Package[] {
   return parsedPackages;
 }
 
-function getConfiguredSheetUrl(): string {
-  return (import.meta.env.VITE_PACKAGES_SHEET_CSV_URL || '').trim();
+const DEFAULT_PACKAGES_SHEET_URL =
+  'https://docs.google.com/spreadsheets/d/14M2X50ABnzcOduPfWiNxBqGq7m7FCmy7C2lMTHwy3RY/edit?gid=517827184#gid=517827184';
+
+function buildCandidateCsvUrls(raw: string): string[] {
+  const url = raw.trim();
+  if (!url) return [];
+
+  if (url.includes('output=csv') || url.includes('format=csv') || url.includes('tqx=out:csv')) {
+    return [url];
+  }
+
+  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (idMatch && idMatch[1]) {
+    const gidMatch = url.match(/[?&#]gid=(\d+)/);
+    const gidParam = gidMatch ? `&gid=${gidMatch[1]}` : '';
+    return [
+      `https://docs.google.com/spreadsheets/d/${idMatch[1]}/export?format=csv${gidParam}`,
+      `https://docs.google.com/spreadsheets/d/${idMatch[1]}/gviz/tq?tqx=out:csv${gidParam}`
+    ];
+  }
+
+  return [url];
 }
 
-export async function fetchPackagesWithStatus(forceRefresh = false): Promise<{
+function getConfiguredSheetUrl(): string {
+  const envUrl = (import.meta.env.VITE_PACKAGES_SHEET_CSV_URL || '').trim();
+  return envUrl || DEFAULT_PACKAGES_SHEET_URL;
+}
+
+export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
   packages: Package[];
   status: SheetSyncStatus;
 }> {
-  const sheetUrl = getConfiguredSheetUrl();
+  const configuredUrl = getConfiguredSheetUrl();
+  const candidates = buildCandidateCsvUrls(configuredUrl);
 
-  if (!sheetUrl) {
+  if (candidates.length === 0) {
     const activeBaseline = filterActivePackages(ALL_PACKAGES);
     return {
       packages: activeBaseline,
@@ -519,7 +545,47 @@ export async function fetchPackagesWithStatus(forceRefresh = false): Promise<{
     };
   }
 
-  if (!forceRefresh && typeof window !== 'undefined') {
+  let lastError: unknown = null;
+
+  for (const endpoint of candidates) {
+    const cacheBustUrl = `${endpoint}${endpoint.includes('?') ? '&' : '?'}_cb=${Date.now()}`;
+    try {
+      const response = await fetch(cacheBustUrl, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Google Sheets CSV endpoint returned HTTP ${response.status}`);
+      }
+      const csvText = await response.text();
+      const parsed = mapCsvToPackages(csvText);
+      const activeOnly = filterActivePackages(parsed);
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify({ timestamp: Date.now(), url: endpoint, packages: parsed })
+          );
+        } catch {
+          // Ignore storage quota issues
+        }
+      }
+
+      return {
+        packages: activeOnly,
+        status: {
+          configured: true,
+          mode: 'live-google-sheet',
+          sourceUrl: endpoint,
+          lastSyncedAt: new Date().toISOString(),
+          errorMessage: null
+        }
+      };
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  // Fallback to cached copy if offline/unreachable
+  if (typeof window !== 'undefined') {
     try {
       const cachedRaw = localStorage.getItem(CACHE_KEY);
       if (cachedRaw) {
@@ -528,67 +594,35 @@ export async function fetchPackagesWithStatus(forceRefresh = false): Promise<{
           url: string;
           packages: Package[];
         };
-        if (cached.url === sheetUrl && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        if (candidates.includes(cached.url) && cached.packages.length > 0) {
           return {
             packages: filterActivePackages(cached.packages),
             status: {
               configured: true,
-              mode: 'live-google-sheet',
-              sourceUrl: sheetUrl,
+              mode: 'sheet-error-fallback',
+              sourceUrl: candidates[0],
               lastSyncedAt: new Date(cached.timestamp).toISOString(),
-              errorMessage: null
+              errorMessage: lastError instanceof Error ? lastError.message : 'Network fallback'
             }
           };
         }
       }
     } catch {
-      // Ignore cache read issues cleanly
+      // Ignore storage errors
     }
   }
 
-  try {
-    const response = await fetch(sheetUrl, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Google Sheets CSV endpoint returned HTTP ${response.status}`);
+  const message = lastError instanceof Error ? lastError.message : 'Unable to reach Google Sheet CSV';
+  return {
+    packages: filterActivePackages(ALL_PACKAGES),
+    status: {
+      configured: true,
+      mode: 'sheet-error-fallback',
+      sourceUrl: candidates[0],
+      lastSyncedAt: null,
+      errorMessage: message
     }
-    const csvText = await response.text();
-    const parsed = mapCsvToPackages(csvText);
-    const activeOnly = filterActivePackages(parsed);
-
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(
-          CACHE_KEY,
-          JSON.stringify({ timestamp: Date.now(), url: sheetUrl, packages: parsed })
-        );
-      } catch {
-        // Ignore storage quota issues
-      }
-    }
-
-    return {
-      packages: activeOnly,
-      status: {
-        configured: true,
-        mode: 'live-google-sheet',
-        sourceUrl: sheetUrl,
-        lastSyncedAt: new Date().toISOString(),
-        errorMessage: null
-      }
-    };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unable to reach published Google Sheet CSV';
-    return {
-      packages: filterActivePackages(ALL_PACKAGES),
-      status: {
-        configured: true,
-        mode: 'sheet-error-fallback',
-        sourceUrl: sheetUrl,
-        lastSyncedAt: null,
-        errorMessage: message
-      }
-    };
-  }
+  };
 }
 
 export function usePackagesData() {
@@ -602,7 +636,7 @@ export function usePackagesData() {
     errorMessage: null
   });
 
-  const load = useCallback(async (force = false) => {
+  const load = useCallback(async (force = true) => {
     if (getConfiguredSheetUrl()) setLoading(true);
     const result = await fetchPackagesWithStatus(force);
     setPackages(result.packages);
@@ -611,7 +645,7 @@ export function usePackagesData() {
   }, []);
 
   useEffect(() => {
-    load(false);
+    load(true);
     const intervalId = getConfiguredSheetUrl()
       ? window.setInterval(() => load(true), CACHE_TTL_MS)
       : undefined;
