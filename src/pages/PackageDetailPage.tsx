@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, Check, XCircle, Phone, MessageCircle } from 'lucide-react';
-import { PACKAGE_STOCK_IMAGES, DESTINATION_STOCK_IMAGES, GENERATED_ASSETS, CLIENT_ASSETS } from '../data/stockImages';
+import { PACKAGE_STOCK_IMAGES, DESTINATION_STOCK_IMAGES, CLIENT_ASSETS } from '../data/stockImages';
+import { resolveStockImage } from '../components/common/ImagePlaceholder';
 import { PriceDisplay } from '../components/common/PriceDisplay';
 import { EnquiryForm } from '../components/common/EnquiryForm';
 import { PackageCard } from '../components/cards/PackageCard';
@@ -28,10 +29,13 @@ export const PackageDetailPage: React.FC<PackageDetailPageProps> = ({ packages }
     .filter((p) => p.id !== pkg.id && (p.destination === pkg.destination || p.region === pkg.region))
     .slice(0, 3);
 
-  const heroImage =
-    PACKAGE_STOCK_IMAGES[pkg.id] ||
-    DESTINATION_STOCK_IMAGES[pkg.destinationSlug] ||
-    GENERATED_ASSETS.maldivesLuxury;
+  const heroImage = resolveStockImage(
+    pkg.imageSubject,
+    pkg.holidayType,
+    pkg.id,
+    pkg.destinationSlug,
+    pkg.imageUrl || PACKAGE_STOCK_IMAGES[pkg.id] || DESTINATION_STOCK_IMAGES[pkg.destinationSlug]
+  );
 
   return (
     <div className="bg-[#FAF9F6] pt-24 sm:pt-28 pb-12">

@@ -23,7 +23,8 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({
       className={`group relative block overflow-hidden rounded-2xl bg-[#111827] ${className}`}
     >
       <ImagePlaceholder
-        src={DESTINATION_STOCK_IMAGES[destination.slug]}
+        src={destination.imageUrl || DESTINATION_STOCK_IMAGES[destination.slug]}
+        destinationSlug={destination.slug}
         subject={destination.heroImageSubject}
         aspectRatio="portrait"
         overlayGradient={true}

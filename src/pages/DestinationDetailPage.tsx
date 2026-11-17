@@ -5,6 +5,7 @@ import { DESTINATION_STOCK_IMAGES } from '../data/stockImages';
 import { PackageCard } from '../components/cards/PackageCard';
 import { FAQAccordion } from '../components/common/FAQAccordion';
 import { CTASection } from '../components/common/CTASection';
+import { resolveStockImage } from '../components/common/ImagePlaceholder';
 import { Package } from '../types';
 import {
   filterActivePackages,
@@ -23,13 +24,20 @@ export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ pa
   if (!destination) {
     return <Navigate to="/destinations" replace />;
   }
+
   const relatedPackages = activePackages.filter(
     (p) =>
       p.destinationSlug === destination.slug ||
       p.destination.toLowerCase().includes(destination.name.toLowerCase())
   );
 
-  const heroImage = DESTINATION_STOCK_IMAGES[destination.slug] || DESTINATION_STOCK_IMAGES['maldives'];
+  const heroImage = resolveStockImage(
+    destination.heroImageSubject,
+    undefined,
+    undefined,
+    destination.slug,
+    destination.imageUrl || DESTINATION_STOCK_IMAGES[destination.slug]
+  );
 
   return (
     <div className="bg-[#FAF9F6]">

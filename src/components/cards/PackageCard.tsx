@@ -20,8 +20,10 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg, className = '' })
       {/* Clean Borderless Photography */}
       <Link to={`/packages/${pkg.slug}`} className="block relative overflow-hidden">
         <ImagePlaceholder
-          src={PACKAGE_STOCK_IMAGES[pkg.id]}
+          src={pkg.imageUrl || PACKAGE_STOCK_IMAGES[pkg.id]}
           packageId={pkg.id}
+          destinationSlug={pkg.destinationSlug}
+          category={pkg.holidayType}
           subject={pkg.imageSubject}
           aspectRatio="card"
         />

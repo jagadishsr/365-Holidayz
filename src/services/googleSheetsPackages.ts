@@ -56,6 +56,14 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
     );
     if (hasMatch) matchedSlugs.add(dest.slug);
     return hasMatch;
+  }).map((dest) => {
+    const pkgWithImage = active.find(
+      (pkg) =>
+        (pkg.destinationSlug === dest.slug ||
+          pkg.destination.toLowerCase().includes(dest.name.toLowerCase())) &&
+        pkg.imageUrl
+    );
+    return pkgWithImage?.imageUrl ? { ...dest, imageUrl: pkgWithImage.imageUrl } : dest;
   });
 
   active.forEach((pkg) => {
@@ -66,6 +74,8 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
       return;
     }
     matchedSlugs.add(pkg.destinationSlug);
+    const matchingPkgs = active.filter((p) => p.destinationSlug === pkg.destinationSlug);
+    const explicitImageUrl = matchingPkgs.find((p) => p.imageUrl)?.imageUrl;
     synthesized.push({
       id: `dest-${pkg.destinationSlug}`,
       slug: pkg.destinationSlug,
@@ -73,7 +83,8 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
       country: pkg.destination,
       region: pkg.region,
       tagline: `Curated international holidays across ${pkg.destination}`,
-      heroImageSubject: `${pkg.destination} iconic skyline and coastal landscape`,
+      imageUrl: explicitImageUrl,
+      heroImageSubject: `${pkg.destination} ${pkg.title} scenic travel landscape`,
       description: pkg.description,
       whyVisit: pkg.features.slice(0, 4),
       keyExperiences: pkg.features.slice(0, 4),
@@ -206,6 +217,18 @@ function normalizeDestination(raw: string): { name: string; slug: string } {
   if (upper.includes('KAZAKHSTAN')) return { name: 'Kazakhstan', slug: 'kazakhstan' };
   if (upper.includes('UZBEKISTAN')) return { name: 'Uzbekistan', slug: 'uzbekistan' };
   if (upper.includes('GREECE')) return { name: 'Greece', slug: 'greece' };
+  if (upper.includes('SWITZERLAND') || upper.includes('SWISS')) {
+    return { name: 'Switzerland', slug: 'switzerland' };
+  }
+  if (upper.includes('FRANCE') || upper.includes('PARIS')) return { name: 'France', slug: 'france' };
+  if (upper.includes('ITALY')) return { name: 'Italy', slug: 'italy' };
+  if (upper.includes('AUSTRIA')) return { name: 'Austria', slug: 'austria' };
+  if (upper.includes('GERMANY')) return { name: 'Germany', slug: 'germany' };
+  if (upper.includes('UNITED KINGDOM') || upper === 'UK' || upper.includes('LONDON')) {
+    return { name: 'United Kingdom', slug: 'united-kingdom' };
+  }
+  if (upper.includes('JAPAN')) return { name: 'Japan', slug: 'japan' };
+  if (upper.includes('AUSTRALIA')) return { name: 'Australia', slug: 'australia' };
 
   const titleCased = cleanText(raw)
     .toLowerCase()
@@ -223,7 +246,32 @@ function parseRegionFromSection(raw: string): Region | null {
   if (/^(IV\.|REGION\s*4)/.test(upper) || upper.includes('OTHER COUNTRIES')) {
     return 'Other Countries';
   }
+  if (/^(V\.|VI\.|REGION\s*5)/.test(upper) || upper === 'EUROPE' || upper.includes('EUROPE')) {
+    return 'Europe';
+  }
+  if (upper === 'AFRICA' || upper === 'AMERICAS' || upper === 'AUSTRALIA & OCEANIA') {
+    return cleanText(raw)
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
   return null;
+}
+
+function normalizeImageUrl(raw?: string): string | undefined {
+  const val = cleanText(raw);
+  if (!val || !/^https?:\/\//i.test(val)) return undefined;
+
+  // Auto-convert Google Drive file share URLs into directly embeddable image URLs
+  const driveFileMatch = val.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/thumbnail?id=${driveFileMatch[1]}&sz=w1600`;
+  }
+  const driveOpenMatch = val.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if (driveOpenMatch && driveOpenMatch[1]) {
+    return `https://drive.google.com/thumbnail?id=${driveOpenMatch[1]}&sz=w1600`;
+  }
+
+  return val;
 }
 
 function inferDuration(text: string): { duration: string; nights: number; days: number } {
@@ -332,9 +380,22 @@ export function mapCsvToPackages(csvText: string): Package[] {
   const idxFlashOffer = colExactOrIncludes(['flash offer', 'flash']);
   const idxDescription = colExactOrIncludes(['package description', 'description', 'summary']);
   const idxStayDetails = colExactOrIncludes(['stay details', 'hotel', 'resort']);
+  const colExcluding = (aliases: string[], excludeTerms: string[] = []) => {
+    const valid = (h: string) => !excludeTerms.some((ex) => h.includes(ex));
+    const exact = headers.findIndex((h) => valid(h) && aliases.some((a) => h === a));
+    if (exact !== -1) return exact;
+    return headers.findIndex((h) => valid(h) && aliases.some((a) => h.includes(a)));
+  };
+
+  const idxImageUrl = colExcluding(
+    ['image url', 'photo url', 'picture url', 'img url', 'image', 'photo', 'picture', 'thumbnail', 'url'],
+    ['video']
+  );
 
   let currentRegion: Region = 'Islands';
   let currentDestination = { name: 'Maldives', slug: 'maldives' };
+  let awaitingDestinationAfterRegion = false;
+  let currentDestinationImageUrl: string | undefined = undefined;
   const parsedPackages: Package[] = [];
 
   for (let rowIndex = headerRowIdx + 1; rowIndex < rows.length; rowIndex++) {
@@ -345,20 +406,29 @@ export function mapCsvToPackages(csvText: string): Package[] {
     const nonEmptyCells = r.map((c) => cleanText(c)).filter(Boolean);
     if (nonEmptyCells.length === 0) continue;
 
-    // Check if this is a Region section row ("I. ISLANDS") or Destination header row ("MALDIVES")
+    // Check if this is a Region section row ("I. ISLANDS", "EUROPE") or Destination header row ("MALDIVES")
     const hasTitleOrPrice =
       Boolean(get(idxPkgTitle)) ||
       Boolean(get(idxPriceInr)) ||
       Boolean(get(idxOrigPrice)) ||
       Boolean(get(idxDescription));
 
+    const fallbackUrlCell = r.find(
+      (cell) => /^https?:\/\/\S+$/i.test(cleanText(cell)) && !/\.(mp4|webm|mov)(\?|$)/i.test(cleanText(cell))
+    );
+    const rowImageUrl = normalizeImageUrl(get(idxImageUrl) || fallbackUrlCell);
+
     if (!hasTitleOrPrice && nonEmptyCells.length <= 2) {
       const sectionLabel = nonEmptyCells[0];
       const detectedRegion = parseRegionFromSection(sectionLabel);
       if (detectedRegion) {
         currentRegion = detectedRegion;
+        awaitingDestinationAfterRegion = true;
+        currentDestinationImageUrl = undefined;
       } else {
         currentDestination = normalizeDestination(sectionLabel);
+        awaitingDestinationAfterRegion = false;
+        currentDestinationImageUrl = rowImageUrl;
       }
       continue;
     }
@@ -368,9 +438,12 @@ export function mapCsvToPackages(csvText: string): Package[] {
     if (!rawPkgName && !rawPkgTitle) continue;
 
     const destColVal = get(idxDestination);
-    const destInfo = destColVal
-      ? normalizeDestination(destColVal)
-      : currentDestination;
+    let destInfo = destColVal ? normalizeDestination(destColVal) : currentDestination;
+    if (!destColVal && awaitingDestinationAfterRegion && rawPkgName) {
+      destInfo = normalizeDestination(rawPkgName);
+      currentDestination = destInfo;
+      awaitingDestinationAfterRegion = false;
+    }
 
     const regionColVal = get(idxRegion);
     const regionValue = (regionColVal || currentRegion) as Region;
@@ -485,6 +558,7 @@ export function mapCsvToPackages(csvText: string): Package[] {
       stayDetails: get(idxStayDetails) || features[0] || `${rooms} in vetted hotel or resort`,
       features,
       itineraryStatus: 'Detailed day-wise itinerary available on request',
+      imageUrl: rowImageUrl || currentDestinationImageUrl,
       imageSubject: `${destInfo.name} ${displayTitle}`,
       isFeatured: parsedPackages.length < 6,
       displayStatus,
@@ -520,7 +594,7 @@ function buildCandidateCsvUrls(raw: string): string[] {
 }
 
 function getConfiguredSheetUrl(): string {
-  const envUrl = (import.meta.env.VITE_PACKAGES_SHEET_CSV_URL || '').trim();
+  const envUrl = (import.meta.env?.VITE_PACKAGES_SHEET_CSV_URL || '').trim();
   return envUrl || DEFAULT_PACKAGES_SHEET_URL;
 }
 

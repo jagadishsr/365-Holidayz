@@ -2,7 +2,9 @@ export type Region =
   | 'Islands'
   | 'Far East Asian'
   | 'Middle East & Mediterranean'
-  | 'Other Countries';
+  | 'Europe'
+  | 'Other Countries'
+  | (string & {});
 
 export type HolidayCategory =
   | 'Honeymoon'
@@ -52,6 +54,7 @@ export interface Package {
   exclusions?: string[];
   itineraryStatus: string;
   dataReviewNotes?: string[];
+  imageUrl?: string;
   imageSubject: string;
   gallerySubjects?: string[];
   isFeatured?: boolean;
@@ -67,6 +70,7 @@ export interface Destination {
   country: string;
   region: Region;
   tagline: string;
+  imageUrl?: string;
   heroImageSubject: string;
   description: string;
   whyVisit: string[];

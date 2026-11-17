@@ -21,15 +21,59 @@ interface ImagePlaceholderProps {
   compact?: boolean;
   priority?: boolean;
   packageId?: string;
+  destinationSlug?: string;
 }
 
-function resolveStockImage(subject: string, category?: string, packageId?: string): string {
+export function resolveStockImage(
+  subject: string,
+  category?: string,
+  packageId?: string,
+  destinationSlug?: string,
+  explicitImageUrl?: string
+): string {
+  if (explicitImageUrl && explicitImageUrl.trim()) {
+    return explicitImageUrl.trim();
+  }
+
   if (packageId && PACKAGE_STOCK_IMAGES[packageId]) {
     return PACKAGE_STOCK_IMAGES[packageId];
   }
 
-  const text = `${subject} ${category || ''}`.toLowerCase();
+  if (destinationSlug && DESTINATION_STOCK_IMAGES[destinationSlug]) {
+    return DESTINATION_STOCK_IMAGES[destinationSlug];
+  }
 
+  const text = `${subject} ${category || ''} ${destinationSlug || ''}`.toLowerCase();
+
+  if (
+    text.includes('switzerland') ||
+    text.includes('swiss') ||
+    text.includes('interlaken') ||
+    text.includes('geneva') ||
+    text.includes('zurich') ||
+    text.includes('zermatt') ||
+    text.includes('lucerne')
+  ) {
+    return DESTINATION_STOCK_IMAGES['switzerland'];
+  }
+  if (text.includes('france') || text.includes('paris')) {
+    return DESTINATION_STOCK_IMAGES['france'];
+  }
+  if (text.includes('italy') || text.includes('venice') || text.includes('rome') || text.includes('milan')) {
+    return DESTINATION_STOCK_IMAGES['italy'];
+  }
+  if (text.includes('austria') || text.includes('vienna') || text.includes('salzburg') || text.includes('europe')) {
+    return DESTINATION_STOCK_IMAGES['europe'];
+  }
+  if (text.includes('london') || text.includes('united kingdom') || /\buk\b/.test(text)) {
+    return DESTINATION_STOCK_IMAGES['united-kingdom'];
+  }
+  if (text.includes('japan') || text.includes('tokyo') || text.includes('kyoto')) {
+    return DESTINATION_STOCK_IMAGES['japan'];
+  }
+  if (text.includes('australia') || text.includes('sydney') || text.includes('melbourne')) {
+    return DESTINATION_STOCK_IMAGES['australia'];
+  }
   if (text.includes('kazakhstan') || text.includes('tien shan') || text.includes('almaty')) {
     return GENERATED_ASSETS.kazakhstanAdventure;
   }
@@ -39,10 +83,7 @@ function resolveStockImage(subject: string, category?: string, packageId?: strin
   if (text.includes('greece') || text.includes('santorini') || text.includes('aegean')) {
     return GENERATED_ASSETS.greeceVertical;
   }
-  if (text.includes('swiss') || text.includes('honeymoon')) {
-    return GENERATED_ASSETS.swissHoneymoon;
-  }
-  if (text.includes('maldives') || text.includes('overwater') || text.includes('atoll')) {
+  if (text.includes('maldives') || text.includes('overwater') || text.includes('atoll') || text.includes('maafushi')) {
     return GENERATED_ASSETS.maldivesLuxury;
   }
   if (text.includes('bali') || text.includes('ubud') || text.includes('wellness')) {
@@ -54,7 +95,7 @@ function resolveStockImage(subject: string, category?: string, packageId?: strin
   if (text.includes('istanbul') || text.includes('turkey') || text.includes('türkiye') || text.includes('cappadocia')) {
     return DESTINATION_STOCK_IMAGES['istanbul-turkey'];
   }
-  if (text.includes('sri lanka') || text.includes('ceylon') || text.includes('galle') || text.includes('sigiriya')) {
+  if (text.includes('sri lanka') || text.includes('srilanka') || text.includes('ceylon') || text.includes('galle') || text.includes('sigiriya')) {
     return DESTINATION_STOCK_IMAGES['sri-lanka'];
   }
   if (text.includes('singapore') || text.includes('sentosa')) {
@@ -78,7 +119,7 @@ function resolveStockImage(subject: string, category?: string, packageId?: strin
   if (text.includes('oman') || text.includes('muscat')) {
     return DESTINATION_STOCK_IMAGES['oman'];
   }
-  if (text.includes('mauritius') || text.includes('le morne')) {
+  if (text.includes('mauritius') || text.includes('mauriitius') || text.includes('le morne')) {
     return DESTINATION_STOCK_IMAGES['mauritius'];
   }
   if (text.includes('seychelles') || text.includes('praslin') || text.includes('la digue')) {
@@ -93,6 +134,9 @@ function resolveStockImage(subject: string, category?: string, packageId?: strin
   if (text.includes('hong kong') || text.includes('macau')) {
     return DESTINATION_STOCK_IMAGES['hong-kong-macau'];
   }
+  if (text.includes('honeymoon')) {
+    return GENERATED_ASSETS.swissHoneymoon;
+  }
   if (text.includes('family')) {
     return HOLIDAY_TYPE_STOCK_IMAGES['ht-family-group'];
   }
@@ -103,7 +147,7 @@ function resolveStockImage(subject: string, category?: string, packageId?: strin
     return ABOUT_TEAM_IMAGES.founder;
   }
 
-  return GENERATED_ASSETS.maldivesLuxury;
+  return GENERATED_ASSETS.introSeAsia;
 }
 
 export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
@@ -114,7 +158,8 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
   overlayGradient = false,
   src,
   alt,
-  packageId
+  packageId,
+  destinationSlug
 }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -127,7 +172,7 @@ export const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
     square: 'aspect-square w-full'
   };
 
-  const effectiveImageUrl = src || resolveStockImage(subject, category, packageId);
+  const effectiveImageUrl = resolveStockImage(subject, category, packageId, destinationSlug, src);
 
   return (
     <div className={`relative overflow-hidden group bg-[#E8E4DC] ${aspectClassMap[aspectRatio]} ${className}`}>

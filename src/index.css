@@ -70,18 +70,57 @@
   text-wrap: balance;
 }
 
-/* Smooth Ken Burns motion for high-res hero stills when video MP4 URL is not yet linked */
-@keyframes heroKenBurns {
+/* Dramatic flashy motion for hero visuals (angled zoom-in / zoom-out sweep) */
+@keyframes heroDramaticZoomIn {
   0% {
-    transform: scale(1) translate3d(0, 0, 0);
+    transform: scale(1.03) rotate(-1.4deg) translate3d(-1.5%, 1%, 0);
+  }
+  55% {
+    transform: scale(1.19) rotate(1.1deg) translate3d(1.8%, -1.2%, 0);
   }
   100% {
-    transform: scale(1.07) translate3d(-1%, -0.5%, 0);
+    transform: scale(1.12) rotate(0deg) translate3d(0%, 0%, 0);
   }
 }
 
-.animate-ken-burns {
-  animation: heroKenBurns 14s ease-out forwards;
+@keyframes heroDramaticZoomOut {
+  0% {
+    transform: scale(1.22) rotate(1.6deg) translate3d(2%, -1%, 0);
+  }
+  60% {
+    transform: scale(1.04) rotate(-0.9deg) translate3d(-1.5%, 0.8%, 0);
+  }
+  100% {
+    transform: scale(1.14) rotate(0.4deg) translate3d(0.5%, -0.5%, 0);
+  }
+}
+
+@keyframes heroVideoPunch {
+  0% {
+    transform: scale(1.02) rotate(-0.5deg);
+  }
+  50% {
+    transform: scale(1.11) rotate(0.6deg);
+  }
+  100% {
+    transform: scale(1.04) rotate(0deg);
+  }
+}
+
+.animate-ken-burns,
+.animate-hero-zoom-in {
+  animation: heroDramaticZoomIn 6.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+.animate-hero-zoom-out {
+  animation: heroDramaticZoomOut 6.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+.animate-hero-video {
+  animation: heroVideoPunch 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite alternate;
+  will-change: transform;
 }
 
 /* Hide scrollbars cleanly where horizontal sliders appear */

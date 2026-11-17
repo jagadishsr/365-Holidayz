@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import { DESTINATION_STOCK_IMAGES } from '../data/stockImages';
+import { resolveStockImage } from '../components/common/ImagePlaceholder';
 import { CTASection } from '../components/common/CTASection';
 import { Package } from '../types';
 import {
@@ -18,7 +19,7 @@ export const TravelGuidePage: React.FC<TravelGuidePageProps> = ({ packages }) =>
   const activePackages = filterActivePackages(packages);
   const publishedDestinations = getPublishedDestinations(activePackages);
 
-  const regions = ['All', 'Islands', 'Far East Asian', 'Middle East & Mediterranean', 'Other Countries'];
+  const regions = ['All', ...Array.from(new Set(publishedDestinations.map((d) => d.region)))];
 
   const visibleDestinations =
     selectedRegion === 'All'
@@ -81,7 +82,13 @@ export const TravelGuidePage: React.FC<TravelGuidePageProps> = ({ packages }) =>
           const lowestFormatted =
             lowestInr && lowestInr > 0 ? `₹${Math.round(lowestInr).toLocaleString('en-IN')}` : null;
 
-          const photoUrl = DESTINATION_STOCK_IMAGES[dest.slug] || DESTINATION_STOCK_IMAGES['maldives'];
+          const photoUrl = resolveStockImage(
+            dest.heroImageSubject,
+            undefined,
+            undefined,
+            dest.slug,
+            dest.imageUrl || DESTINATION_STOCK_IMAGES[dest.slug]
+          );
           const reverseLayout = idx % 2 === 1;
 
           return (
