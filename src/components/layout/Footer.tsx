@@ -16,11 +16,11 @@ const FEATURED_LINKS = [
   { label: 'Malaysia – Langkawi', href: '/destinations/malaysia' },
   { label: 'Maldives', href: '/destinations/maldives' },
   { label: 'Vietnam – Phu Quoc', href: '/destinations/vietnam' },
-  { label: 'Kazakhstan', href: '/destinations/kazakhstan' },
-  { label: 'Uzbekistan', href: '/destinations/uzbekistan' },
   { label: 'Thailand – Krabi & Phuket', href: '/destinations/thailand' },
-  { label: 'Greece', href: '/destinations/greece' },
-  { label: 'Indonesia – Bali', href: '/destinations/bali' }
+  { label: 'Indonesia – Bali', href: '/destinations/bali' },
+  { label: 'Singapore', href: '/destinations/singapore' },
+  { label: 'Dubai & UAE', href: '/destinations/dubai' },
+  { label: 'Mauritius', href: '/destinations/mauritius' }
 ];
 
 export const Footer: React.FC = () => {

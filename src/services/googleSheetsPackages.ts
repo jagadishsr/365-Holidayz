@@ -18,7 +18,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ALL_PACKAGES } from '../data/packages';
-import { CurrencyCode, HolidayCategory, Package, PackageDisplayStatus, Region } from '../types';
+import { ALL_DESTINATIONS } from '../data/destinations';
+import {
+  CurrencyCode,
+  Destination,
+  HolidayCategory,
+  Package,
+  PackageDisplayStatus,
+  Region
+} from '../types';
 
 export interface SheetSyncStatus {
   configured: boolean;
@@ -33,6 +41,58 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function filterActivePackages(packages: Package[]): Package[] {
   return packages.filter((pkg) => (pkg.displayStatus ?? 'Active') === 'Active');
+}
+
+export function getPublishedDestinations(packages: Package[]): Destination[] {
+  const active = filterActivePackages(packages);
+  const matchedSlugs = new Set<string>();
+  const synthesized: Destination[] = [];
+
+  const matchedKnown = ALL_DESTINATIONS.filter((dest) => {
+    const hasMatch = active.some(
+      (pkg) =>
+        pkg.destinationSlug === dest.slug ||
+        pkg.destination.toLowerCase().includes(dest.name.toLowerCase())
+    );
+    if (hasMatch) matchedSlugs.add(dest.slug);
+    return hasMatch;
+  });
+
+  active.forEach((pkg) => {
+    if (
+      matchedSlugs.has(pkg.destinationSlug) ||
+      ALL_DESTINATIONS.some((d) => pkg.destination.toLowerCase().includes(d.name.toLowerCase()))
+    ) {
+      return;
+    }
+    matchedSlugs.add(pkg.destinationSlug);
+    synthesized.push({
+      id: `dest-${pkg.destinationSlug}`,
+      slug: pkg.destinationSlug,
+      name: pkg.destination,
+      country: pkg.destination,
+      region: pkg.region,
+      tagline: `Curated international holidays across ${pkg.destination}`,
+      heroImageSubject: `${pkg.destination} iconic skyline and coastal landscape`,
+      description: pkg.description,
+      whyVisit: pkg.features.slice(0, 4),
+      keyExperiences: pkg.features.slice(0, 4),
+      bestTimeToVisit: pkg.stayPeriod || 'Seasonal departures available',
+      bestTimeEditorialLabel: pkg.bookingValidity,
+      practicalInfo: {
+        currency: pkg.originalCurrency || 'INR',
+        language: 'English widely spoken in hospitality',
+        idealDuration: pkg.duration,
+        timeZone: 'Confirm local timings at enquiry',
+        highlights: pkg.destination
+      },
+      travelStyles: [pkg.holidayType],
+      isFeatured: false,
+      faqs: []
+    });
+  });
+
+  return [...matchedKnown, ...synthesized];
 }
 
 export function getActiveFlashOffers(packages: Package[]): Package[] {

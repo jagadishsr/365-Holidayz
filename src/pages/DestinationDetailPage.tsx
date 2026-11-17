@@ -1,13 +1,15 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Globe } from 'lucide-react';
-import { ALL_DESTINATIONS } from '../data/destinations';
 import { DESTINATION_STOCK_IMAGES } from '../data/stockImages';
 import { PackageCard } from '../components/cards/PackageCard';
 import { FAQAccordion } from '../components/common/FAQAccordion';
 import { CTASection } from '../components/common/CTASection';
 import { Package } from '../types';
-import { filterActivePackages } from '../services/googleSheetsPackages';
+import {
+  filterActivePackages,
+  getPublishedDestinations
+} from '../services/googleSheetsPackages';
 
 interface DestinationDetailPageProps {
   packages: Package[];
@@ -15,13 +17,12 @@ interface DestinationDetailPageProps {
 
 export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ packages }) => {
   const { slug } = useParams<{ slug: string }>();
-  const destination = ALL_DESTINATIONS.find((d) => d.slug === slug);
+  const activePackages = filterActivePackages(packages);
+  const destination = getPublishedDestinations(activePackages).find((d) => d.slug === slug);
 
   if (!destination) {
     return <Navigate to="/destinations" replace />;
   }
-
-  const activePackages = filterActivePackages(packages);
   const relatedPackages = activePackages.filter(
     (p) =>
       p.destinationSlug === destination.slug ||

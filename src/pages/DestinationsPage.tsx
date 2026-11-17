@@ -1,14 +1,17 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { RefreshCw, RotateCcw } from 'lucide-react';
-import { ALL_DESTINATIONS } from '../data/destinations';
 import { ALL_HOLIDAY_TYPES } from '../data/holidayTypes';
 import { PackageCard } from '../components/cards/PackageCard';
 import { DestinationCard } from '../components/cards/DestinationCard';
 import { CTASection } from '../components/common/CTASection';
 import { GENERATED_ASSETS } from '../data/stockImages';
 import { Package } from '../types';
-import { filterActivePackages, SheetSyncStatus } from '../services/googleSheetsPackages';
+import {
+  filterActivePackages,
+  getPublishedDestinations,
+  SheetSyncStatus
+} from '../services/googleSheetsPackages';
 
 interface DestinationsPageProps {
   packages: Package[];
@@ -241,7 +244,7 @@ export const DestinationsPage: React.FC<DestinationsPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {ALL_DESTINATIONS.map((dest) => {
+            {getPublishedDestinations(activePackages).map((dest) => {
               const matching = activePackages.filter(
                 (p) =>
                   p.destinationSlug === dest.slug ||

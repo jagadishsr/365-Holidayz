@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
-import { ALL_DESTINATIONS } from '../data/destinations';
 import { DESTINATION_STOCK_IMAGES } from '../data/stockImages';
 import { CTASection } from '../components/common/CTASection';
 import { Package } from '../types';
-import { filterActivePackages } from '../services/googleSheetsPackages';
+import {
+  filterActivePackages,
+  getPublishedDestinations
+} from '../services/googleSheetsPackages';
 
 interface TravelGuidePageProps {
   packages: Package[];
@@ -14,13 +16,14 @@ interface TravelGuidePageProps {
 export const TravelGuidePage: React.FC<TravelGuidePageProps> = ({ packages }) => {
   const [selectedRegion, setSelectedRegion] = useState<string>('All');
   const activePackages = filterActivePackages(packages);
+  const publishedDestinations = getPublishedDestinations(activePackages);
 
   const regions = ['All', 'Islands', 'Far East Asian', 'Middle East & Mediterranean', 'Other Countries'];
 
   const visibleDestinations =
     selectedRegion === 'All'
-      ? ALL_DESTINATIONS
-      : ALL_DESTINATIONS.filter((d) => d.region === selectedRegion);
+      ? publishedDestinations
+      : publishedDestinations.filter((d) => d.region === selectedRegion);
 
   return (
     <div className="bg-[#FAF9F6] pt-28 sm:pt-36">

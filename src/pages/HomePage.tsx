@@ -4,10 +4,12 @@ import { ArrowRight, ChevronDown, ChevronUp, Compass, Sparkles, ShieldCheck, Hea
 import { HeroSlider } from '../components/home/HeroSlider';
 import { DestinationCard } from '../components/cards/DestinationCard';
 import { CTASection } from '../components/common/CTASection';
-import { ALL_DESTINATIONS } from '../data/destinations';
 import { GENERATED_ASSETS, HAPPY_CLIENT_STORIES } from '../data/stockImages';
 import { Destination, Package } from '../types';
-import { filterActivePackages } from '../services/googleSheetsPackages';
+import {
+  filterActivePackages,
+  getPublishedDestinations
+} from '../services/googleSheetsPackages';
 
 interface HomePageProps {
   packages: Package[];
@@ -20,7 +22,7 @@ const WHY_365_PILLARS = [
     accent: true,
     title: '30+ Years On-Ground Expertise',
     blurb:
-      'Decades of firsthand international routing across Asia, Indian Ocean islands, Central Asia, the Middle East, and Europe.'
+      'Decades of firsthand international routing across Asia, Indian Ocean islands, the Middle East, and emerging destinations.'
   },
   {
     icon: Sparkles,
@@ -66,18 +68,28 @@ export const HomePage: React.FC<HomePageProps> = ({ packages, onOpenEnquiry }) =
   const [showAllDestinations, setShowAllDestinations] = useState(false);
 
   const activePackages = useMemo(() => filterActivePackages(packages), [packages]);
-
-  const featuredDestinations = useMemo(
-    () =>
-      ALL_DESTINATIONS.filter((d) => d.isFeatured)
-        .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99))
-        .slice(0, 8),
-    []
+  const publishedDestinations = useMemo(
+    () => getPublishedDestinations(activePackages),
+    [activePackages]
   );
 
+  const featuredDestinations = useMemo(() => {
+    const preferredFeatured = publishedDestinations
+      .filter((d) => d.isFeatured)
+      .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99));
+    if (preferredFeatured.length >= 8) return preferredFeatured.slice(0, 8);
+    const remaining = publishedDestinations.filter(
+      (d) => !preferredFeatured.some((f) => f.slug === d.slug)
+    );
+    return [...preferredFeatured, ...remaining].slice(0, 8);
+  }, [publishedDestinations]);
+
   const additionalDestinations = useMemo(
-    () => ALL_DESTINATIONS.filter((d) => !d.isFeatured),
-    []
+    () =>
+      publishedDestinations.filter(
+        (d) => !featuredDestinations.some((f) => f.slug === d.slug)
+      ),
+    [publishedDestinations, featuredDestinations]
   );
 
   return (

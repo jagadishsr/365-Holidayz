@@ -1,7 +1,6 @@
 /**
  * 365Holidayz - Destinations Master Dataset
- * Features destinations from the client workbook across 4 regions,
- * plus Hong Kong & Macau explicitly designated as "Inspiration-Only".
+ * Strictly synchronized with destinations available in the Package Google Sheet.
  */
 
 import { Destination } from '../types';
@@ -41,7 +40,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     },
     travelStyles: ['Honeymoon & Romance', 'Wellness & Serenity', 'Adventure & Discovery', 'Family Luxury'],
     isFeatured: true,
-    featuredOrder: 8,
+    featuredOrder: 5,
     faqs: [
       {
         question: 'What is the visa policy for travelling to Bali?',
@@ -86,7 +85,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     },
     travelStyles: ['Family & Group', 'Island Luxury', 'Culinary & Heritage', 'Romance'],
     isFeatured: true,
-    featuredOrder: 6,
+    featuredOrder: 4,
     faqs: [
       {
         question: 'Can we combine Bangkok with island destinations?',
@@ -141,52 +140,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       }
     ]
   },
-  {
-    id: 'dest-hong-kong-macau',
-    slug: 'hong-kong-macau',
-    name: 'Hong Kong & Macau',
-    country: 'Special Administrative Regions',
-    region: 'Far East Asian',
-    tagline: 'Inspiration Only: Neon skylines, Victoria Harbour & Portuguese-Cantonese heritage',
-    heroImageSubject: 'Victoria Harbour skyline reflection with traditional junk boat sail in Hong Kong',
-    description: 'A dazzling juxtaposition of sky-piercing towers, tranquil mountain tramways, Michelin dining, and Macau’s UNESCO cobblestone Portuguese heritage.',
-    whyVisit: [
-      'Iconic Victoria Peak panoramas and historic Star Ferry harbour crossings',
-      'Macau’s UNESCO Historic Centre blending baroque Portuguese facades with Cantonese temples',
-      'World-class shopping, modern art museums, and legendary dim sum dining',
-      'Dynamic urban energy combined with lush green outlying hiking trails'
-    ],
-    keyExperiences: [
-      'Victoria Peak tram journey at twilight to overlook the illuminated skyline',
-      'Tasting Michelin-level dim sum and roast goose in central Hong Kong',
-      'Walking through the Ruins of St. Paul’s and Senado Square in Macau',
-      'High-speed TurboJet ferry crossing across the Pearl River Delta'
-    ],
-    bestTimeToVisit: 'October to December',
-    bestTimeEditorialLabel: 'Verified Editorial Guidance: Autumn brings crisp, pleasant breezes, lower humidity, and sunny days.',
-    practicalInfo: {
-      currency: 'Hong Kong Dollar (HKD) & Macau Pataca (MOP)',
-      language: 'Cantonese & English (Portuguese also official in Macau)',
-      idealDuration: '4 to 6 Days',
-      timeZone: 'GMT+8 (HKT)',
-      highlights: 'Victoria Harbour, Peak Tram, Macau St. Paul’s ruins, Dim Sum culture'
-    },
-    travelStyles: ['Urban Luxury', 'Culinary Expeditions', 'Shopping & Glamour'],
-    isFeatured: false,
-    isInspirationOnly: true, // Strictly specified in brief: inspiration-only, no active package in current sheet
-    faqs: [
-      {
-        question: 'Why does Hong Kong & Macau show as Inspiration-Only?',
-        answer: 'Our current verified package catalogue does not contain a fixed group or fixed-departure package for Hong Kong & Macau. However, with our 30+ years of expertise, our travel planners curate bespoke private independent itineraries upon request.'
-      },
-      {
-        question: 'Can I request a custom trip to Hong Kong & Macau?',
-        answer: 'Absolutely. Click "Plan Your Trip" or "Enquire / Customise" and our specialist concierge will design a tailored route for your travel dates.'
-      }
-    ]
-  },
 
-  // --- OTHER DESTINATIONS FROM WORKBOOK ---
+  // --- OTHER SHEET DESTINATIONS ---
   {
     id: 'dest-maldives',
     slug: 'maldives',
@@ -297,7 +252,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Grand Baie, Ile aux Cerfs, Chamarel, Le Morne'
     },
     travelStyles: ['Honeymoon & Romance', 'All-Ages Family', 'Catamaran & Coast'],
-    isFeatured: false,
+    isFeatured: true,
+    featuredOrder: 8,
     faqs: [
       {
         question: 'Is Mauritius suitable for family vacations with children?',
@@ -375,7 +331,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Gardens by the Bay, Marina Bay, Sentosa, Orchard Road'
     },
     travelStyles: ['Family & Group', 'Modern Luxury', 'City & Food'],
-    isFeatured: false,
+    isFeatured: true,
+    featuredOrder: 6,
     faqs: [
       {
         question: 'Can Singapore be easily combined with Malaysia?',
@@ -496,7 +453,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Burj Khalifa, Desert Safari, Dubai Marina, Museum of the Future'
     },
     travelStyles: ['Luxury Escapes', 'Corporate & MICE', 'Family Holiday'],
-    isFeatured: false,
+    isFeatured: true,
+    featuredOrder: 7,
     faqs: [
       {
         question: 'What is the Tourism Dirham fee in Dubai?',
@@ -696,132 +654,6 @@ export const ALL_DESTINATIONS: Destination[] = [
       {
         question: 'How can travellers obtain an Azerbaijan visa?',
         answer: 'Travellers can obtain an official ASAN E-Visa online in typically 3 business days for approximately USD 26. Our concierge provides full document assistance.'
-      }
-    ]
-  },
-  {
-    id: 'dest-kazakhstan',
-    slug: 'kazakhstan',
-    name: 'Kazakhstan',
-    displayLabel: 'Kazakhstan',
-    country: 'Republic of Kazakhstan',
-    region: 'Other Countries',
-    tagline: 'Alpine glacier lakes, Charyn Canyon & Tien Shan mountain trails',
-    heroImageSubject: 'Travellers trekking dramatic alpine ridge above turquoise lakes in Kazakhstan mountains',
-    description: 'Central Asia’s highland frontier: alpine valleys above Almaty, emerald Kolsai & Kaindy lakes, sculpted canyon walls at Charyn, and sweeping steppe horizons.',
-    whyVisit: [
-      'Dramatic Tien Shan glacier peaks just outside modern Almaty',
-      'Turquoise alpine waters of Kolsai and submerged-forest Kaindy lakes',
-      'Striking red sedimentary cliffs inside Charyn Canyon',
-      'Direct regional connectivity and warm nomadic hospitality'
-    ],
-    keyExperiences: [
-      'Alpine ridge hiking above Big Almaty Lake',
-      'Walking through the Valley of Castles at Charyn Canyon',
-      'Cable car ascent to Shymbulak glacier overlook',
-      'Exploring Almaty’s Panfilov Park and Green Bazaar'
-    ],
-    bestTimeToVisit: 'May to October',
-    bestTimeEditorialLabel: 'Verified Editorial Guidance: Late spring through early autumn unlocks high alpine lakes and crisp clear skies.',
-    practicalInfo: {
-      currency: 'Kazakhstani Tenge (KZT)',
-      language: 'Kazakh & Russian (English in hospitality)',
-      idealDuration: '5 to 7 Days',
-      timeZone: 'GMT+5',
-      highlights: 'Almaty, Shymbulak, Kolsai Lakes, Charyn Canyon'
-    },
-    travelStyles: ['Adventure', 'Family & Group', 'Mountain Discovery'],
-    isFeatured: true,
-    featuredOrder: 4,
-    isInspirationOnly: true,
-    faqs: [
-      {
-        question: 'Are custom itineraries available for Kazakhstan?',
-        answer: 'Yes. Contact our India desk to craft a private or small-group Kazakhstan itinerary aligned with your flight dates.'
-      }
-    ]
-  },
-  {
-    id: 'dest-uzbekistan',
-    slug: 'uzbekistan',
-    name: 'Uzbekistan',
-    displayLabel: 'Uzbekistan',
-    country: 'Republic of Uzbekistan',
-    region: 'Other Countries',
-    tagline: 'Samarkand turquoise domes, Bukhara caravanserais & living Silk Road',
-    heroImageSubject: 'Travellers walking through sunlit turquoise mosaic arches of Registan Square Samarkand Uzbekistan',
-    description: 'Walk through the storied heart of the Great Silk Road: azure-tiled madrasahs in Samarkand, mud-walled citadels in Khiva, and artisan bazaars across Bukhara.',
-    whyVisit: [
-      'Unrivalled Islamic mosaic architecture across Samarkand, Bukhara, and Khiva',
-      'Scenic high-speed rail connections linking historic Silk Road cities',
-      'Rich heritage of silk weaving, ceramics, and spiced plov cuisine',
-      'Remarkably warm, unhurried local hospitality'
-    ],
-    keyExperiences: [
-      'Golden hour walk across Registan Square in Samarkand',
-      'Tracing historic trading domes and Poi Kalyan minaret in Bukhara',
-      'Exploring walled old town alleyways of Itchan Kala in Khiva',
-      'High-speed Afrosiyob rail journey between Tashkent and Samarkand'
-    ],
-    bestTimeToVisit: 'April to May & September to October',
-    bestTimeEditorialLabel: 'Verified Editorial Guidance: Spring and autumn provide crisp golden daylight ideal for architectural walking.',
-    practicalInfo: {
-      currency: 'Uzbekistani Som (UZS)',
-      language: 'Uzbek (Russian & English in tourism)',
-      idealDuration: '6 to 8 Days',
-      timeZone: 'GMT+5 (UZT)',
-      highlights: 'Tashkent, Samarkand Registan, Bukhara, Khiva'
-    },
-    travelStyles: ['Culture & Heritage', 'Luxury Escapes', 'Family & Group'],
-    isFeatured: true,
-    featuredOrder: 5,
-    isInspirationOnly: true,
-    faqs: [
-      {
-        question: 'Can 365Holidayz combine Uzbekistan and Kazakhstan?',
-        answer: 'Yes, our specialists frequently combine Almaty alpine scenery in Kazakhstan with Samarkand and Bukhara in Uzbekistan.'
-      }
-    ]
-  },
-  {
-    id: 'dest-greece',
-    slug: 'greece',
-    name: 'Greece',
-    displayLabel: 'Greece',
-    country: 'Hellenic Republic',
-    region: 'Middle East & Mediterranean',
-    tagline: 'Aegean clifftop suites, sunlit Cycladic islands & classical Acropolis',
-    heroImageSubject: 'Whitewashed Cycladic clifftop villas overlooking deep cobalt Aegean Sea in Santorini Greece',
-    description: 'Where classical marble history meets luminous Aegean horizons: Athens, Santorini’s volcanic caldera suites, Mykonos coves, and unhurried Mediterranean dining.',
-    whyVisit: [
-      'Iconic Cycladic island architecture sculpted high above sapphire bays',
-      'Centuries of Mediterranean history rooted in the Acropolis and Delphi',
-      'Intimate sunset catamaran cruises along volcanic beaches',
-      'Vibrant island-to-island ferry logistics curated privately'
-    ],
-    keyExperiences: [
-      'Private sunset caldera cruise overlooking Santorini’s whitewashed cliffs',
-      'Guided morning walk atop the Acropolis in Athens before midday heat',
-      'Seaside cliffside dining in Oia and Fira',
-      'Relaxed coastal days across Paros, Naxos, or Crete'
-    ],
-    bestTimeToVisit: 'May to October',
-    bestTimeEditorialLabel: 'Verified Editorial Guidance: Late spring and early autumn pair warm Aegean breezes with quieter island views.',
-    practicalInfo: {
-      currency: 'Euro (EUR)',
-      language: 'Greek (English widely spoken)',
-      idealDuration: '6 to 9 Days',
-      timeZone: 'GMT+2 / +3',
-      highlights: 'Athens Acropolis, Santorini Caldera, Mykonos, Crete'
-    },
-    travelStyles: ['Honeymoon', 'Luxury Escapes', 'Culture & Heritage'],
-    isFeatured: true,
-    featuredOrder: 7,
-    isInspirationOnly: true,
-    faqs: [
-      {
-        question: 'Do you arrange Schengen visa assistance and island ferries for Greece?',
-        answer: 'Yes. We prepare curated travel itineraries, confirmed island hotel vouchers, and inter-island ferry or domestic flight logistics.'
       }
     ]
   }

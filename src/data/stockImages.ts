@@ -107,14 +107,14 @@ export const HAPPY_CLIENT_STORIES: ClientExperienceStory[] = [
       'Waking up above quiet Ubud rice terraces with private chauffeurs waiting downstairs made our honeymoon feel completely unscripted and personal.'
   },
   {
-    id: 'story-med-group',
+    id: 'story-coast-group',
     traveller: 'Meera & Travel Companions · Mumbai',
-    destination: 'Greece & Mediterranean Coast',
+    destination: 'Phuket & Krabi Coast, Thailand',
     tripType: 'Small Group Tour',
-    duration: '7 Days',
+    duration: '5 Days',
     image: happyClientGroupImg,
     quote:
-      'From caldera sunset boat charters to walking-distance island hotels, 365Holidayz handled every ferry and transfer behind the scenes.'
+      'From Phi Phi speedboat charters to seamless Phuket-to-Krabi hotel transfers, 365Holidayz handled every detail quietly behind the scenes.'
   }
 ];
 

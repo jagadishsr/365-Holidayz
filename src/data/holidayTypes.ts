@@ -21,7 +21,7 @@ export const ALL_HOLIDAY_TYPES: HolidayType[] = [
       'Candlelit coastal dinners and private sunset boat charters',
       'Unrushed itineraries with seamless private transfers'
     ],
-    recommendedDestinations: ['Maldives', 'Indonesia – Bali', 'Greece', 'Mauritius', 'Thailand – Krabi & Phuket'],
+    recommendedDestinations: ['Maldives', 'Indonesia – Bali', 'Seychelles', 'Mauritius', 'Thailand – Krabi & Phuket'],
     imageSubject: 'Couple waiting for scenic mountain train at snow-covered Swiss train station',
     accentQuote: 'Where quiet moments and boundless horizons intertwine into memories of a lifetime.'
   },
@@ -56,13 +56,13 @@ export const ALL_HOLIDAY_TYPES: HolidayType[] = [
     suitableTraveller:
       'Active explorers and nature lovers drawn to dramatic alpine trails and raw landscapes.',
     signatureExperiences: [
-      'Guided alpine treks across the glacier valleys of Kazakhstan',
-      'Sunrise balloon flights over Cappadocia valleys',
-      '4x4 desert expeditions in Wadi Rum and Wahiba Sands',
+      'Guided mountain cable car ascents in Gabala and Caucasus canyons in Georgia',
+      'Sunrise Bosphorus and coastal journeys across Turkey',
+      '4x4 desert expeditions in Wadi Rum and Jebel Akhdar',
       'Island cliff hikes and marine canyon explorations'
     ],
-    recommendedDestinations: ['Kazakhstan', 'Georgia', 'Jordan', 'Turkey', 'Oman'],
-    imageSubject: 'Travellers trekking along spectacular alpine ridge in Kazakhstan mountain range',
+    recommendedDestinations: ['Georgia', 'Azerbaijan', 'Jordan', 'Istanbul & Turkey', 'Sultanate of Oman'],
+    imageSubject: 'Travellers exploring dramatic alpine mountain valleys and trails',
     accentQuote: 'The thrill of untamed wilderness, paired with the comfort of a thoughtful return.'
   },
   {
@@ -77,11 +77,11 @@ export const ALL_HOLIDAY_TYPES: HolidayType[] = [
       'Discerning travellers who prioritize architecture, calm privacy, and elevated personal attention.',
     signatureExperiences: [
       'Overwater infinity villas framed by coral reefs in the Maldives',
-      'Cliffside Aegean views and private sunset sails in Greece',
+      'Private granite beach sanctuaries and lagoon cruises in Seychelles & Mauritius',
       'Private VIP airport meet-and-assist and luxury sedan transfers',
       'Curated stays handpicked across 30+ years of industry relationships'
     ],
-    recommendedDestinations: ['Maldives', 'Greece', 'Seychelles', 'Dubai', 'Istanbul & Turkey'],
+    recommendedDestinations: ['Maldives', 'Seychelles', 'Mauritius', 'Dubai & UAE', 'Istanbul & Turkey'],
     imageSubject: 'Exclusive Maldives villa infinity pool and turquoise Indian Ocean lagoon',
     accentQuote: 'Discreet luxury that whispers rather than shouts.'
   },
@@ -132,17 +132,17 @@ export const ALL_HOLIDAY_TYPES: HolidayType[] = [
     subtitle: 'Living History & Architecture',
     badge: 'Silk Road & Ancient Worlds',
     description:
-      'Walk sunlit turquoise mosaic courtyards along Uzbekistan’s Silk Road, trace Petra’s carved sandstone canyons, and explore Istanbul’s timeless domes.',
+      'Walk sunlit historic squares in Old Baku and Tbilisi, trace Petra’s carved sandstone canyons, and explore Istanbul’s timeless domes.',
     suitableTraveller:
       'History enthusiasts, architects, and cultural travellers moved by craftsmanship and ancient routes.',
     signatureExperiences: [
-      'Guided walks through Registan Square and Samarkand tiled madrasahs in Uzbekistan',
-      'Private architectural visits across Istanbul and ancient Cappadocia',
+      'Guided architectural walks through Old Baku and Tbilisi historic quarters',
+      'Private visits across Istanbul’s Sultanahmet domes and Princes’ Islands',
       'Daybreak entry through the Siq canyon into Jordan’s Petra Treasury',
-      '8,000-year winemaking and highland monastic heritage in Georgia'
+      'Ancient fortresses, royal trails, and Ceylon heritage in Sri Lanka'
     ],
-    recommendedDestinations: ['Uzbekistan', 'Istanbul & Turkey', 'Jordan', 'Georgia', 'Sri Lanka'],
-    imageSubject: 'Travellers exploring sunlit turquoise mosaic courtyards of Samarkand Uzbekistan',
+    recommendedDestinations: ['Istanbul & Turkey', 'Jordan', 'Georgia', 'Azerbaijan', 'Sri Lanka'],
+    imageSubject: 'Travellers exploring historic stone courtyards and domes across Istanbul and Petra',
     accentQuote: 'Stories written in sandstone, mosaic tile, and living local tradition.'
   }
 ];

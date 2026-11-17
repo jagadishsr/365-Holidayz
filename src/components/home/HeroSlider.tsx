@@ -35,13 +35,13 @@ const HERO_SLIDES: SliderSlide[] = [
     id: 'slide-adventure',
     holidayCategory: 'Adventure',
     heading: 'ADVENTURE',
-    subtitle: 'Cross-border mountain treks through Kazakhstan’s dramatic glacier valleys.',
+    subtitle: 'Wadi Rum desert canyons, alpine cable cars in Gabala, and island water sports.',
     ctaLabel: 'Explore Adventure',
     ctaLink: '/destinations?category=Adventure',
     videoUrl: undefined,
-    posterUrl: GENERATED_ASSETS.kazakhstanAdventure,
-    mobileFallbackUrl: GENERATED_ASSETS.kazakhstanAdventure,
-    visualStoryNote: 'Travellers trekking through mountain landscapes in Kazakhstan.',
+    posterUrl: DESTINATION_STOCK_IMAGES['georgia'] || GENERATED_ASSETS.kazakhstanAdventure,
+    mobileFallbackUrl: DESTINATION_STOCK_IMAGES['georgia'] || GENERATED_ASSETS.kazakhstanAdventure,
+    visualStoryNote: 'Mountain adventure scenery across Caucasus canyons.',
     isTemporaryMedia: true
   },
   {
@@ -87,13 +87,13 @@ const HERO_SLIDES: SliderSlide[] = [
     id: 'slide-culture',
     holidayCategory: 'Culture & Heritage',
     heading: 'CULTURE & HERITAGE',
-    subtitle: 'Walk sunlit turquoise mosaic courtyards along Uzbekistan’s storied Silk Road.',
+    subtitle: 'Walk sunlit Istanbul mosques, rose-red Petra canyons, and Ceylon tea trails.',
     ctaLabel: 'Explore Culture & Heritage',
     ctaLink: '/destinations?category=Culture+%26+Heritage',
     videoUrl: undefined,
-    posterUrl: GENERATED_ASSETS.uzbekistanCulture,
-    mobileFallbackUrl: GENERATED_ASSETS.uzbekistanCulture,
-    visualStoryNote: 'Travellers exploring the Registan turquoise architecture of Samarkand in Uzbekistan.',
+    posterUrl: DESTINATION_STOCK_IMAGES['istanbul-turkey'] || GENERATED_ASSETS.uzbekistanCulture,
+    mobileFallbackUrl: DESTINATION_STOCK_IMAGES['istanbul-turkey'] || GENERATED_ASSETS.uzbekistanCulture,
+    visualStoryNote: 'Historic domes and coastal heritage streets.',
     isTemporaryMedia: true
   }
 ];
