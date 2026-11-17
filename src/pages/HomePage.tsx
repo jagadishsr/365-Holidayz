@@ -1,84 +1,91 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Compass, Sparkles, ShieldCheck, Headphones } from 'lucide-react';
 import { HeroSlider } from '../components/home/HeroSlider';
 import { DestinationCard } from '../components/cards/DestinationCard';
-import { PackageCard } from '../components/cards/PackageCard';
 import { CTASection } from '../components/common/CTASection';
 import { ALL_DESTINATIONS } from '../data/destinations';
-import { CLIENT_ASSETS, GENERATED_ASSETS } from '../data/stockImages';
-import { Package } from '../types';
+import { GENERATED_ASSETS, HAPPY_CLIENT_STORIES } from '../data/stockImages';
+import { Destination, Package } from '../types';
 import { filterActivePackages } from '../services/googleSheetsPackages';
 
 interface HomePageProps {
   packages: Package[];
-  packagesLoading: boolean;
   onOpenEnquiry: () => void;
 }
 
-const WHY_PILLARS = [
+const WHY_365_PILLARS = [
   {
-    number: '01',
-    title: '30+ Years Experience',
-    detail: 'Three decades of firsthand routing across Asia, Indian Ocean islands, Central Asia, the Middle East, and Europe.'
+    icon: Compass,
+    accent: true,
+    title: '30+ Years On-Ground Expertise',
+    blurb:
+      'Decades of firsthand international routing across Asia, Indian Ocean islands, Central Asia, the Middle East, and Europe.'
   },
   {
-    number: '02',
-    title: 'Personalised Holiday Planning',
-    detail: 'Every journey is shaped around your travel pace, room sharing needs, dining preferences, and occasion.'
+    icon: Sparkles,
+    accent: false,
+    title: 'Handpicked Stays & Personal Pacing',
+    blurb:
+      'Every overwater villa, mountain lodge, and city stay is tailored around your party size, dining needs, and rhythm.'
   },
   {
-    number: '03',
-    title: 'International Destination Expertise',
-    detail: 'Verified insights on transfer timings, flight connections, seasonality, and visa lead times before you commit.'
+    icon: ShieldCheck,
+    accent: false,
+    title: 'Transparent INR Pricing & Vetted Partners',
+    blurb:
+      'Direct partnerships with trusted local chauffeurs and guides with clear pricing free from hidden surprise surcharges.'
   },
   {
-    number: '04',
-    title: 'Trusted Global Partnerships',
-    detail: 'Longstanding relationships with boutique hoteliers, local ground operators, and licensed private guides.'
-  },
-  {
-    number: '05',
-    title: 'Curated Stay Experiences',
-    detail: 'Handpicked overwater villas, alpine lodges, and heritage properties vetted for location and service warmth.'
-  },
-  {
-    number: '06',
-    title: 'Seamless Trip Coordination',
-    detail: 'Private airport pickups, inter-island boats, rail passes, and dietary arrangements timed to the minute.'
-  },
-  {
-    number: '07',
-    title: 'Dedicated End-to-End Support',
-    detail: 'Direct India booking desk support from your first consultation call until your return home.'
+    icon: Headphones,
+    accent: true,
+    title: 'Dedicated Gate-to-Gate India Desk',
+    blurb:
+      'Seamless end-to-end trip coordination with responsive real-human concierge support from planning until return home.'
   }
 ];
 
-export const HomePage: React.FC<HomePageProps> = ({
-  packages,
-  packagesLoading,
-  onOpenEnquiry
-}) => {
+function getLowestInrLabel(dest: Destination, activePackages: Package[]): string | undefined {
+  const matches = activePackages.filter(
+    (p) =>
+      p.destinationSlug === dest.slug ||
+      p.destination.toLowerCase().includes(dest.name.toLowerCase())
+  );
+  if (matches.length === 0) return undefined;
+
+  const lowest = matches.reduce((min, pkg) => {
+    const val = pkg.inrPrice || pkg.priceValue;
+    return val > 0 && val < min ? val : min;
+  }, Number.POSITIVE_INFINITY);
+
+  if (!Number.isFinite(lowest) || lowest <= 0) return undefined;
+  return `₹${Math.round(lowest).toLocaleString('en-IN')}`;
+}
+
+export const HomePage: React.FC<HomePageProps> = ({ packages, onOpenEnquiry }) => {
   const [showAllDestinations, setShowAllDestinations] = useState(false);
 
-  const featuredDestinations = ALL_DESTINATIONS.filter((d) => d.isFeatured)
-    .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99))
-    .slice(0, 8);
+  const activePackages = useMemo(() => filterActivePackages(packages), [packages]);
 
-  const additionalDestinations = ALL_DESTINATIONS.filter((d) => !d.isFeatured);
+  const featuredDestinations = useMemo(
+    () =>
+      ALL_DESTINATIONS.filter((d) => d.isFeatured)
+        .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99))
+        .slice(0, 8),
+    []
+  );
 
-  const activePackages = filterActivePackages(packages);
-  const featuredPackages = (activePackages.filter((p) => p.isFeatured).length > 0
-    ? activePackages.filter((p) => p.isFeatured)
-    : activePackages
-  ).slice(0, 6);
+  const additionalDestinations = useMemo(
+    () => ALL_DESTINATIONS.filter((d) => !d.isFeatured),
+    []
+  );
 
   return (
     <div className="bg-[#FAF9F6]">
-      {/* A. Hero Video Slider (88-94% viewport height) */}
+      {/* A. Cinematic Hero Video Slider (Title, Subtitle & CTA Button Only) */}
       <HeroSlider />
 
-      {/* B. Intro Section: YOUR WORLD, EXPERTLY CURATED. */}
+      {/* B. Intro Section with Southeast Asia Visual */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <div className="lg:col-span-6 space-y-6">
@@ -89,7 +96,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               YOUR WORLD, EXPERTLY CURATED.
             </h2>
             <p className="text-base sm:text-lg text-[#4B5563] leading-relaxed">
-              For more than thirty years, we have crafted international holidays defined by unhurried pacing, handpicked properties, and direct personal care—so every mile feels effortless.
+              For over three decades, we have designed international holidays defined by unhurried pacing, handpicked properties, and direct personal care across Southeast Asia, Indian Ocean sanctuaries, and beyond.
             </p>
             <div className="pt-2">
               <Link
@@ -103,10 +110,10 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
 
           <div className="lg:col-span-6">
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-[#E8E4DC]">
+            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-[#E8E4DC] shadow-sm">
               <img
-                src={GENERATED_ASSETS.uzbekistanCulture}
-                alt="Travellers exploring Silk Road architecture in Uzbekistan"
+                src={GENERATED_ASSETS.introSeAsia}
+                alt="Limestone karst cliffs and longtail boat in Southeast Asia at sunset"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -114,40 +121,53 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* C. Why 365Holidayz? Editorial Showcase */}
-      <section className="py-20 sm:py-24 bg-[#F3F1EC] border-y border-[#E5E2DC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="max-w-2xl space-y-3">
+      {/* C. Why 365Holidayz? — 4 Bold Pillars in 2x2 Grid with 3D Icons */}
+      <section className="py-20 sm:py-28 bg-[#F3F1EC] border-y border-[#E5E2DC]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+          <div className="max-w-3xl space-y-3">
             <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D94E28] block">
               Why 365Holidayz
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight">
-              Three Decades of Travel Wisdom, Applied Personally.
+            <h2 className="font-display text-3xl sm:text-5xl font-extrabold text-[#111827] tracking-tight">
+              Bigger Care. Simpler Planning.
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
-            {WHY_PILLARS.map((pillar) => (
-              <div
-                key={pillar.number}
-                className="pt-5 border-t border-[#D6D1C7] space-y-2"
-              >
-                <span className="font-mono-tabular text-xs font-semibold text-[#D94E28]">
-                  {pillar.number}
-                </span>
-                <h3 className="font-display text-lg font-bold text-[#111827]">
-                  {pillar.title}
-                </h3>
-                <p className="text-sm text-[#4B5563] leading-relaxed">
-                  {pillar.detail}
-                </p>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+            {WHY_365_PILLARS.map((pillar) => {
+              const IconComponent = pillar.icon;
+              return (
+                <div
+                  key={pillar.title}
+                  className="bg-white rounded-3xl p-8 sm:p-10 border border-[#E5E2DC] flex items-start gap-6 sm:gap-7 shadow-xs hover:border-[#010048]/30 transition-colors"
+                >
+                  {/* Sculpted 3D Icon Container */}
+                  <div
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl shrink-0 flex items-center justify-center ${
+                      pillar.accent
+                        ? 'icon-3d-badge-accent text-white'
+                        : 'icon-3d-badge text-[#010048]'
+                    }`}
+                  >
+                    <IconComponent className="w-8 h-8 sm:w-9 sm:h-9 stroke-[1.9]" />
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-[#111827] leading-tight">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
+                      {pillar.blurb}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* D. Featured Destinations (4x2 Grid of Vertical 3:4 Showcase Cards) */}
+      {/* D. Featured Destinations (4x2 Grid with Condensed Bottom-Right Starting Price) */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2">
@@ -170,11 +190,14 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredDestinations.map((dest) => (
-            <DestinationCard key={dest.id} destination={dest} />
+            <DestinationCard
+              key={dest.id}
+              destination={dest}
+              startingPrice={getLowestInrLabel(dest, activePackages)}
+            />
           ))}
         </div>
 
-        {/* Expandable More Destinations Grid */}
         {showAllDestinations && additionalDestinations.length > 0 && (
           <div className="pt-4 space-y-6">
             <div className="border-t border-[#E5E2DC] pt-8">
@@ -184,7 +207,11 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {additionalDestinations.map((dest) => (
-                <DestinationCard key={dest.id} destination={dest} />
+                <DestinationCard
+                  key={dest.id}
+                  destination={dest}
+                  startingPrice={getLowestInrLabel(dest, activePackages)}
+                />
               ))}
             </div>
           </div>
@@ -206,130 +233,64 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* E. Featured Packages (Active Packages Only) */}
+      {/* E. Happy Clients Experiences (Generic Tour Photography & Guest Shares) */}
       <section className="py-20 sm:py-28 bg-white border-t border-[#E5E2DC]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2 max-w-2xl">
               <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D94E28] block">
-                Signature Itineraries
+                Traveller Stories
               </span>
               <h2 className="font-display text-3xl sm:text-5xl font-extrabold text-[#111827] tracking-tight">
-                FEATURED PACKAGES
+                HAPPY CLIENTS
               </h2>
+              <p className="text-sm sm:text-base text-[#4B5563]">
+                Real moments and experiences shared by families, couples, and groups travelling across our international circuits.
+              </p>
             </div>
 
             <Link
-              to="/destinations"
-              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#010048] hover:text-[#D94E28] transition-colors shrink-0"
+              to="/happy-clients"
+              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#010048] hover:bg-[#D94E28] text-white text-xs font-bold uppercase tracking-[0.14em] transition-colors shrink-0"
             >
-              <span>View All Packages ({activePackages.length})</span>
+              <span>Explore Client Stories</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          {packagesLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="h-[440px] rounded-2xl bg-[#FAF9F6] border border-[#E5E2DC] animate-pulse"
-                />
-              ))}
-            </div>
-          ) : featuredPackages.length === 0 ? (
-            <div className="p-12 rounded-2xl bg-[#FAF9F6] border border-[#E5E2DC] text-center space-y-3">
-              <p className="text-sm font-medium text-[#111827]">
-                No active packages are currently published.
-              </p>
-              <button
-                type="button"
-                onClick={onOpenEnquiry}
-                className="text-xs font-semibold uppercase tracking-wider text-[#D94E28] underline cursor-pointer"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {HAPPY_CLIENT_STORIES.map((story) => (
+              <article
+                key={story.id}
+                className="rounded-2xl overflow-hidden border border-[#E5E2DC] bg-[#FAF9F6] flex flex-col"
               >
-                Request a Custom Itinerary
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredPackages.map((pkg) => (
-                <PackageCard key={pkg.id} pkg={pkg} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* F. Client Experiences & Departures */}
-      <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div className="space-y-2 max-w-2xl">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D94E28] block">
-              Real Departures &amp; Travellers
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight">
-              CLIENT EXPERIENCES
-            </h2>
-            <p className="text-sm sm:text-base text-[#4B5563]">
-              Highlights from our curated seasonal departures, small-group circuits, and signature campaigns.
-            </p>
-          </div>
-
-          <Link
-            to="/happy-clients"
-            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#010048] hover:bg-[#D94E28] text-white text-xs font-bold uppercase tracking-[0.14em] transition-colors shrink-0"
-          >
-            <span>Happy Clients</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="rounded-2xl overflow-hidden border border-[#E5E2DC] bg-white">
-            <div className="aspect-[3/4] overflow-hidden bg-[#F3F1EC]">
-              <img
-                src={CLIENT_ASSETS.posterPhilippines}
-                alt="365Holidayz Philippines 6 Nights / 7 Days Departure Showcase"
-                className="w-full h-full object-cover object-top"
-              />
-            </div>
-            <div className="p-5 flex items-center justify-between text-xs font-semibold text-[#111827]">
-              <span>Philippines &middot; 6N / 7D</span>
-              <span className="text-[#6B7280]">Manila · Cebu · Bohol</span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-[#E5E2DC] bg-white">
-            <div className="aspect-[3/4] overflow-hidden bg-[#F3F1EC]">
-              <img
-                src={CLIENT_ASSETS.posterTurkiyeGeorgia}
-                alt="365Holidayz Türkiye & Georgia Diwali Departures Showcase"
-                className="w-full h-full object-cover object-top"
-              />
-            </div>
-            <div className="p-5 flex items-center justify-between text-xs font-semibold text-[#111827]">
-              <span>Türkiye &amp; Georgia</span>
-              <span className="text-[#6B7280]">Festival Departures</span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-[#E5E2DC] bg-white">
-            <div className="aspect-[3/4] overflow-hidden bg-[#F3F1EC]">
-              <img
-                src={CLIENT_ASSETS.posterSingaporeMalaysia}
-                alt="365Holidayz Singapore & Malaysia 5 Days Departure Showcase"
-                className="w-full h-full object-cover object-top"
-              />
-            </div>
-            <div className="p-5 flex items-center justify-between text-xs font-semibold text-[#111827]">
-              <span>Singapore &amp; Malaysia</span>
-              <span className="text-[#6B7280]">5 Days Twin-City</span>
-            </div>
+                <div className="aspect-[4/3] overflow-hidden bg-[#E8E4DC]">
+                  <img
+                    src={story.image}
+                    alt={`${story.traveller} in ${story.destination}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <p className="text-sm sm:text-base text-[#111827] leading-relaxed">
+                    &ldquo;{story.quote}&rdquo;
+                  </p>
+                  <div className="pt-4 border-t border-[#E5E2DC] space-y-0.5">
+                    <p className="font-display text-sm font-bold text-[#010048]">
+                      {story.traveller}
+                    </p>
+                    <p className="text-xs font-medium text-[#6B7280]">
+                      {story.destination} &middot; {story.duration}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* G. Final CTA Band */}
+      {/* F. Final CTA Band */}
       <CTASection onOpenEnquiry={onOpenEnquiry} />
     </div>
   );

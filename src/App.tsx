@@ -75,7 +75,6 @@ export function App() {
               element={
                 <HomePage
                   packages={packages}
-                  packagesLoading={packagesLoading}
                   onOpenEnquiry={() => handleOpenEnquiry()}
                 />
               }

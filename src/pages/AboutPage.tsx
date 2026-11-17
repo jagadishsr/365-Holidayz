@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { ABOUT_TEAM_IMAGES, GENERATED_ASSETS } from '../data/stockImages';
+import { ABOUT_TEAM_IMAGES, GENERATED_ASSETS, resolveAssetUrl } from '../data/stockImages';
 import { CTASection } from '../components/common/CTASection';
 
 export const AboutPage: React.FC = () => {
@@ -34,14 +34,13 @@ export const AboutPage: React.FC = () => {
       {/* Approved Founder Narrative: Aameena */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 sm:pb-32">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Portrait */}
+          {/* Attached Founder Portrait */}
           <div className="lg:col-span-5">
-            <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-[#E8E4DC]">
+            <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-[#E8E4DC] border border-[#E5E2DC]">
               <img
-                src={ABOUT_TEAM_IMAGES.founder}
+                src={resolveAssetUrl(ABOUT_TEAM_IMAGES.founder)}
                 alt="Aameena, Founder of 365Holidayz"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
             <div className="mt-4 flex items-baseline justify-between border-t border-[#E5E2DC] pt-4">

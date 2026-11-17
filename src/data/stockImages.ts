@@ -1,11 +1,8 @@
 /**
- * 365Holidayz - Curated Editorial Assets, Generated Imagery & Client Poster Assets
+ * 365Holidayz - Curated Editorial Assets, Generated Imagery & Client Profile Asset
  */
 
 import clientLogoImg from '../assets/aistudio/365-Logo-circle.png';
-import posterPhilippinesImg from '../assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.04_4bf6a70f.jpeg';
-import posterTurkiyeGeorgiaImg from '../assets/aistudio/WhatsApp_Image_2026-09-22_at_16.38.41_e96733ea.jpeg';
-import posterSingaporeMalaysiaImg from '../assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.03_99832391.jpeg';
 
 // Generated Editorial High-Resolution Assets (Local Vite Bundled)
 import heroSwissHoneymoonImg from '../assets/images/hero_swiss_honeymoon_1794891874336.jpg';
@@ -14,6 +11,10 @@ import heroKazakhstanAdventureImg from '../assets/images/hero_kazakhstan_adventu
 import heroBaliWellnessImg from '../assets/images/hero_bali_wellness_1794891874651.jpg';
 import heroUzbekistanCultureImg from '../assets/images/hero_uzbekistan_culture_1794891875350.jpg';
 import destGreeceVerticalImg from '../assets/images/dest_greece_vertical_1794891876009.jpg';
+import introSeAsiaImg from '../assets/images/intro_seasia_landscape_1794893867284.jpg';
+import happyClientFamilyImg from '../assets/images/happy_client_family_1794893866385.jpg';
+import happyClientCoupleImg from '../assets/images/happy_client_couple_1794893867435.jpg';
+import happyClientGroupImg from '../assets/images/happy_client_group_1794893867174.jpg';
 
 export const GENERATED_ASSETS = {
   swissHoneymoon: heroSwissHoneymoonImg,
@@ -21,7 +22,11 @@ export const GENERATED_ASSETS = {
   kazakhstanAdventure: heroKazakhstanAdventureImg,
   baliWellness: heroBaliWellnessImg,
   uzbekistanCulture: heroUzbekistanCultureImg,
-  greeceVertical: destGreeceVerticalImg
+  greeceVertical: destGreeceVerticalImg,
+  introSeAsia: introSeAsiaImg,
+  happyClientFamily: happyClientFamilyImg,
+  happyClientCouple: happyClientCoupleImg,
+  happyClientGroup: happyClientGroupImg
 };
 
 /**
@@ -56,9 +61,7 @@ export function resolveAssetUrl(path: string): string {
 
 export const CLIENT_ASSETS = {
   logo: clientLogoImg || './assets/aistudio/365-Logo-circle.png',
-  posterPhilippines: posterPhilippinesImg || './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.04_4bf6a70f.jpeg',
-  posterTurkiyeGeorgia: posterTurkiyeGeorgiaImg || './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.38.41_e96733ea.jpeg',
-  posterSingaporeMalaysia: posterSingaporeMalaysiaImg || './assets/aistudio/WhatsApp_Image_2026-09-22_at_16.40.03_99832391.jpeg',
+  founderPhoto: './assets/aistudio/aameenataj_46a39b42.jpg',
   verifiedContacts: {
     phone1: '+91 8939958899',
     phone2: '+91 9444179215',
@@ -72,17 +75,60 @@ export const CLIENT_ASSETS = {
   }
 };
 
+export interface ClientExperienceStory {
+  id: string;
+  traveller: string;
+  destination: string;
+  tripType: string;
+  duration: string;
+  image: string;
+  quote: string;
+}
+
+export const HAPPY_CLIENT_STORIES: ClientExperienceStory[] = [
+  {
+    id: 'story-singapore-family',
+    traveller: 'Raghavan & Family · Chennai',
+    destination: 'Singapore & Malaysia',
+    tripType: 'Family & Group',
+    duration: '6 Days',
+    image: happyClientFamilyImg,
+    quote:
+      'Every airport transfer, Sentosa pass, and vegetarian dinner was timed smoothly without rushing the kids. We returned relaxed rather than exhausted.'
+  },
+  {
+    id: 'story-bali-honeymoon',
+    traveller: 'Siddharth & Ananya · Bengaluru',
+    destination: 'Ubud & Seminyak, Bali',
+    tripType: 'Honeymoon',
+    duration: '6 Nights / 7 Days',
+    image: happyClientCoupleImg,
+    quote:
+      'Waking up above quiet Ubud rice terraces with private chauffeurs waiting downstairs made our honeymoon feel completely unscripted and personal.'
+  },
+  {
+    id: 'story-med-group',
+    traveller: 'Meera & Travel Companions · Mumbai',
+    destination: 'Greece & Mediterranean Coast',
+    tripType: 'Small Group Tour',
+    duration: '7 Days',
+    image: happyClientGroupImg,
+    quote:
+      'From caldera sunset boat charters to walking-distance island hotels, 365Holidayz handled every ferry and transfer behind the scenes.'
+  }
+];
+
 // Destination imagery mapped by slug
 export const DESTINATION_STOCK_IMAGES: Record<string, string> = {
   'bali': heroBaliWellnessImg,
-  'thailand': 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1600&q=80',
+  'thailand': introSeAsiaImg,
   'istanbul-turkey': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1600&q=80',
   'hong-kong-macau': 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1600&q=80',
   'maldives': heroMaldivesLuxuryImg,
   'sri-lanka': 'https://images.unsplash.com/photo-1588598198321-9735fd52455b?auto=format&fit=crop&w=1600&q=80',
   'mauritius': 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1600&q=80',
   'seychelles': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80',
-  'singapore': 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1600&q=80',
+  'singapore': happyClientFamilyImg,
   'malaysia': 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1600&q=80',
   'vietnam': 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1600&q=80',
   'dubai': 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&q=80',
@@ -99,7 +145,7 @@ export const DESTINATION_STOCK_IMAGES: Record<string, string> = {
 // Holiday Types photography
 export const HOLIDAY_TYPE_STOCK_IMAGES: Record<string, string> = {
   'ht-honeymoon': heroSwissHoneymoonImg,
-  'ht-family-group': 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1400&q=80',
+  'ht-family-group': happyClientFamilyImg,
   'ht-adventure': heroKazakhstanAdventureImg,
   'ht-luxury-escapes': heroMaldivesLuxuryImg,
   'ht-women-solo': 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80',
@@ -119,10 +165,10 @@ export const PACKAGE_STOCK_IMAGES: Record<string, string> = {
   'pkg-08': 'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80',
   'pkg-09': heroBaliWellnessImg,
   'pkg-10': 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=1200&q=80',
-  'pkg-11': 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1200&q=80',
+  'pkg-11': happyClientFamilyImg,
   'pkg-12': 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80',
   'pkg-13': 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80',
-  'pkg-14': 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1200&q=80',
+  'pkg-14': introSeAsiaImg,
   'pkg-15': 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1200&q=80',
   'pkg-16': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
   'pkg-17': 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80',
@@ -145,6 +191,6 @@ export const PACKAGE_STOCK_IMAGES: Record<string, string> = {
 };
 
 export const ABOUT_TEAM_IMAGES = {
-  founder: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=80',
-  editorialSpread: heroUzbekistanCultureImg
+  founder: './assets/aistudio/aameenataj_46a39b42.jpg',
+  editorialSpread: introSeAsiaImg
 };

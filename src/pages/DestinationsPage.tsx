@@ -241,9 +241,29 @@ export const DestinationsPage: React.FC<DestinationsPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {ALL_DESTINATIONS.map((dest) => (
-              <DestinationCard key={dest.id} destination={dest} />
-            ))}
+            {ALL_DESTINATIONS.map((dest) => {
+              const matching = activePackages.filter(
+                (p) =>
+                  p.destinationSlug === dest.slug ||
+                  p.destination.toLowerCase().includes(dest.name.toLowerCase())
+              );
+              const lowest = matching.reduce((min, pkg) => {
+                const v = pkg.inrPrice || pkg.priceValue;
+                return v > 0 && v < min ? v : min;
+              }, Number.POSITIVE_INFINITY);
+              const priceLabel =
+                Number.isFinite(lowest) && lowest > 0
+                  ? `₹${Math.round(lowest).toLocaleString('en-IN')}`
+                  : undefined;
+
+              return (
+                <DestinationCard
+                  key={dest.id}
+                  destination={dest}
+                  startingPrice={priceLabel}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
