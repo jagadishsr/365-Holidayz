@@ -1,26 +1,19 @@
 /**
  * 365Holidayz - Google Sheets Package Integration & Visibility Service
  *
- * Expects a published Google Sheets CSV endpoint via VITE_PACKAGES_SHEET_CSV_URL
+ * Connects to a published Google Sheets CSV endpoint via VITE_PACKAGES_SHEET_CSV_URL
  * (`File -> Share -> Publish to web -> Comma-separated values (.csv)`).
  *
- * Supported Spreadsheet Columns:
- * - Title
- * - Destination
- * - Region
- * - Holiday Category
- * - Duration
- * - Stay Period
- * - Persons
- * - Rooms
- * - Features
- * - Original Currency
- * - Original Price
- * - Price INR
- * - Booking Validity
- * - Advance Booking Conditions
- * - Display Status ("Active" | "Hidden")
- * - Flash Offer (optional: "Yes" | "No")
+ * Supports BOTH:
+ * 1) The master grouped Google Sheet layout:
+ *    - Title row ("Packages Detail")
+ *    - Column header row:
+ *      S.No | Package Name | Package Title | Package Description | Features |
+ *      Stay Period | Booking Validity | Persons | Rooms | Price (USD) | Price (INR)
+ *      (+ optional Display Status / Flash Offer columns)
+ *    - Region section rows ("I. ISLANDS", "II. FAR EAST ASIAN", etc.)
+ *    - Destination section rows ("MALDIVES", "SRILANKA", "BALI , INDONESIA", etc.)
+ * 2) Standard flat-table CSV sheets with explicit Destination / Region / Holiday Category columns.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -35,7 +28,7 @@ export interface SheetSyncStatus {
   errorMessage: string | null;
 }
 
-const CACHE_KEY = '365holidayz_sheets_packages_v2';
+const CACHE_KEY = '365holidayz_sheets_packages_v3';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function filterActivePackages(packages: Package[]): Package[] {
@@ -101,6 +94,10 @@ export function parseCsvRows(csvText: string): string[][] {
   return rows.filter((r) => r.some((cell) => cell.length > 0));
 }
 
+function cleanText(value?: string): string {
+  return (value || '').replace(/\s+/g, ' ').trim();
+}
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -120,115 +117,322 @@ function formatInr(amount: number): string {
   return `₹${Math.round(amount).toLocaleString('en-IN')}`;
 }
 
-function parseDurationParts(durationText: string): { nights: number; days: number } {
-  const nightsMatch = durationText.match(/(\d+)\s*N/i);
-  const daysMatch = durationText.match(/(\d+)\s*D/i);
-  const nights = nightsMatch ? Number(nightsMatch[1]) : 4;
-  const days = daysMatch ? Number(daysMatch[1]) : nights + 1;
-  return { nights, days };
+function normalizeDestination(raw: string): { name: string; slug: string } {
+  const upper = cleanText(raw).toUpperCase();
+  if (upper.includes('MALDIVES')) return { name: 'Maldives', slug: 'maldives' };
+  if (upper.includes('SRILANKA') || upper.includes('SRI LANKA')) {
+    return { name: 'Sri Lanka', slug: 'sri-lanka' };
+  }
+  if (upper.includes('BALI')) return { name: 'Bali', slug: 'bali' };
+  if (upper.includes('MAURITIUS') || upper.includes('MAURIITIUS')) {
+    return { name: 'Mauritius', slug: 'mauritius' };
+  }
+  if (upper.includes('SEYCHELLES')) return { name: 'Seychelles', slug: 'seychelles' };
+  if (upper.includes('SINGAPORE')) return { name: 'Singapore', slug: 'singapore' };
+  if (upper.includes('MALAYSIA')) return { name: 'Malaysia', slug: 'malaysia' };
+  if (upper.includes('THAILAND')) return { name: 'Thailand', slug: 'thailand' };
+  if (upper.includes('VIETNAM')) return { name: 'Vietnam', slug: 'vietnam' };
+  if (upper.includes('DUBAI') || upper.includes('UAE')) {
+    return { name: 'Dubai & UAE', slug: 'dubai' };
+  }
+  if (upper.includes('TURKEY') || upper.includes('TURKIYE') || upper.includes('ISTANBUL')) {
+    return { name: 'Istanbul & Turkey', slug: 'istanbul-turkey' };
+  }
+  if (upper.includes('BAHRAIN')) return { name: 'Kingdom of Bahrain', slug: 'bahrain' };
+  if (upper.includes('JORDAN')) return { name: 'Jordan', slug: 'jordan' };
+  if (upper.includes('OMAN')) return { name: 'Sultanate of Oman', slug: 'oman' };
+  if (upper.includes('GEORGIA')) return { name: 'Georgia', slug: 'georgia' };
+  if (upper.includes('AZERBAIJAN')) return { name: 'Azerbaijan', slug: 'azerbaijan' };
+  if (upper.includes('KAZAKHSTAN')) return { name: 'Kazakhstan', slug: 'kazakhstan' };
+  if (upper.includes('UZBEKISTAN')) return { name: 'Uzbekistan', slug: 'uzbekistan' };
+  if (upper.includes('GREECE')) return { name: 'Greece', slug: 'greece' };
+
+  const titleCased = cleanText(raw)
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return { name: titleCased || 'International', slug: slugify(titleCased || 'international') };
+}
+
+function parseRegionFromSection(raw: string): Region | null {
+  const upper = cleanText(raw).toUpperCase();
+  if (/^(I\.|REGION\s*1)/.test(upper) || upper === 'ISLANDS') return 'Islands';
+  if (/^(II\.|REGION\s*2)/.test(upper) || upper.includes('FAR EAST')) return 'Far East Asian';
+  if (/^(III\.|REGION\s*3)/.test(upper) || upper.includes('MIDDLE EAST') || upper.includes('MEDIT')) {
+    return 'Middle East & Mediterranean';
+  }
+  if (/^(IV\.|REGION\s*4)/.test(upper) || upper.includes('OTHER COUNTRIES')) {
+    return 'Other Countries';
+  }
+  return null;
+}
+
+function inferDuration(text: string): { duration: string; nights: number; days: number } {
+  const ndMatch = text.match(/(\d+)\s*n(?:ights?|ihgts?)?\s*\/\s*(\d+)\s*d(?:ays?)?/i);
+  if (ndMatch) {
+    const nights = Number(ndMatch[1]);
+    const days = Number(ndMatch[2]);
+    return {
+      duration: `${nights} Nights / ${days} Days`,
+      nights,
+      days
+    };
+  }
+
+  const nOnlyMatch = text.match(/(\d+)\s*n(?:ights?|ihgts?)?\b/i);
+  if (nOnlyMatch) {
+    const nights = Number(nOnlyMatch[1]);
+    const days = nights + 1;
+    return {
+      duration: `${nights} Nights / ${days} Days`,
+      nights,
+      days
+    };
+  }
+
+  return { duration: '4 Nights / 5 Days', nights: 4, days: 5 };
+}
+
+function inferHolidayCategory(rawCategory: string, combinedText: string): HolidayCategory {
+  if (rawCategory) return rawCategory as HolidayCategory;
+  const t = combinedText.toLowerCase();
+  if (t.includes('mice') || t.includes('corporate')) return 'MICE & Corporate';
+  if (t.includes('honeymoon')) return 'Honeymoon';
+  if (t.includes('family') || t.includes('fiesta') || t.includes('diwali') || t.includes('summer')) {
+    return 'Family & Group';
+  }
+  if (t.includes('off beat') || t.includes('thrill') || t.includes('wilds') || t.includes('adventure')) {
+    return 'Adventure';
+  }
+  if (t.includes('heritage') || t.includes('wonders') || t.includes('glimpse') || t.includes('discover')) {
+    return 'Culture & Heritage';
+  }
+  return 'Luxury Escapes';
+}
+
+function parseForeignCurrencyAndPrice(raw: string): { currency: CurrencyCode; amount?: number } {
+  const cleaned = cleanText(raw);
+  if (!cleaned) return { currency: 'USD', amount: undefined };
+
+  let currency: CurrencyCode = 'USD';
+  if (/sgd/i.test(cleaned)) currency = 'SGD';
+  else if (/eur/i.test(cleaned)) currency = 'EUR';
+  else if (/inr|₹/i.test(cleaned)) currency = 'INR';
+
+  const amount = parseNumber(cleaned);
+  return { currency, amount: amount > 0 ? amount : undefined };
 }
 
 function normalizeDisplayStatus(raw?: string): PackageDisplayStatus {
-  const val = (raw || '').trim().toLowerCase();
+  const val = cleanText(raw).toLowerCase();
   if (val === 'hidden' || val === 'inactive' || val === 'no' || val === 'draft') {
     return 'Hidden';
   }
   return 'Active';
 }
 
-function mapCsvToPackages(csvText: string): Package[] {
+export function mapCsvToPackages(csvText: string): Package[] {
   const rows = parseCsvRows(csvText);
   if (rows.length < 2) return [];
 
-  const headers = rows[0].map((h) => h.toLowerCase().trim());
-  const col = (nameAliases: string[]) =>
-    headers.findIndex((h) => nameAliases.some((alias) => h === alias || h.includes(alias)));
+  // Locate the real column header row (row 0 may be "Packages Detail")
+  let headerRowIdx = rows.findIndex((r) => {
+    const joined = r.map((c) => cleanText(c).toLowerCase()).join('|');
+    return (
+      (joined.includes('package name') || joined.includes('package title') || joined.includes('title')) &&
+      (joined.includes('price') || joined.includes('destination') || joined.includes('features'))
+    );
+  });
+  if (headerRowIdx === -1) headerRowIdx = 0;
 
-  const idxTitle = col(['title', 'package name', 'package']);
-  const idxDestination = col(['destination']);
-  const idxRegion = col(['region']);
-  const idxCategory = col(['holiday category', 'holiday type', 'category']);
-  const idxDuration = col(['duration']);
-  const idxStayPeriod = col(['stay period', 'travel period']);
-  const idxPersons = col(['persons', 'pax', 'min pax']);
-  const idxRooms = col(['rooms', 'room basis']);
-  const idxFeatures = col(['features', 'inclusions']);
-  const idxOrigCurrency = col(['original currency', 'currency']);
-  const idxOrigPrice = col(['original price']);
-  const idxPriceInr = col(['price inr', 'inr price', 'price']);
-  const idxBookingValidity = col(['booking validity', 'validity']);
-  const idxAdvanceCond = col(['advance booking conditions', 'advance booking', 'conditions']);
-  const idxDisplayStatus = col(['display status', 'status', 'visibility']);
-  const idxFlashOffer = col(['flash offer', 'flash']);
-  const idxDescription = col(['description', 'summary']);
-  const idxStayDetails = col(['stay details', 'hotel', 'resort']);
+  const headers = rows[headerRowIdx].map((h) => cleanText(h).toLowerCase());
+  const colExactOrIncludes = (aliases: string[]) => {
+    const exact = headers.findIndex((h) => aliases.some((a) => h === a));
+    if (exact !== -1) return exact;
+    return headers.findIndex((h) => aliases.some((a) => h.includes(a)));
+  };
 
-  return rows.slice(1).map((r, index) => {
-    const get = (i: number) => (i >= 0 && i < r.length ? r[i] : '');
-    const title = get(idxTitle) || `Curated Holiday ${index + 1}`;
-    const destination = get(idxDestination) || 'International';
-    const regionRaw = (get(idxRegion) || 'Other Countries') as Region;
-    const categoryRaw = (get(idxCategory) || 'Luxury Escapes') as HolidayCategory;
-    const duration = get(idxDuration) || '5 Nights / 6 Days';
-    const { nights, days } = parseDurationParts(duration);
-    const persons = get(idxPersons) || 'Min 2 Pax';
-    const minPaxMatch = persons.match(/\d+/);
-    const minPax = minPaxMatch ? Number(minPaxMatch[0]) : 2;
-    const rooms = get(idxRooms) || 'Double sharing';
+  const idxSNo = colExactOrIncludes(['s.no', 'sno', 'sl no', '#']);
+  const idxPkgName = colExactOrIncludes(['package name']);
+  const idxPkgTitle = colExactOrIncludes(['package title', 'title', 'package']);
+  const idxDestination = colExactOrIncludes(['destination']);
+  const idxRegion = colExactOrIncludes(['region']);
+  const idxCategory = colExactOrIncludes(['holiday category', 'holiday type', 'category']);
+  const idxDuration = colExactOrIncludes(['duration']);
+  const idxStayPeriod = colExactOrIncludes(['stay period', 'travel period']);
+  const idxPersons = colExactOrIncludes(['persons', 'pax', 'min pax']);
+  const idxRooms = colExactOrIncludes(['rooms', 'room basis']);
+  const idxFeatures = colExactOrIncludes(['features', 'inclusions']);
+  const idxOrigCurrency = colExactOrIncludes(['original currency', 'currency']);
+  const idxOrigPrice = colExactOrIncludes(['price (usd)', 'original price']);
+  const idxPriceInr = colExactOrIncludes(['price (inr)', 'price inr', 'inr price']);
+  const idxGenericPrice = colExactOrIncludes(['price']);
+  const idxBookingValidity = colExactOrIncludes(['booking validity', 'validity']);
+  const idxAdvanceCond = colExactOrIncludes(['advance booking conditions', 'advance booking', 'conditions']);
+  const idxDisplayStatus = colExactOrIncludes(['display status', 'status', 'visibility']);
+  const idxFlashOffer = colExactOrIncludes(['flash offer', 'flash']);
+  const idxDescription = colExactOrIncludes(['package description', 'description', 'summary']);
+  const idxStayDetails = colExactOrIncludes(['stay details', 'hotel', 'resort']);
+
+  let currentRegion: Region = 'Islands';
+  let currentDestination = { name: 'Maldives', slug: 'maldives' };
+  const parsedPackages: Package[] = [];
+
+  for (let rowIndex = headerRowIdx + 1; rowIndex < rows.length; rowIndex++) {
+    const r = rows[rowIndex];
+    const get = (i: number) => (i >= 0 && i < r.length ? cleanText(r[i]) : '');
+
+    const firstCell = get(idxSNo !== -1 ? idxSNo : 0);
+    const nonEmptyCells = r.map((c) => cleanText(c)).filter(Boolean);
+    if (nonEmptyCells.length === 0) continue;
+
+    // Check if this is a Region section row ("I. ISLANDS") or Destination header row ("MALDIVES")
+    const hasTitleOrPrice =
+      Boolean(get(idxPkgTitle)) ||
+      Boolean(get(idxPriceInr)) ||
+      Boolean(get(idxOrigPrice)) ||
+      Boolean(get(idxDescription));
+
+    if (!hasTitleOrPrice && nonEmptyCells.length <= 2) {
+      const sectionLabel = nonEmptyCells[0];
+      const detectedRegion = parseRegionFromSection(sectionLabel);
+      if (detectedRegion) {
+        currentRegion = detectedRegion;
+      } else {
+        currentDestination = normalizeDestination(sectionLabel);
+      }
+      continue;
+    }
+
+    const rawPkgName = get(idxPkgName);
+    const rawPkgTitle = get(idxPkgTitle);
+    if (!rawPkgName && !rawPkgTitle) continue;
+
+    const destColVal = get(idxDestination);
+    const destInfo = destColVal
+      ? normalizeDestination(destColVal)
+      : currentDestination;
+
+    const regionColVal = get(idxRegion);
+    const regionValue = (regionColVal || currentRegion) as Region;
+
+    // Combine Package Name + Package Title without repeating country-only labels
+    let displayTitle = rawPkgTitle || rawPkgName;
+    if (rawPkgName && rawPkgTitle) {
+      const normName = slugify(rawPkgName);
+      const normDest = slugify(destInfo.name);
+      const nameIsJustCountry =
+        normName === normDest ||
+        rawPkgName.toUpperCase() === 'SRILANKA' ||
+        rawPkgName.toUpperCase() === 'TURKEY';
+
+      if (!nameIsJustCountry && !slugify(rawPkgTitle).includes(normName)) {
+        displayTitle = `${rawPkgName} — ${rawPkgTitle}`;
+      }
+    }
+
+    const description = get(idxDescription);
     const featuresRaw = get(idxFeatures);
     const features = featuresRaw
       ? featuresRaw
-          .split(/\||;|\n/)
-          .map((f) => f.trim())
+          .split(/\||;|\n|,(?=\s*[A-Za-z0-9])/)
+          .map((f) => cleanText(f))
           .filter(Boolean)
       : ['Accommodation & breakfast', 'Airport transfers', 'Curated sightseeing'];
 
-    const inrPrice = parseNumber(get(idxPriceInr));
-    const originalPrice = parseNumber(get(idxOrigPrice));
-    const origCurrRaw = (get(idxOrigCurrency) || 'INR').toUpperCase() as CurrencyCode;
-    const displayStatus = normalizeDisplayStatus(get(idxDisplayStatus));
+    const durationSource = `${get(idxDuration)} ${rawPkgTitle} ${description} ${featuresRaw}`;
+    const { duration, nights, days } = inferDuration(durationSource);
+
+    const minPaxMatch = `${rawPkgName} ${rawPkgTitle}`.match(/min\s*(\d+)/i);
+    const rawPersonsCell = get(idxPersons);
+    let personsDisplay = 'Per Person (Double Sharing)';
+    let minPax = 2;
+    if (minPaxMatch) {
+      minPax = Number(minPaxMatch[1]);
+      personsDisplay = `Min ${minPax} Pax`;
+    } else if (rawPersonsCell && rawPersonsCell !== '1') {
+      personsDisplay = rawPersonsCell;
+      const cellMatch = rawPersonsCell.match(/\d+/);
+      if (cellMatch) minPax = Number(cellMatch[0]);
+    }
+
+    const roomsRaw = get(idxRooms);
+    const rooms =
+      roomsRaw.toLowerCase().includes('twin')
+        ? 'Twin sharing'
+        : roomsRaw || 'Double sharing';
+
+    const inrVal = parseNumber(get(idxPriceInr) || get(idxGenericPrice));
+    const foreignParsed = parseForeignCurrencyAndPrice(get(idxOrigPrice));
+    const origCurr: CurrencyCode = get(idxOrigCurrency)
+      ? (get(idxOrigCurrency).toUpperCase() as CurrencyCode)
+      : foreignParsed.currency;
+    const origPrice = foreignParsed.amount;
+
     const bookingValidity = get(idxBookingValidity) || 'Confirm availability on enquiry';
     const advanceConditions = get(idxAdvanceCond);
+    const displayStatus = normalizeDisplayStatus(get(idxDisplayStatus));
     const flashRaw = get(idxFlashOffer).toLowerCase();
+    const isFlash =
+      flashRaw === 'yes' ||
+      flashRaw === 'true' ||
+      flashRaw === '1' ||
+      /flash\s*offer/i.test(`${rawPkgName} ${rawPkgTitle}`);
 
-    return {
-      id: `sheet-pkg-${index + 1}`,
-      slug: slugify(`${destination}-${title}-${index + 1}`),
-      title,
-      destination,
-      destinationSlug: slugify(destination),
-      region: regionRaw,
-      holidayType: categoryRaw,
+    const numericSno = Number(firstCell);
+    const stableId =
+      Number.isInteger(numericSno) && numericSno > 0
+        ? `pkg-${String(numericSno).padStart(2, '0')}`
+        : `sheet-pkg-${parsedPackages.length + 1}`;
+
+    const holidayType = inferHolidayCategory(
+      get(idxCategory),
+      `${rawPkgName} ${rawPkgTitle} ${description}`
+    );
+
+    const effectiveInr = inrVal || origPrice || 0;
+
+    parsedPackages.push({
+      id: stableId,
+      slug: slugify(`${destInfo.slug}-${displayTitle}-${parsedPackages.length + 1}`),
+      title: displayTitle,
+      destination: destInfo.name,
+      destinationSlug: destInfo.slug,
+      region: regionValue,
+      holidayType,
       duration,
       durationNights: nights,
       durationDays: days,
-      persons,
+      persons: personsDisplay,
       minPax,
       roomBasis: rooms,
       stayPeriod: get(idxStayPeriod) || 'Seasonal validity — confirm dates',
       bookingValidity,
-      isUrgentValidity: /31\s*oct|urgent|limited|flash/i.test(bookingValidity) || flashRaw === 'yes',
+      isUrgentValidity: /31\s*oct|urgent|limited|flash/i.test(`${bookingValidity} ${rawPkgName}`) || isFlash,
       currency: 'INR',
-      priceValue: inrPrice || originalPrice,
-      priceDisplay: formatInr(inrPrice || originalPrice),
-      originalCurrency: origCurrRaw,
-      originalPrice: originalPrice || undefined,
-      inrPrice: inrPrice || undefined,
-      inrPriceDisplay: inrPrice ? formatInr(inrPrice) : undefined,
-      priceBasisNote: advanceConditions || 'Rates from Google Sheets master — confirm availability at enquiry',
+      priceValue: effectiveInr,
+      priceDisplay: formatInr(effectiveInr),
+      originalCurrency: origCurr,
+      originalPrice: origPrice,
+      inrPrice: inrVal || undefined,
+      inrPriceDisplay: inrVal ? formatInr(inrVal) : undefined,
+      priceBasisNote:
+        advanceConditions ||
+        (origPrice ? `Sheet ref: ${origCurr} ${origPrice.toLocaleString('en-IN')} · Per person on ${rooms}` : `Per person on ${rooms}`),
       advanceBookingConditions: advanceConditions || undefined,
       description:
-        get(idxDescription) ||
-        `${duration} curated itinerary in ${destination} designed by 365Holidayz travel specialists.`,
-      stayDetails: get(idxStayDetails) || `${rooms} in vetted boutique or luxury properties`,
+        description ||
+        `${duration} curated itinerary in ${destInfo.name} designed by 365Holidayz travel specialists.`,
+      stayDetails: get(idxStayDetails) || features[0] || `${rooms} in vetted hotel or resort`,
       features,
       itineraryStatus: 'Detailed day-wise itinerary available on request',
-      imageSubject: `${destination} ${title}`,
-      isFeatured: index < 6,
+      imageSubject: `${destInfo.name} ${displayTitle}`,
+      isFeatured: parsedPackages.length < 6,
       displayStatus,
-      isFlashOffer: flashRaw === 'yes' || flashRaw === 'true' || flashRaw === '1'
-    };
-  });
+      isFlashOffer: isFlash
+    });
+  }
+
+  return parsedPackages;
 }
 
 function getConfiguredSheetUrl(): string {

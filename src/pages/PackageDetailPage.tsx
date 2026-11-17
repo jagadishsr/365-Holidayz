@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, Check, XCircle, Phone, MessageCircle } from 'lucide-react';
-import { PACKAGE_STOCK_IMAGES, CLIENT_ASSETS } from '../data/stockImages';
+import { PACKAGE_STOCK_IMAGES, DESTINATION_STOCK_IMAGES, GENERATED_ASSETS, CLIENT_ASSETS } from '../data/stockImages';
 import { PriceDisplay } from '../components/common/PriceDisplay';
 import { EnquiryForm } from '../components/common/EnquiryForm';
 import { PackageCard } from '../components/cards/PackageCard';
@@ -30,7 +30,8 @@ export const PackageDetailPage: React.FC<PackageDetailPageProps> = ({ packages }
 
   const heroImage =
     PACKAGE_STOCK_IMAGES[pkg.id] ||
-    PACKAGE_STOCK_IMAGES['pkg-01'];
+    DESTINATION_STOCK_IMAGES[pkg.destinationSlug] ||
+    GENERATED_ASSETS.maldivesLuxury;
 
   return (
     <div className="bg-[#FAF9F6] pt-24 sm:pt-28 pb-12">
