@@ -1,120 +1,171 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { HomePage } from './pages/HomePage';
 import { DestinationsPage } from './pages/DestinationsPage';
 import { DestinationDetailPage } from './pages/DestinationDetailPage';
-import { HolidayTypesPage } from './pages/HolidayTypesPage';
 import { HolidayTypeDetailPage } from './pages/HolidayTypeDetailPage';
-import { PackagesPage } from './pages/PackagesPage';
 import { PackageDetailPage } from './pages/PackageDetailPage';
 import { TravelGuidePage } from './pages/TravelGuidePage';
 import { AboutPage } from './pages/AboutPage';
-import { PlanYourTripPage } from './pages/PlanYourTripPage';
+import { HappyClientsPage } from './pages/HappyClientsPage';
 import { ContactPage } from './pages/ContactPage';
 import { EnquiryForm } from './components/common/EnquiryForm';
-import { EntranceOfferModal } from './components/common/EntranceOfferModal';
-import { X } from 'lucide-react';
+import { FlashOffersDrawer } from './components/common/FlashOffersDrawer';
+import { usePackagesData } from './services/googleSheetsPackages';
+import { Package } from './types';
 
-// Scroll to top helper on navigation
-const ScrollToTop: React.FC = () => {
-  const { pathname } = useLocation();
-
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [pathname, search]);
   return null;
-};
+}
 
-// Dynamically detect subdirectory basename (e.g. /365/) for hosting under arbitrary subfolders
-const getSubdirectoryBasename = (): string | undefined => {
-  if (typeof window === 'undefined') return undefined;
-  const knownRoutes = ['destinations', 'holiday-types', 'packages', 'travel-guide', 'about', 'contact', 'plan-your-trip'];
-  const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
-  if (firstSegment && !knownRoutes.includes(firstSegment)) {
-    return `/${firstSegment}`;
+function getSubdirectoryBasename(): string {
+  if (typeof window === 'undefined') return '/';
+  const knownRoutes = [
+    'destinations',
+    'holiday-types',
+    'packages',
+    'travel-guide',
+    'happy-clients',
+    'about',
+    'contact',
+    'plan-your-trip'
+  ];
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  if (segments.length > 0 && !knownRoutes.includes(segments[0])) {
+    return `/${segments[0]}`;
   }
-  return undefined;
-};
+  return '/';
+}
 
-export default function App() {
-  const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
+export function App() {
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [enquiryPackageContext, setEnquiryPackageContext] = useState<Package | undefined>(undefined);
+  const { packages, loading: packagesLoading, status: sheetStatus, refresh: refreshPackages } =
+    usePackagesData();
 
-  const handleOpenEnquiry = () => {
-    setIsEnquiryModalOpen(true);
+  const basename = getSubdirectoryBasename();
+
+  const handleOpenEnquiry = (pkg?: Package) => {
+    setEnquiryPackageContext(pkg);
+    setEnquiryModalOpen(true);
   };
 
   const handleCloseEnquiry = () => {
-    setIsEnquiryModalOpen(false);
+    setEnquiryModalOpen(false);
+    setEnquiryPackageContext(undefined);
   };
 
   return (
-    <BrowserRouter basename={getSubdirectoryBasename()}>
+    <Router basename={basename}>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col bg-[#f8fafc] text-[#0f172a] font-sans antialiased selection:bg-[#fed7aa] selection:text-[#7c2d12]">
-        {/* Approved Navigation Header */}
-        <Header onOpenEnquiry={handleOpenEnquiry} />
+      <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#111827] selection:bg-[#010048] selection:text-[#FAF9F6]">
+        <Header onOpenEnquiry={() => handleOpenEnquiry()} />
 
-        {/* Main Content View */}
         <main className="flex-1">
           <Routes>
-            <Route path="/" element={<HomePage onOpenEnquiry={handleOpenEnquiry} />} />
-            <Route path="/destinations" element={<DestinationsPage />} />
-            <Route path="/destinations/:slug" element={<DestinationDetailPage />} />
-            <Route path="/holiday-types" element={<HolidayTypesPage onOpenEnquiry={handleOpenEnquiry} />} />
-            <Route path="/holiday-types/:slug" element={<HolidayTypeDetailPage />} />
-            <Route path="/packages" element={<PackagesPage />} />
-            <Route path="/packages/:id" element={<PackageDetailPage />} />
-            <Route path="/travel-guide" element={<TravelGuidePage />} />
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  packages={packages}
+                  packagesLoading={packagesLoading}
+                  onOpenEnquiry={() => handleOpenEnquiry()}
+                />
+              }
+            />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/plan-your-trip" element={<ContactPage />} />
-            {/* Fallback route */}
-            <Route path="*" element={<HomePage onOpenEnquiry={handleOpenEnquiry} />} />
+            <Route
+              path="/destinations"
+              element={
+                <DestinationsPage
+                  packages={packages}
+                  packagesLoading={packagesLoading}
+                  sheetStatus={sheetStatus}
+                  onRefreshPackages={refreshPackages}
+                />
+              }
+            />
+            <Route
+              path="/destinations/:slug"
+              element={<DestinationDetailPage packages={packages} />}
+            />
+            <Route
+              path="/packages"
+              element={<Navigate to="/destinations" replace />}
+            />
+            <Route
+              path="/packages/:id"
+              element={<PackageDetailPage packages={packages} />}
+            />
+            <Route
+              path="/holiday-types"
+              element={<Navigate to="/destinations" replace />}
+            />
+            <Route
+              path="/holiday-types/:slug"
+              element={<HolidayTypeDetailPage packages={packages} />}
+            />
+            <Route
+              path="/travel-guide"
+              element={<TravelGuidePage packages={packages} />}
+            />
+            <Route path="/happy-clients" element={<HappyClientsPage />} />
+            <Route path="/contact" element={<ContactPage packages={packages} />} />
+            <Route path="/plan-your-trip" element={<ContactPage packages={packages} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
 
-        {/* Brand Footer */}
         <Footer />
 
-        {/* Catchy Entrance Offer Popup (GT Holidays Style) */}
-        <EntranceOfferModal onOpenEnquiry={handleOpenEnquiry} />
+        {/* Persistent Right-Edge FLASH OFFERS Hanging Tab & Drawer */}
+        <FlashOffersDrawer
+          packages={packages}
+          onEnquirePackage={(pkg) => handleOpenEnquiry(pkg)}
+        />
 
-        {/* Global Quick Plan Your Trip Modal */}
-        {isEnquiryModalOpen && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#000032]/80 backdrop-blur-xs animate-in fade-in"
-            onClick={handleCloseEnquiry}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="quick-enquiry-modal"
-          >
-            <div
-              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl bg-white animate-in zoom-in-95 duration-200"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
+        {/* Global Bespoke Enquiry Modal */}
+        {enquiryModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+            <div className="relative w-full max-w-2xl bg-[#FAF9F6] rounded-2xl shadow-2xl my-auto max-h-[90vh] overflow-y-auto border border-[#E5E2DC]">
               <button
                 type="button"
-                onClick={handleCloseEnd => handleCloseEnquiry()}
-                className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-                aria-label="Close dialog"
+                onClick={handleCloseEnquiry}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white text-[#4B5563] hover:text-[#111827] border border-[#E5E2DC] transition-colors cursor-pointer"
+                aria-label="Close enquiry modal"
               >
                 <X className="w-5 h-5" />
               </button>
-
-              <EnquiryForm onSuccess={handleCloseEnquiry} className="border-0 shadow-none" />
+              <EnquiryForm
+                onSuccess={handleCloseEnquiry}
+                initialDestination={enquiryPackageContext?.destination}
+                initialHolidayType={enquiryPackageContext?.holidayType}
+                packageContext={
+                  enquiryPackageContext
+                    ? {
+                        id: enquiryPackageContext.id,
+                        title: enquiryPackageContext.title,
+                        price:
+                          enquiryPackageContext.inrPriceDisplay ||
+                          enquiryPackageContext.priceDisplay
+                      }
+                    : undefined
+                }
+                className="border-0 shadow-none"
+              />
             </div>
           </div>
         )}
       </div>
-    </BrowserRouter>
+    </Router>
   );
 }
+
+export default App;

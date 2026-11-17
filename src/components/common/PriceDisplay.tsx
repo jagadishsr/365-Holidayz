@@ -1,11 +1,13 @@
 import React from 'react';
-import { AlertCircle, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 interface PriceDisplayProps {
   priceDisplay: string;
   roomBasis: string;
   persons: string;
   minPax?: number;
+  originalCurrency?: string;
+  originalPrice?: number;
   priceBasisNote?: string;
   size?: 'sm' | 'md' | 'lg';
   showDisclaimer?: boolean;
@@ -16,53 +18,45 @@ export const PriceDisplay: React.FC<PriceDisplayProps> = ({
   priceDisplay,
   roomBasis,
   persons,
-  minPax,
-  priceBasisNote = 'Price shown in client sheet — confirm basis at enquiry',
+  originalCurrency,
+  originalPrice,
+  priceBasisNote = 'Confirm room availability & departure dates on enquiry.',
   size = 'md',
   showDisclaimer = true,
   className = ''
 }) => {
-  const isLargeGroup = minPax && minPax >= 4;
-
   const sizeClasses = {
-    sm: 'text-lg font-bold',
-    md: 'text-2xl font-bold tracking-tight',
-    lg: 'text-3xl sm:text-4xl font-extrabold tracking-tight'
+    sm: 'text-xl font-bold',
+    md: 'text-2xl font-bold',
+    lg: 'text-3xl sm:text-4xl font-extrabold'
   };
 
   return (
-    <div className={`space-y-1.5 ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       <div className="flex items-baseline gap-2 flex-wrap">
-        <span className={`text-[#010048] ${sizeClasses[size]}`}>
+        <span className={`font-mono-tabular text-[#010048] ${sizeClasses[size]}`}>
           {priceDisplay}
         </span>
-        <span className="text-xs sm:text-sm text-slate-500 font-medium">
-          / per person ({roomBasis})
+        <span className="text-xs sm:text-sm text-[#4B5563] font-medium">
+          / person &middot; {roomBasis}
         </span>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap text-xs text-slate-600">
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium ${
-          isLargeGroup 
-            ? 'bg-amber-100 text-amber-900 border border-amber-300' 
-            : 'bg-slate-100 text-slate-700 border border-slate-200'
-        }`}>
-          <Users className="w-3 h-3" />
-          <span>{persons}</span>
-        </span>
+      {originalCurrency && originalCurrency !== 'INR' && originalPrice ? (
+        <div className="text-xs font-mono-tabular text-[#6B7280]">
+          Original contract quote: {originalCurrency} {originalPrice.toLocaleString()}
+        </div>
+      ) : null}
 
-        {roomBasis === 'Twin sharing' && (
-          <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200 font-medium">
-            Twin Sharing
-          </span>
-        )}
+      <div className="flex items-center gap-2 text-xs text-[#4B5563]">
+        <Users className="w-3.5 h-3.5 text-[#D94E28] shrink-0" />
+        <span>{persons}</span>
       </div>
 
       {showDisclaimer && (
-        <div className="flex items-start gap-1 text-[11px] text-slate-500 leading-tight pt-0.5">
-          <AlertCircle className="w-3 h-3 text-[#c8a97e] shrink-0 mt-0.5" />
-          <span className="italic">{priceBasisNote}</span>
-        </div>
+        <p className="text-[11px] text-[#6B7280] leading-snug pt-0.5">
+          {priceBasisNote}
+        </p>
       )}
     </div>
   );

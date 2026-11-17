@@ -1,7 +1,5 @@
 /**
- * 365Holidayz - Signature Holiday Types Dataset
- * The 5 approved core categories with suitable traveller personas,
- * signature experiences, and verified destinations.
+ * 365Holidayz - 7 Approved Holiday Categories Dataset
  */
 
 import { HolidayType } from '../types';
@@ -11,90 +9,140 @@ export const ALL_HOLIDAY_TYPES: HolidayType[] = [
     id: 'ht-honeymoon',
     slug: 'honeymoon',
     title: 'Honeymoon',
-    subtitle: 'Infinite Horizons',
-    badge: 'Romantic Sanctuaries',
-    description: 'Intimate escapes designed for two: secluded overwater villas, private candlelight dinners on untouched sands, and quiet horizons crafted with unmatched attention to detail.',
-    suitableTraveller: 'Couples, newlyweds, and anniversary celebrants seeking unhurried privacy, elevated luxury, and memorable romantic settings.',
+    subtitle: 'Quiet Horizons for Two',
+    badge: 'Romantic Journeys',
+    description:
+      'Scenic alpine railways, private overwater suites, and unhurried sunsets crafted for newlyweds and couples seeking lasting memories.',
+    suitableTraveller:
+      'Couples, newlyweds, and anniversary celebrants seeking unhurried privacy and refined comfort.',
     signatureExperiences: [
-      'Private overwater villa sundecks with direct steps into turquoise atoll waters',
-      'Candlelit multi-course dinners on secluded sandbanks with personal chef service',
-      'Couples Ayurvedic and tropical herbal botanical spa treatments',
-      'Sunset champagne cruises on traditional wooden yachts and catamarans'
+      'Scenic train departures across snow-covered Swiss valleys',
+      'Private overwater villa decks opening into turquoise Maldives lagoons',
+      'Candlelit coastal dinners and private sunset boat charters',
+      'Unrushed itineraries with seamless private transfers'
     ],
-    recommendedDestinations: ['Maldives', 'Bali', 'Mauritius', 'Thailand (Krabi)', 'Malaysia (Langkawi)'],
-    imageSubject: 'Romantic private candlelit dinner set up on white sand beach at sunset beside calm waves',
+    recommendedDestinations: ['Maldives', 'Indonesia – Bali', 'Greece', 'Mauritius', 'Thailand – Krabi & Phuket'],
+    imageSubject: 'Couple waiting for scenic mountain train at snow-covered Swiss train station',
     accentQuote: 'Where quiet moments and boundless horizons intertwine into memories of a lifetime.'
   },
   {
     id: 'ht-family-group',
     slug: 'family-group',
     title: 'Family & Group',
-    subtitle: 'All-Ages Elegance',
-    badge: 'Multi-Generational Harmony',
-    description: 'Thoughtfully paced itineraries with spacious multi-bedroom suites, private chauffeur logistics, engaging wildlife encounters, and cultural discoveries for every generation.',
-    suitableTraveller: 'Families with young children, teens, and grandparents, as well as milestone celebration groups seeking ease, comfort, and seamless coordination.',
+    subtitle: 'Effortless Togetherness',
+    badge: 'Multi-Generational Travel',
+    description:
+      'Naturally paced journeys across international cities and island coastlines with spacious suites, private coaches, and effortless coordination for every age.',
+    suitableTraveller:
+      'Families across generations and private friend groups looking for seamless comfort.',
     signatureExperiences: [
-      'Spacious interconnected resort family suites and private villas with gardens',
-      'Private air-conditioned chauffeur travel for effortless multi-generational movement',
-      'Gentle wildlife encounters: sea turtles, elephant ethical sanctuaries, and marine parks',
-      'Dedicated activities combining kid-friendly exploration with adult relaxation'
+      'Spacious multi-bedroom coastal suites and private resort stays',
+      'Dedicated private air-conditioned vehicles and vetted local guides',
+      'Balanced itineraries with engaging cultural discovery and leisure',
+      'Indian & vegetarian dining arrangements tailored on request'
     ],
-    recommendedDestinations: ['Singapore', 'Sri Lanka', 'Vietnam', 'Bali', 'Mauritius', 'Dubai'],
-    imageSubject: 'Family walking together along a sunlit coastal palm garden overlooking turquoise sea',
+    recommendedDestinations: ['Singapore', 'Malaysia – Langkawi', 'Vietnam – Phu Quoc', 'Thailand – Krabi & Phuket', 'Dubai'],
+    imageSubject: 'Family exploring international coastline naturally at sunlit leisure',
     accentQuote: 'Journeys designed so parents unwind, grandparents relax, and children discover wonder.'
   },
   {
     id: 'ht-adventure',
     slug: 'adventure',
     title: 'Adventure',
-    subtitle: 'Wild & Refined',
-    badge: 'Expedition & Wonder',
-    description: 'Expeditions that awaken the senses without compromising on comfort. Ascend ancient volcanic fortresses, navigate deep river canyons, traverse Mars-like deserts, and float over surreal fairy chimneys.',
-    suitableTraveller: 'Curious explorers, active couples, and photography enthusiasts seeking authentic encounters, untamed landscapes, and refined basecamps.',
+    subtitle: 'Highlands, Trails & Horizons',
+    badge: 'Active Exploration',
+    description:
+      'Trekking spectacular Central Asian mountain ridges, traversing desert canyons, and flying over Cappadocia at sunrise without sacrificing rest.',
+    suitableTraveller:
+      'Active explorers and nature lovers drawn to dramatic alpine trails and raw landscapes.',
     signatureExperiences: [
-      'Sunrise hot-air balloon flights above Cappadocia’s geological fairy chimneys',
-      '4x4 Bedouin desert expeditions and starlit camps in Jordan’s Wadi Rum',
-      'Climbing the sky citadel of Sigiriya and hiking through high Ceylon cloud forests',
-      'Navigating karst limestone caves and jungle rapids in Bali and Vietnam'
+      'Guided alpine treks across the glacier valleys of Kazakhstan',
+      'Sunrise balloon flights over Cappadocia valleys',
+      '4x4 desert expeditions in Wadi Rum and Wahiba Sands',
+      'Island cliff hikes and marine canyon explorations'
     ],
-    recommendedDestinations: ['Turkey (Cappadocia)', 'Jordan (Petra & Wadi Rum)', 'Sri Lanka', 'Georgia (Kazbegi)', 'Oman'],
-    imageSubject: 'Hot air balloon floating at dawn above deep canyon valleys and stone spires in Cappadocia',
-    accentQuote: 'The thrill of the untamed wilderness, paired with the quiet comfort of a curated return.'
+    recommendedDestinations: ['Kazakhstan', 'Georgia', 'Jordan', 'Turkey', 'Oman'],
+    imageSubject: 'Travellers trekking along spectacular alpine ridge in Kazakhstan mountain range',
+    accentQuote: 'The thrill of untamed wilderness, paired with the comfort of a thoughtful return.'
   },
   {
     id: 'ht-luxury-escapes',
     slug: 'luxury-escapes',
     title: 'Luxury Escapes',
-    subtitle: 'Curated Luxury',
-    badge: 'Bespoke Splendour',
-    description: 'The pinnacle of bespoke travel. Handpicked 5-star suites, private yacht charters, bespoke sommelier wine tastings, and behind-the-velvet-rope cultural access.',
-    suitableTraveller: 'Discerning travellers who prioritize discreet excellence, personalized service, architectural distinction, and exclusive experiences.',
+    subtitle: 'Discreet Splendour',
+    badge: 'Handpicked Sanctuaries',
+    description:
+      'Exclusive Maldives infinity pool villas, private yacht charters, iconic Mediterranean clifftop suites, and quiet concierge care from gate to gate.',
+    suitableTraveller:
+      'Discerning travellers who prioritize architecture, calm privacy, and elevated personal attention.',
     signatureExperiences: [
-      'Private charter cruises along the Bosphorus, Dubai Marina, and Persian Gulf',
-      'Exclusive sommelier tastings in ancient underground Qvevri wine cellars',
-      'Secluded cliffside infinity pools overlooking vast mountain canyons in Oman and Bali',
-      'VIP airport meet-and-assist services with private luxury sedan transfers'
+      'Overwater infinity villas framed by coral reefs in the Maldives',
+      'Cliffside Aegean views and private sunset sails in Greece',
+      'Private VIP airport meet-and-assist and luxury sedan transfers',
+      'Curated stays handpicked across 30+ years of industry relationships'
     ],
-    recommendedDestinations: ['Dubai', 'Istanbul & Turkey', 'Seychelles', 'Oman (Jebel Akhdar)', 'Thailand (Koh Samui)'],
-    imageSubject: 'Bespoke luxury clifftop lounge with panoramic ocean views and sleek architecture',
-    accentQuote: 'Discreet luxury that whispers rather than shouts — curated specifically around your desires.'
+    recommendedDestinations: ['Maldives', 'Greece', 'Seychelles', 'Dubai', 'Istanbul & Turkey'],
+    imageSubject: 'Exclusive Maldives villa infinity pool and turquoise Indian Ocean lagoon',
+    accentQuote: 'Discreet luxury that whispers rather than shouts.'
   },
   {
     id: 'ht-women-solo',
     slug: 'women-solo',
     title: 'Women Solo',
-    subtitle: 'The Luminous Solo',
-    badge: 'Empowered Exploration',
-    description: 'Empowering independent travel designed with vetted boutique properties, private verified drivers, mindful wellness retreats, and cultural immersion tailored for the solo woman explorer.',
-    suitableTraveller: 'Independent female travellers seeking self-discovery, safe verified logistics, rejuvenating wellness, and freedom without isolation.',
+    subtitle: 'Empowered Independent Journeys',
+    badge: 'Guided & Safe',
+    description:
+      'Confident solo exploration across vibrant Malaysian streets, serene Balinese sanctuaries, and trusted small-group departures with vetted local guides.',
+    suitableTraveller:
+      'Independent women seeking authentic exploration supported by trusted local partners and warm hospitality.',
     signatureExperiences: [
-      'Vetted boutique properties chosen for warm hospitality, prime walkability, and discreet service',
-      'Trusted private female or senior vetted drivers and licensed local guides',
-      'Mindful wellness sessions, sound healing, and holistic traditional therapies in Ubud & Sri Lanka',
-      'Artisanal craft workshops, textile discovery, and intimate small-group culinary trails'
+      'Curated boutique stays in walkable, safe international quarters',
+      'Guided street, market, and cultural walks in Malaysia and Singapore',
+      'Small international travel groups balancing freedom with camaraderie',
+      '24x7 India-desk support and verified private transfers'
     ],
-    recommendedDestinations: ['Bali (Ubud)', 'Sri Lanka (Hill Country)', 'Georgia (Tbilisi & Sighnaghi)', 'Vietnam', 'Singapore'],
-    imageSubject: 'Solo female traveller seated peacefully on a scenic mountain lookout with tea terrace view',
-    accentQuote: 'The luxury of complete autonomy, supported every step of the way by 30+ years of travel care.'
+    recommendedDestinations: ['Malaysia – Langkawi', 'Indonesia – Bali', 'Vietnam – Phu Quoc', 'Singapore', 'Georgia'],
+    imageSubject: 'Young South Indian woman exploring vibrant Malaysian streets with local guide and small travel group',
+    accentQuote: 'Complete autonomy supported every step of the way by three decades of care.'
+  },
+  {
+    id: 'ht-wellness-retreats',
+    slug: 'wellness-retreats',
+    title: 'Wellness & Retreats',
+    subtitle: 'Restorative Sanctuary Living',
+    badge: 'Mindful Restoration',
+    description:
+      'Unhurried tropical retreats nestled in Balinese jungle valleys, Sri Lankan Ayurvedic estates, and tranquil coastal sanctuaries built for genuine renewal.',
+    suitableTraveller:
+      'Travellers seeking deep rest, holistic movement, nature immersion, and digital quiet.',
+    signatureExperiences: [
+      'Morning yoga and breathwork pavilions overlooking Ubud lotus ponds',
+      'Traditional Balinese botanical therapies and Ayurvedic consultations',
+      'Farm-to-table tropical dining in peaceful botanical estates',
+      'Gentle sound-bath evenings away from busy tourist crowds'
+    ],
+    recommendedDestinations: ['Indonesia – Bali', 'Sri Lanka', 'Thailand – Krabi & Phuket', 'Maldives'],
+    imageSubject: 'Peaceful tropical wellness pavilion surrounded by lush Balinese jungle foliage and lotus pond',
+    accentQuote: 'Return home not exhausted from sightseeing, but deeply restored.'
+  },
+  {
+    id: 'ht-culture-heritage',
+    slug: 'culture-heritage',
+    title: 'Culture & Heritage',
+    subtitle: 'Living History & Architecture',
+    badge: 'Silk Road & Ancient Worlds',
+    description:
+      'Walk sunlit turquoise mosaic courtyards along Uzbekistan’s Silk Road, trace Petra’s carved sandstone canyons, and explore Istanbul’s timeless domes.',
+    suitableTraveller:
+      'History enthusiasts, architects, and cultural travellers moved by craftsmanship and ancient routes.',
+    signatureExperiences: [
+      'Guided walks through Registan Square and Samarkand tiled madrasahs in Uzbekistan',
+      'Private architectural visits across Istanbul and ancient Cappadocia',
+      'Daybreak entry through the Siq canyon into Jordan’s Petra Treasury',
+      '8,000-year winemaking and highland monastic heritage in Georgia'
+    ],
+    recommendedDestinations: ['Uzbekistan', 'Istanbul & Turkey', 'Jordan', 'Georgia', 'Sri Lanka'],
+    imageSubject: 'Travellers exploring sunlit turquoise mosaic courtyards of Samarkand Uzbekistan',
+    accentQuote: 'Stories written in sandstone, mosaic tile, and living local tradition.'
   }
 ];

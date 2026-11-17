@@ -12,6 +12,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     id: 'dest-bali',
     slug: 'bali',
     name: 'Bali',
+    displayLabel: 'Indonesia – Bali',
     country: 'Indonesia',
     region: 'Far East Asian',
     tagline: 'Isle of Gods, verdant rice terraces & coastal sanctuaries',
@@ -40,6 +41,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     },
     travelStyles: ['Honeymoon & Romance', 'Wellness & Serenity', 'Adventure & Discovery', 'Family Luxury'],
     isFeatured: true,
+    featuredOrder: 8,
     faqs: [
       {
         question: 'What is the visa policy for travelling to Bali?',
@@ -55,6 +57,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     id: 'dest-thailand',
     slug: 'thailand',
     name: 'Thailand',
+    displayLabel: 'Thailand – Krabi & Phuket',
     country: 'Thailand',
     region: 'Far East Asian',
     tagline: 'Golden royal temples, Andaman karst islands & culinary mastery',
@@ -83,6 +86,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     },
     travelStyles: ['Family & Group', 'Island Luxury', 'Culinary & Heritage', 'Romance'],
     isFeatured: true,
+    featuredOrder: 6,
     faqs: [
       {
         question: 'Can we combine Bangkok with island destinations?',
@@ -125,7 +129,7 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Sultanahmet heritage, Bosphorus private cruises, Cappadocia cave dwellings'
     },
     travelStyles: ['Heritage & Architecture', 'Luxury Escapes', 'Adventure', 'Solo Journeys'],
-    isFeatured: true,
+    isFeatured: false,
     faqs: [
       {
         question: 'Is it easy to combine Istanbul with Cappadocia?',
@@ -168,7 +172,7 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Victoria Harbour, Peak Tram, Macau St. Paul’s ruins, Dim Sum culture'
     },
     travelStyles: ['Urban Luxury', 'Culinary Expeditions', 'Shopping & Glamour'],
-    isFeatured: true,
+    isFeatured: false,
     isInspirationOnly: true, // Strictly specified in brief: inspiration-only, no active package in current sheet
     faqs: [
       {
@@ -214,7 +218,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Overwater villas, house reef snorkeling, sunset cruises'
     },
     travelStyles: ['Honeymoon & Romance', 'Luxury Escapes', 'Family Beachfront'],
-    isFeatured: false,
+    isFeatured: true,
+    featuredOrder: 2,
     faqs: [
       {
         question: 'How do resort transfers work in the Maldives?',
@@ -382,6 +387,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     id: 'dest-malaysia',
     slug: 'malaysia',
     name: 'Malaysia',
+    displayLabel: 'Malaysia – Langkawi',
     country: 'Malaysia',
     region: 'Far East Asian',
     tagline: 'Twin towers, UNESCO heritage towns & Langkawi rainforest canopies',
@@ -409,7 +415,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Kuala Lumpur, Batu Caves, Genting Highlands, Langkawi Island'
     },
     travelStyles: ['Family Leisure', 'Nature & Rainforest', 'City Exploration'],
-    isFeatured: false,
+    isFeatured: true,
+    featuredOrder: 1,
     faqs: [
       {
         question: 'What is the Malaysian hotel tourism tax?',
@@ -421,6 +428,7 @@ export const ALL_DESTINATIONS: Destination[] = [
     id: 'dest-vietnam',
     slug: 'vietnam',
     name: 'Vietnam',
+    displayLabel: 'Vietnam – Phu Quoc',
     country: 'Socialist Republic of Vietnam',
     region: 'Far East Asian',
     tagline: 'Ha Long emerald waters, lantern-lit ancient towns & French boulevards',
@@ -448,7 +456,8 @@ export const ALL_DESTINATIONS: Destination[] = [
       highlights: 'Hanoi Old Quarter, Ha Long Bay, Da Nang Golden Bridge, Mekong Delta'
     },
     travelStyles: ['Adventure & Cruise', 'Heritage & Culture', 'Gastronomy'],
-    isFeatured: false,
+    isFeatured: true,
+    featuredOrder: 3,
     faqs: [
       {
         question: 'Do travellers need a visa for Vietnam?',
@@ -687,6 +696,132 @@ export const ALL_DESTINATIONS: Destination[] = [
       {
         question: 'How can travellers obtain an Azerbaijan visa?',
         answer: 'Travellers can obtain an official ASAN E-Visa online in typically 3 business days for approximately USD 26. Our concierge provides full document assistance.'
+      }
+    ]
+  },
+  {
+    id: 'dest-kazakhstan',
+    slug: 'kazakhstan',
+    name: 'Kazakhstan',
+    displayLabel: 'Kazakhstan',
+    country: 'Republic of Kazakhstan',
+    region: 'Other Countries',
+    tagline: 'Alpine glacier lakes, Charyn Canyon & Tien Shan mountain trails',
+    heroImageSubject: 'Travellers trekking dramatic alpine ridge above turquoise lakes in Kazakhstan mountains',
+    description: 'Central Asia’s highland frontier: alpine valleys above Almaty, emerald Kolsai & Kaindy lakes, sculpted canyon walls at Charyn, and sweeping steppe horizons.',
+    whyVisit: [
+      'Dramatic Tien Shan glacier peaks just outside modern Almaty',
+      'Turquoise alpine waters of Kolsai and submerged-forest Kaindy lakes',
+      'Striking red sedimentary cliffs inside Charyn Canyon',
+      'Direct regional connectivity and warm nomadic hospitality'
+    ],
+    keyExperiences: [
+      'Alpine ridge hiking above Big Almaty Lake',
+      'Walking through the Valley of Castles at Charyn Canyon',
+      'Cable car ascent to Shymbulak glacier overlook',
+      'Exploring Almaty’s Panfilov Park and Green Bazaar'
+    ],
+    bestTimeToVisit: 'May to October',
+    bestTimeEditorialLabel: 'Verified Editorial Guidance: Late spring through early autumn unlocks high alpine lakes and crisp clear skies.',
+    practicalInfo: {
+      currency: 'Kazakhstani Tenge (KZT)',
+      language: 'Kazakh & Russian (English in hospitality)',
+      idealDuration: '5 to 7 Days',
+      timeZone: 'GMT+5',
+      highlights: 'Almaty, Shymbulak, Kolsai Lakes, Charyn Canyon'
+    },
+    travelStyles: ['Adventure', 'Family & Group', 'Mountain Discovery'],
+    isFeatured: true,
+    featuredOrder: 4,
+    isInspirationOnly: true,
+    faqs: [
+      {
+        question: 'Are custom itineraries available for Kazakhstan?',
+        answer: 'Yes. Contact our India desk to craft a private or small-group Kazakhstan itinerary aligned with your flight dates.'
+      }
+    ]
+  },
+  {
+    id: 'dest-uzbekistan',
+    slug: 'uzbekistan',
+    name: 'Uzbekistan',
+    displayLabel: 'Uzbekistan',
+    country: 'Republic of Uzbekistan',
+    region: 'Other Countries',
+    tagline: 'Samarkand turquoise domes, Bukhara caravanserais & living Silk Road',
+    heroImageSubject: 'Travellers walking through sunlit turquoise mosaic arches of Registan Square Samarkand Uzbekistan',
+    description: 'Walk through the storied heart of the Great Silk Road: azure-tiled madrasahs in Samarkand, mud-walled citadels in Khiva, and artisan bazaars across Bukhara.',
+    whyVisit: [
+      'Unrivalled Islamic mosaic architecture across Samarkand, Bukhara, and Khiva',
+      'Scenic high-speed rail connections linking historic Silk Road cities',
+      'Rich heritage of silk weaving, ceramics, and spiced plov cuisine',
+      'Remarkably warm, unhurried local hospitality'
+    ],
+    keyExperiences: [
+      'Golden hour walk across Registan Square in Samarkand',
+      'Tracing historic trading domes and Poi Kalyan minaret in Bukhara',
+      'Exploring walled old town alleyways of Itchan Kala in Khiva',
+      'High-speed Afrosiyob rail journey between Tashkent and Samarkand'
+    ],
+    bestTimeToVisit: 'April to May & September to October',
+    bestTimeEditorialLabel: 'Verified Editorial Guidance: Spring and autumn provide crisp golden daylight ideal for architectural walking.',
+    practicalInfo: {
+      currency: 'Uzbekistani Som (UZS)',
+      language: 'Uzbek (Russian & English in tourism)',
+      idealDuration: '6 to 8 Days',
+      timeZone: 'GMT+5 (UZT)',
+      highlights: 'Tashkent, Samarkand Registan, Bukhara, Khiva'
+    },
+    travelStyles: ['Culture & Heritage', 'Luxury Escapes', 'Family & Group'],
+    isFeatured: true,
+    featuredOrder: 5,
+    isInspirationOnly: true,
+    faqs: [
+      {
+        question: 'Can 365Holidayz combine Uzbekistan and Kazakhstan?',
+        answer: 'Yes, our specialists frequently combine Almaty alpine scenery in Kazakhstan with Samarkand and Bukhara in Uzbekistan.'
+      }
+    ]
+  },
+  {
+    id: 'dest-greece',
+    slug: 'greece',
+    name: 'Greece',
+    displayLabel: 'Greece',
+    country: 'Hellenic Republic',
+    region: 'Middle East & Mediterranean',
+    tagline: 'Aegean clifftop suites, sunlit Cycladic islands & classical Acropolis',
+    heroImageSubject: 'Whitewashed Cycladic clifftop villas overlooking deep cobalt Aegean Sea in Santorini Greece',
+    description: 'Where classical marble history meets luminous Aegean horizons: Athens, Santorini’s volcanic caldera suites, Mykonos coves, and unhurried Mediterranean dining.',
+    whyVisit: [
+      'Iconic Cycladic island architecture sculpted high above sapphire bays',
+      'Centuries of Mediterranean history rooted in the Acropolis and Delphi',
+      'Intimate sunset catamaran cruises along volcanic beaches',
+      'Vibrant island-to-island ferry logistics curated privately'
+    ],
+    keyExperiences: [
+      'Private sunset caldera cruise overlooking Santorini’s whitewashed cliffs',
+      'Guided morning walk atop the Acropolis in Athens before midday heat',
+      'Seaside cliffside dining in Oia and Fira',
+      'Relaxed coastal days across Paros, Naxos, or Crete'
+    ],
+    bestTimeToVisit: 'May to October',
+    bestTimeEditorialLabel: 'Verified Editorial Guidance: Late spring and early autumn pair warm Aegean breezes with quieter island views.',
+    practicalInfo: {
+      currency: 'Euro (EUR)',
+      language: 'Greek (English widely spoken)',
+      idealDuration: '6 to 9 Days',
+      timeZone: 'GMT+2 / +3',
+      highlights: 'Athens Acropolis, Santorini Caldera, Mykonos, Crete'
+    },
+    travelStyles: ['Honeymoon', 'Luxury Escapes', 'Culture & Heritage'],
+    isFeatured: true,
+    featuredOrder: 7,
+    isInspirationOnly: true,
+    faqs: [
+      {
+        question: 'Do you arrange Schengen visa assistance and island ferries for Greece?',
+        answer: 'Yes. We prepare curated travel itineraries, confirmed island hotel vouchers, and inter-island ferry or domestic flight logistics.'
       }
     ]
   }

@@ -1,286 +1,250 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Pause, Play, Sparkles, ArrowRight, Calendar, MapPin, Tag } from 'lucide-react';
-import { HERO_SLIDES } from '../../data/sliderSlides';
-import { HERO_SLIDER_STOCK_IMAGES, DESTINATION_STOCK_IMAGES } from '../../data/stockImages';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { SliderSlide } from '../../types';
+import { GENERATED_ASSETS, HOLIDAY_TYPE_STOCK_IMAGES, DESTINATION_STOCK_IMAGES } from '../../data/stockImages';
 
-interface HeroSliderProps {
-  onOpenEnquiry?: () => void;
-}
+/**
+ * 7 Approved Hero Categories with Video-Ready Architecture
+ * When short looping 4-6s MP4 clips (no watermarks, web-optimized) are hosted,
+ * populate `videoUrl` on each slide; desktop browsers play muted autoPlay loops
+ * while mobile / missing-video environments display the high-res Ken Burns still.
+ */
+const HERO_SLIDES: SliderSlide[] = [
+  {
+    id: 'slide-honeymoon',
+    holidayCategory: 'Honeymoon',
+    heading: 'HONEYMOON',
+    subtitle: 'Private alpine rail journeys and secluded island retreats crafted for two.',
+    ctaLabel: 'Explore Honeymoon',
+    ctaLink: '/destinations?category=Honeymoon',
+    videoUrl: undefined,
+    posterUrl: GENERATED_ASSETS.swissHoneymoon,
+    mobileFallbackUrl: GENERATED_ASSETS.swissHoneymoon,
+    visualStoryNote: 'Young travelling couple at a snow-covered Swiss train station with luggage.',
+    isTemporaryMedia: true
+  },
+  {
+    id: 'slide-family',
+    holidayCategory: 'Family & Group',
+    heading: 'FAMILY & GROUP',
+    subtitle: 'Effortless international journeys paced naturally for every generation.',
+    ctaLabel: 'Explore Family Holidays',
+    ctaLink: '/destinations?category=Family+%26+Group',
+    videoUrl: undefined,
+    posterUrl: HOLIDAY_TYPE_STOCK_IMAGES['ht-family-group'],
+    mobileFallbackUrl: HOLIDAY_TYPE_STOCK_IMAGES['ht-family-group'],
+    visualStoryNote: 'Family exploring an international coastline naturally at leisure.',
+    isTemporaryMedia: true
+  },
+  {
+    id: 'slide-adventure',
+    holidayCategory: 'Adventure',
+    heading: 'ADVENTURE',
+    subtitle: 'Cross-border mountain treks through Kazakhstan’s dramatic glacier valleys.',
+    ctaLabel: 'Explore Adventure',
+    ctaLink: '/destinations?category=Adventure',
+    videoUrl: undefined,
+    posterUrl: GENERATED_ASSETS.kazakhstanAdventure,
+    mobileFallbackUrl: GENERATED_ASSETS.kazakhstanAdventure,
+    visualStoryNote: 'Travellers trekking through mountain landscapes in Kazakhstan.',
+    isTemporaryMedia: true
+  },
+  {
+    id: 'slide-luxury',
+    holidayCategory: 'Luxury Escapes',
+    heading: 'LUXURY ESCAPES',
+    subtitle: 'Private Maldives overwater infinity villas above undisturbed turquoise reefs.',
+    ctaLabel: 'Explore Luxury Escapes',
+    ctaLink: '/destinations?category=Luxury+Escapes',
+    videoUrl: undefined,
+    posterUrl: GENERATED_ASSETS.maldivesLuxury,
+    mobileFallbackUrl: GENERATED_ASSETS.maldivesLuxury,
+    visualStoryNote: 'Exclusive Maldives villa with turquoise ocean and infinity pool aerial view.',
+    isTemporaryMedia: true
+  },
+  {
+    id: 'slide-women-solo',
+    holidayCategory: 'Women Solo',
+    heading: 'WOMEN SOLO',
+    subtitle: 'Empowered, vetted small-group exploration from Malaysia to cosmopolitan capitals.',
+    ctaLabel: 'Explore Women Solo',
+    ctaLink: '/destinations?category=Women+Solo',
+    videoUrl: undefined,
+    posterUrl: HOLIDAY_TYPE_STOCK_IMAGES['ht-women-solo'] || DESTINATION_STOCK_IMAGES['malaysia'],
+    mobileFallbackUrl: HOLIDAY_TYPE_STOCK_IMAGES['ht-women-solo'] || DESTINATION_STOCK_IMAGES['malaysia'],
+    visualStoryNote: 'Independent solo traveller exploring vibrant cultural streets with a trusted local guide.',
+    isTemporaryMedia: true
+  },
+  {
+    id: 'slide-wellness',
+    holidayCategory: 'Wellness & Retreats',
+    heading: 'WELLNESS & RETREATS',
+    subtitle: 'Serene open-air pavilions tucked inside Bali’s quiet emerald jungle valleys.',
+    ctaLabel: 'Explore Wellness Retreats',
+    ctaLink: '/destinations?category=Wellness+%26+Retreats',
+    videoUrl: undefined,
+    posterUrl: GENERATED_ASSETS.baliWellness,
+    mobileFallbackUrl: GENERATED_ASSETS.baliWellness,
+    visualStoryNote: 'Peaceful tropical wellness retreat pavilion surrounded by lush greenery in Bali.',
+    isTemporaryMedia: true
+  },
+  {
+    id: 'slide-culture',
+    holidayCategory: 'Culture & Heritage',
+    heading: 'CULTURE & HERITAGE',
+    subtitle: 'Walk sunlit turquoise mosaic courtyards along Uzbekistan’s storied Silk Road.',
+    ctaLabel: 'Explore Culture & Heritage',
+    ctaLink: '/destinations?category=Culture+%26+Heritage',
+    videoUrl: undefined,
+    posterUrl: GENERATED_ASSETS.uzbekistanCulture,
+    mobileFallbackUrl: GENERATED_ASSETS.uzbekistanCulture,
+    visualStoryNote: 'Travellers exploring the Registan turquoise architecture of Samarkand in Uzbekistan.',
+    isTemporaryMedia: true
+  }
+];
 
-export const HeroSlider: React.FC<HeroSliderProps> = ({ onOpenEnquiry }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isPausedHover, setIsPausedHover] = useState(false);
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const touchStartXRef = useRef<number | null>(null);
-  const pillsContainerRef = useRef<HTMLDivElement | null>(null);
+export const HeroSlider: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const totalSlides = HERO_SLIDES.length;
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  }, [totalSlides]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  }, [totalSlides]);
-
-  // Autoplay 6 seconds
-  useEffect(() => {
-    if (isPlaying && !isPausedHover) {
-      timerRef.current = setInterval(() => {
-        nextSlide();
-      }, 6000);
-    }
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isPlaying, isPausedHover, nextSlide]);
-
-  // Keyboard navigation support
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') nextSlide();
-      if (e.key === 'ArrowLeft') prevSlide();
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nextSlide, prevSlide]);
-
-  // Scroll active location pill horizontally inside container only (NEVER touch window scroll)
-  useEffect(() => {
-    if (pillsContainerRef.current) {
-      const activeBtn = pillsContainerRef.current.querySelector<HTMLButtonElement>(`[data-slide-index="${currentSlide}"]`);
-      if (activeBtn) {
-        const container = pillsContainerRef.current;
-        const scrollLeft = activeBtn.offsetLeft - container.offsetWidth / 2 + activeBtn.offsetWidth / 2;
-        container.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
-      }
-    }
-  }, [currentSlide]);
-
-  // Touch swipe support
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.touches[0].clientX;
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartXRef.current === null) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartXRef.current - touchEndX;
-
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        nextSlide();
-      } else {
-        prevSlide();
-      }
-    }
-    touchStartXRef.current = null;
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
   };
 
-  const activeSlide = HERO_SLIDES[currentSlide];
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 6500);
+    return () => clearInterval(timer);
+  }, [isPaused]);
 
-  // Guaranteed fallback image URL in case of any external network glitch
-  const getSlideImageUrl = (slide: typeof activeSlide) => {
-    return (
-      HERO_SLIDER_STOCK_IMAGES[slide.id] ||
-      DESTINATION_STOCK_IMAGES[slide.destinationSlug] ||
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=85'
-    );
-  };
+  const activeSlide = HERO_SLIDES[currentIndex];
 
   return (
-    <div
-      className="relative w-full h-[80vh] min-h-[580px] max-h-[820px] overflow-hidden bg-slate-900 text-white select-none"
-      onMouseEnter={() => setIsPausedHover(true)}
-      onMouseLeave={() => setIsPausedHover(false)}
-      onFocus={() => setIsPausedHover(true)}
-      onBlur={() => setIsPausedHover(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      role="region"
-      aria-label="Featured Destinations Hero Slider"
+    <section
+      className="relative w-full h-[88vh] min-h-[600px] lg:h-[94vh] overflow-hidden bg-[#111827] text-white"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      aria-label="Signature Holiday Experiences"
     >
-      {/* Slide Images Background Layer - Bright, Vivid & Clear */}
-      {HERO_SLIDES.map((slide, index) => {
-        const isCurrent = index === currentSlide;
-        const imageUrl = getSlideImageUrl(slide);
-
+      {/* Background Video / High-Res Motion Layers */}
+      {HERO_SLIDES.map((slide, idx) => {
+        const isCurrent = idx === currentIndex;
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+            className={`absolute inset-0 transition-opacity duration-1000 ease-out ${
               isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
             }`}
-            aria-hidden={!isCurrent}
           >
-            <img
-              src={imageUrl}
-              alt={slide.title}
-              onLoad={() => setLoadedImages((prev) => ({ ...prev, [slide.id]: true }))}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=85';
-              }}
-              className="w-full h-full object-cover object-center transform scale-100 transition-transform duration-10000 ease-out"
-              loading={index === 0 ? 'eager' : 'lazy'}
-            />
+            {slide.videoUrl ? (
+              <>
+                <video
+                  key={slide.id}
+                  src={slide.videoUrl}
+                  poster={slide.posterUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="hidden md:block w-full h-full object-cover"
+                />
+                <img
+                  src={slide.mobileFallbackUrl}
+                  alt={slide.visualStoryNote}
+                  referrerPolicy="no-referrer"
+                  className="md:hidden w-full h-full object-cover"
+                />
+              </>
+            ) : (
+              <img
+                src={slide.posterUrl}
+                alt={slide.visualStoryNote}
+                referrerPolicy="no-referrer"
+                className={`w-full h-full object-cover ${isCurrent ? 'animate-ken-burns' : ''}`}
+              />
+            )}
 
-            {/* Light, clean gradient overlay for crisp text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/30 to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/20 z-10 pointer-events-none" />
+            {/* Measured contrast scrim */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/45" />
           </div>
         );
       })}
 
-      {/* Slide Content Layer - Bold, Bright, Simple (GT Holidays Style) */}
-      <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center pb-24 sm:pb-28">
-        <div className="max-w-3xl space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {/* Eyebrow & Tag in Soft Pastel Badges */}
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="px-3.5 py-1 rounded-full bg-[#fefce8] text-[#854d0e] border border-yellow-200 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-yellow-600" />
-              <span>{activeSlide.eyebrow}</span>
-            </span>
-
-            <span className="text-xs font-black text-rose-900 px-3.5 py-1 rounded-full bg-[#fff1f2] border border-rose-200 shadow-md">
-              {activeSlide.tag}
-            </span>
-          </div>
-
-          {/* Large Bold Sans-Serif Title with strong text shadow */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1] drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)]">
-            {activeSlide.title}
-          </h1>
-
-          {/* Concise Factual Text with strong shadow */}
-          <p className="text-sm sm:text-base md:text-lg text-white font-medium max-w-2xl leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-            {activeSlide.summary}
+      {/* Main Content Container */}
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-14 sm:pb-20">
+        <div className="max-w-3xl space-y-5">
+          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.26em] text-white/85">
+            {String(currentIndex + 1).padStart(2, '0')} / {String(HERO_SLIDES.length).padStart(2, '0')} &nbsp;—&nbsp; Signature Experiences
           </p>
 
-          {/* Action CTAs (Simple & Bold) */}
-          <div className="pt-3 flex items-center gap-3.5 flex-wrap">
-            {onOpenEnquiry ? (
-              <button
-                type="button"
-                onClick={onOpenEnquiry}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-sm uppercase tracking-wider shadow-xl transition-all hover:scale-105 cursor-pointer"
-              >
-                <Calendar className="w-4 h-4 text-white" />
-                <span>Plan Your Trip</span>
-              </button>
-            ) : (
-              <Link
-                to={`/contact?destination=${encodeURIComponent(activeSlide.destination)}`}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#ff5a36] hover:bg-[#e04422] text-white font-black text-sm uppercase tracking-wider shadow-xl transition-all hover:scale-105"
-              >
-                <Calendar className="w-4 h-4 text-white" />
-                <span>Plan Your Trip</span>
-              </Link>
-            )}
+          <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[0.98] text-balance">
+            {activeSlide.heading}
+          </h1>
 
+          <p className="text-base sm:text-xl text-white/90 font-normal leading-relaxed max-w-2xl">
+            {activeSlide.subtitle}
+          </p>
+
+          <div className="pt-2">
             <Link
               to={activeSlide.ctaLink}
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-900 font-extrabold text-sm border border-slate-200 shadow-xl transition-all hover:scale-105"
+              className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white text-[#111827] hover:bg-[#D94E28] hover:text-white text-xs font-bold uppercase tracking-[0.14em] transition-colors shadow-lg"
             >
-              <span>{activeSlide.ctaText}</span>
-              <ArrowRight className="w-4 h-4 text-[#ff5a36]" />
+              <span>{activeSlide.ctaLabel}</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Location Navigation Strip & Slider Controls */}
-      <div className="absolute bottom-5 left-0 right-0 z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-        {/* All Slider Locations Quick-Picker Bar in Pastel Pills */}
-        <div
-          ref={pillsContainerRef}
-          className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth"
-          role="tablist"
-          aria-label="Slider destinations"
-        >
-          {HERO_SLIDES.map((slide, idx) => {
-            const isSelected = idx === currentSlide;
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                data-slide-index={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#ff5a36] text-white shadow-lg scale-105 ring-2 ring-white'
-                    : 'bg-white/90 hover:bg-white text-slate-800 border border-slate-200 shadow-sm'
-                }`}
-                title={`View ${slide.destination}`}
-              >
-                <MapPin className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-[#ff5a36]'}`} />
-                <span>{slide.destination}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Counter, Dots & Navigation Arrows */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xs font-bold text-slate-800 bg-white/90 px-3 py-1 rounded-full border border-slate-200 shadow-sm">
-              {String(currentSlide + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
-            </span>
-
-            {/* Slide Progress Dots */}
-            <div className="hidden sm:flex items-center gap-1.5">
-              {HERO_SLIDES.map((_, i) => (
+        {/* Bottom Category Strip & Navigation Controls */}
+        <div className="mt-10 pt-5 border-t border-white/20 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto scrollbar-none py-1">
+            {HERO_SLIDES.map((slide, idx) => {
+              const isCurrent = idx === currentIndex;
+              return (
                 <button
-                  key={i}
+                  key={slide.id}
                   type="button"
-                  onClick={() => setCurrentSlide(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === currentSlide ? 'w-6 bg-[#ff5a36]' : 'w-2 bg-white/50 hover:bg-white'
+                  onClick={() => setCurrentIndex(idx)}
+                  className={`text-[11px] font-semibold uppercase tracking-[0.16em] whitespace-nowrap pb-1 border-b-2 transition-all cursor-pointer ${
+                    isCurrent
+                      ? 'text-white border-[#D94E28]'
+                      : 'text-white/60 border-transparent hover:text-white/90'
                   }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            {/* Autoplay Pause / Play Toggle */}
-            <button
-              type="button"
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:text-slate-950 border border-slate-200 transition-colors cursor-pointer shadow-sm"
-              title={isPlaying ? 'Pause autoplay' : 'Resume autoplay'}
-              aria-label={isPlaying ? 'Pause autoplay' : 'Resume autoplay'}
-            >
-              {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            </button>
+                >
+                  {slide.holidayCategory}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Previous / Next Arrow Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={prevSlide}
-              className="p-2.5 sm:p-3 rounded-full bg-white/95 hover:bg-white text-slate-900 border border-slate-200 transition-all hover:scale-105 cursor-pointer shadow-lg"
-              aria-label="Previous slide"
+              aria-label="Previous experience slide"
+              className="p-2.5 rounded-full border border-white/25 text-white hover:bg-white hover:text-[#111827] transition-colors cursor-pointer"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               type="button"
               onClick={nextSlide}
-              className="p-2.5 sm:p-3 rounded-full bg-white/95 hover:bg-white text-slate-900 border border-slate-200 transition-all hover:scale-105 cursor-pointer shadow-lg"
-              aria-label="Next slide"
+              aria-label="Next experience slide"
+              className="p-2.5 rounded-full border border-white/25 text-white hover:bg-white hover:text-[#111827] transition-colors cursor-pointer"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

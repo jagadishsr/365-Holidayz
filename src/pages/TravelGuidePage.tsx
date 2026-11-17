@@ -1,428 +1,174 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  BookOpen, 
-  Compass, 
-  FileText, 
-  Globe, 
-  DollarSign, 
-  Sparkles, 
-  Clock, 
-  ShieldAlert, 
-  MapPin, 
-  ArrowRight,
-  Luggage,
-  Calendar
-} from 'lucide-react';
-import { Breadcrumbs } from '../components/common/Breadcrumbs';
+import { ArrowRight, Check } from 'lucide-react';
 import { ALL_DESTINATIONS } from '../data/destinations';
+import { DESTINATION_STOCK_IMAGES } from '../data/stockImages';
 import { CTASection } from '../components/common/CTASection';
+import { Package } from '../types';
+import { filterActivePackages } from '../services/googleSheetsPackages';
 
-export const TravelGuidePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<
-    'destinations' | 'tips' | 'itineraries' | 'visa' | 'costs' | 'things-to-do'
-  >('destinations');
+interface TravelGuidePageProps {
+  packages: Package[];
+}
 
-  const tabs = [
-    { id: 'destinations', label: 'Destination Guides', icon: Globe },
-    { id: 'tips', label: 'Travel Tips & Etiquette', icon: Compass },
-    { id: 'itineraries', label: 'Crafting Your Itinerary', icon: Clock },
-    { id: 'visa', label: 'Visa & Consular Essentials', icon: FileText },
-    { id: 'costs', label: 'Travel Costs & Currency', icon: DollarSign },
-    { id: 'things-to-do', label: 'Things to Do & Seasons', icon: Sparkles }
-  ];
+export const TravelGuidePage: React.FC<TravelGuidePageProps> = ({ packages }) => {
+  const [selectedRegion, setSelectedRegion] = useState<string>('All');
+  const activePackages = filterActivePackages(packages);
+
+  const regions = ['All', 'Islands', 'Far East Asian', 'Middle East & Mediterranean', 'Other Countries'];
+
+  const visibleDestinations =
+    selectedRegion === 'All'
+      ? ALL_DESTINATIONS
+      : ALL_DESTINATIONS.filter((d) => d.region === selectedRegion);
 
   return (
-    <div className="pt-24 pb-16 space-y-12">
+    <div className="bg-[#FAF9F6] pt-28 sm:pt-36">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#eff6ff] via-[#f0fdf4] to-[#f8fafc] text-slate-900 py-12 sm:py-16 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <Breadcrumbs items={[{ label: 'Travel Guide' }]} className="text-slate-500" />
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 space-y-5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#D94E28] block">
+          Editorial Compendium
+        </span>
+        <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-[#111827]">
+          TRAVEL GUIDE
+        </h1>
+        <p className="text-base sm:text-xl text-[#4B5563] max-w-2xl leading-relaxed">
+          Thirty years of destination knowledge distilled into clear seasonal guidance, cultural notes, and curated itineraries.
+        </p>
 
-          <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#ff5a36] flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-[#ff5a36]" />
-              <span>Editorial Knowledge Base</span>
-            </span>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900">
-              The 365Holidayz Travel Guide
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
-              Thirty years of on-ground global navigation distilled into thoughtful guides, packing insights, and realistic planning advice.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 scrollbar-none">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+        {/* Clean Region Tabs */}
+        <div className="pt-6 flex items-center gap-3 overflow-x-auto scrollbar-none border-b border-[#E5E2DC] pb-4">
+          {regions.map((region) => {
+            const active = selectedRegion === region;
             return (
               <button
-                key={tab.id}
+                key={region}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-[#ff5a36] text-white shadow-md shadow-orange-500/20'
-                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 bg-white border border-slate-200'
+                onClick={() => setSelectedRegion(region)}
+                className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-colors cursor-pointer ${
+                  active
+                    ? 'bg-[#010048] text-white'
+                    : 'bg-white border border-[#E5E2DC] text-[#4B5563] hover:text-[#111827]'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
+                {region}
               </button>
             );
           })}
         </div>
+      </section>
 
-        {/* Tab 1: Destination Guides */}
-        {activeTab === 'destinations' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="space-y-2 max-w-2xl">
-              <h2 className="text-2xl font-black text-slate-900">Curated Destination Overviews</h2>
-              <p className="text-sm text-slate-600 font-medium">
-                Browse our comprehensive geographical guides detailing cultural nuances, optimal length of stay, and verified best seasons.
-              </p>
-            </div>
+      {/* Bold Image-Led Destination Guide Spreads */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-20">
+        {visibleDestinations.map((dest, idx) => {
+          const matchingPackages = activePackages.filter(
+            (p) =>
+              p.destinationSlug === dest.slug ||
+              p.destination.toLowerCase().includes(dest.name.toLowerCase())
+          );
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ALL_DESTINATIONS.map((dest) => (
-                <div key={dest.id} className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span className="font-black text-[#ff5a36] uppercase tracking-wider">{dest.region}</span>
-                      <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">{dest.practicalInfo.idealDuration}</span>
-                    </div>
-                    <h3 className="text-xl font-black text-slate-900">{dest.name}</h3>
-                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">{dest.tagline}</p>
+          const lowestInr =
+            matchingPackages.length > 0
+              ? matchingPackages.reduce(
+                  (min, p) => (p.priceValue > 0 && p.priceValue < min ? p.priceValue : min),
+                  matchingPackages[0].priceValue
+                )
+              : null;
+
+          const lowestFormatted =
+            lowestInr && lowestInr > 0 ? `₹${Math.round(lowestInr).toLocaleString('en-IN')}` : null;
+
+          const photoUrl = DESTINATION_STOCK_IMAGES[dest.slug] || DESTINATION_STOCK_IMAGES['maldives'];
+          const reverseLayout = idx % 2 === 1;
+
+          return (
+            <article
+              key={dest.id}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center pb-16 border-b border-[#E5E2DC] last:border-b-0 last:pb-0"
+            >
+              {/* Striking Photo */}
+              <div className={`lg:col-span-6 ${reverseLayout ? 'lg:order-2' : ''}`}>
+                <Link
+                  to={`/destinations/${dest.slug}`}
+                  className="block aspect-[4/3] rounded-2xl overflow-hidden bg-[#E8E4DC] group"
+                >
+                  <img
+                    src={photoUrl}
+                    alt={dest.heroImageSubject}
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  />
+                </Link>
+              </div>
+
+              {/* Editorial Guide Text */}
+              <div className={`lg:col-span-6 space-y-5 ${reverseLayout ? 'lg:order-1' : ''}`}>
+                <div className="space-y-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#D94E28] block">
+                    {dest.region} &middot; Best: {dest.bestTimeToVisit}
+                  </span>
+                  <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight">
+                    {dest.displayLabel || dest.name}
+                  </h2>
+                  <p className="text-sm sm:text-base font-medium text-[#4B5563]">
+                    {dest.tagline}
+                  </p>
+                </div>
+
+                <p className="text-sm sm:text-base text-[#4B5563] leading-relaxed">
+                  {dest.description}
+                </p>
+
+                <ul className="space-y-2 pt-1">
+                  {dest.keyExperiences.slice(0, 3).map((highlight, hIdx) => (
+                    <li key={hIdx} className="flex items-start gap-2.5 text-sm text-[#111827]">
+                      <Check className="w-4 h-4 text-[#D94E28] shrink-0 mt-0.5" />
+                      <span>{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="pt-4 border-t border-[#E5E2DC] flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    {lowestFormatted ? (
+                      <>
+                        <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6B7280]">
+                          Active Packages From
+                        </span>
+                        <span className="font-mono-tabular text-xl font-bold text-[#010048]">
+                          {lowestFormatted}
+                        </span>
+                        <span className="text-xs text-[#6B7280] ml-1">/ person</span>
+                      </>
+                    ) : (
+                      <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#6B7280]">
+                        Bespoke Private Itineraries
+                      </span>
+                    )}
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-500 font-bold">
-                      Best: {dest.bestTimeToVisit.split('(')[0]}
-                    </span>
+                  <div className="flex items-center gap-3">
                     <Link
                       to={`/destinations/${dest.slug}`}
-                      className="inline-flex items-center gap-1 text-xs font-black text-[#ff5a36] hover:underline"
+                      className="px-5 py-2.5 rounded-full border border-[#E5E2DC] text-xs font-semibold text-[#111827] hover:bg-[#F3F1EC] transition-colors"
                     >
-                      <span>Read Guide</span>
-                      <ArrowRight className="w-3 h-3 text-[#ff5a36]" />
+                      Read Full Guide
+                    </Link>
+                    <Link
+                      to={`/contact?destination=${encodeURIComponent(dest.displayLabel || dest.name)}`}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#010048] hover:bg-[#D94E28] text-white text-xs font-semibold transition-colors"
+                    >
+                      <span>Enquire</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tab 2: Travel Tips (Bright Pastel Boxes with bold visible fonts) */}
-        {activeTab === 'tips' && (
-          <div className="space-y-8 animate-in fade-in max-w-6xl">
-            <div className="space-y-2">
-              <span className="text-xs font-black uppercase tracking-widest text-[#ff5a36] block">
-                30+ Years of Ground Wisdom
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-                Essential Travel Tips & On-Ground Etiquette
-              </h2>
-              <p className="text-sm text-slate-600 max-w-3xl leading-relaxed font-medium">
-                Practical insights earned over three decades of moving travellers smoothly across international borders — curated to ensure your holiday is serene, seamless, and completely stress-free.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Tip 1 - Pastel Mint */}
-              <div className="p-6 rounded-2xl bg-[#f0fdf4] border-2 border-emerald-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
-                    01
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
-                    Arrival Rhythm
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-900 leading-snug">
-                  The "Slow First Morning" Principle
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Never pack back-to-back excursions on Day 1. After international flights or late evening arrivals, we always curate an unhurried morning with breakfast by the pool or lagoon to let your body acclimate naturally before exploring.
-                </p>
               </div>
-
-              {/* Tip 2 - Pastel Sky */}
-              <div className="p-6 rounded-2xl bg-[#f0f9ff] border-2 border-sky-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
-                    02
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-sky-800 bg-sky-100 px-3 py-1 rounded-full border border-sky-300">
-                    Logistics & Ease
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-900 leading-snug">
-                  Private Chauffeur Seamlessness
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Navigating unfamiliar mountain curves in Sri Lanka, Bali, or Jordan can cause fatigue. Having a verified private driver allows you to gaze out at tea trails or desert peaks without navigation stress or parking hassles.
-                </p>
-              </div>
-
-              {/* Tip 3 - Pastel Peach */}
-              <div className="p-6 rounded-2xl bg-[#fff7ed] border-2 border-orange-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-[#ff5a36] text-white flex items-center justify-center font-black text-sm shadow-sm">
-                    03
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-orange-900 bg-orange-100 px-3 py-1 rounded-full border border-orange-300">
-                    Cultural Respect
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-900 leading-snug">
-                  Cultural Reverence & Dress Codes
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  From the marble courtyards of Muscat’s Grand Mosque to Bali’s sacred sea temples, modest attire (covering shoulders and knees) is essential and appreciated. Keep a lightweight cotton pashmina easily accessible in your day pack.
-                </p>
-              </div>
-
-              {/* Tip 4 - Pastel Lavender */}
-              <div className="p-6 rounded-2xl bg-[#faf5ff] border-2 border-purple-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
-                    04
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-purple-900 bg-purple-100 px-3 py-1 rounded-full border border-purple-300">
-                    Smart Stays
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-900 leading-snug">
-                  Preserving Room Contingency & Split Stays
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  When booking split stays (such as 2N jungle + 3N beach in Bali or 3N Istanbul + 3N Cappadocia), coordinate transfers around standard hotel check-out (11 AM) and check-in (3 PM) with scenic lunch stops along the way.
-                </p>
-              </div>
-
-              {/* Tip 5 - Pastel Butter */}
-              <div className="p-6 rounded-2xl bg-[#fefce8] border-2 border-amber-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-900 flex items-center justify-center font-black text-sm shadow-sm">
-                    05
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
-                    Dining Comfort
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-900 leading-snug">
-                  Indian Meals & Dietary Preferences
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Travelling abroad doesn't mean compromising on food. In all our international circuits (Türkiye, Georgia, Far East, Dubai), we pre-arrange authentic Indian meals, vegetarian cuisine, and Jain options with verified partner restaurants.
-                </p>
-              </div>
-
-              {/* Tip 6 - Pastel Rose */}
-              <div className="p-6 rounded-2xl bg-[#fff1f2] border-2 border-rose-200/90 shadow-sm space-y-4 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
-                    06
-                  </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-rose-900 bg-rose-100 px-3 py-1 rounded-full border border-rose-300">
-                    Connectivity & Forex
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-slate-900 leading-snug">
-                  Forex Card & Dual SIM Security
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  Always carry a pre-loaded multi-currency Forex card along with a small amount of local currency cash for market bazaars and tipping. Install an international eSIM before departure for seamless WhatsApp connectivity.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 3: Itineraries */}
-        {activeTab === 'itineraries' && (
-          <div className="space-y-6 animate-in fade-in max-w-4xl">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-[#010048]">Itinerary Curation Philosophy</h2>
-              <p className="text-sm text-slate-600">
-                Why bespoke itineraries differ from rigid off-the-shelf tourist schedules.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
-              <h3 className="text-lg font-bold text-[#010048]">Our Three Golden Rules of Route Design</h3>
-              <ul className="space-y-3 text-xs sm:text-sm text-slate-700">
-                <li className="flex items-start gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-[#c8a97e] shrink-0 mt-1.5" />
-                  <div>
-                    <strong className="text-slate-900 block">Depth Over Checklists:</strong>
-                    Spending 3 immersive nights in one evocative region (like Cappadocia or Ubud) is infinitely more restorative than switching hotels every 24 hours.
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-[#c8a97e] shrink-0 mt-1.5" />
-                  <div>
-                    <strong className="text-slate-900 block">Golden Hour Optimization:</strong>
-                    We sequence iconic outdoor monuments (such as Petra’s Treasury or Sigiriya Lion Rock) at sunrise or late afternoon, avoiding peak heat and cruise day-trippers.
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-[#c8a97e] shrink-0 mt-1.5" />
-                  <div>
-                    <strong className="text-slate-900 block">Buffer Time For Spontaneity:</strong>
-                    Unplanned moments — an unexpected tea stall conversation or lingering over a second cup of Turkish coffee — often become the journey’s most cherished memory.
-                  </div>
-                </li>
-              </ul>
-
-              <div className="pt-2">
-                <Link
-                  to="/packages"
-                  className="inline-flex items-center gap-2 text-xs font-bold text-[#010048] hover:text-[#c8a97e]"
-                >
-                  <span>Explore verified itineraries across 33 packages</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#c8a97e]" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 4: Visa & Essentials (strictly per brief: "Use 'Content coming soon' rather than inventing visa/current travel facts") */}
-        {activeTab === 'visa' && (
-          <div className="space-y-6 animate-in fade-in max-w-3xl">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-[#010048]">Visa & Consular Essentials</h2>
-              <p className="text-sm text-slate-600">
-                Official regulatory guidance and documentation requirements.
-              </p>
-            </div>
-
-            {/* Prompt Constraint Adherence Notice */}
-            <div className="p-8 rounded-xl bg-amber-50/80 border border-amber-300 text-amber-950 space-y-4">
-              <div className="flex items-center gap-2 font-bold text-base text-amber-900">
-                <ShieldAlert className="w-5 h-5 text-amber-700" />
-                <span>Live Consular Guidelines — Content Coming Soon</span>
-              </div>
-              <p className="text-xs sm:text-sm leading-relaxed text-amber-900/90">
-                Visa policies, electronic travel authorizations (ETA), and entry protocols vary significantly by citizenship, origin port, and dynamic consular bilateral treaties.
-              </p>
-              <p className="text-xs sm:text-sm leading-relaxed text-amber-900/90 font-medium">
-                To protect our travellers against outdated embassy rules, 365Holidayz provides personalized, verified consular checklists directly upon itinerary planning rather than displaying static claims.
-              </p>
-
-              <div className="pt-3 border-t border-amber-200 flex flex-col sm:flex-row gap-3">
-                <Link
-                  to="/plan-your-trip"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded bg-[#010048] text-[#f3e098] text-xs font-bold uppercase tracking-wider"
-                >
-                  <span>Request Custom Visa Checklist</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#c59b27]" />
-                </Link>
-
-                <Link
-                  to="/about"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-white text-slate-800 text-xs font-semibold border border-amber-300"
-                >
-                  <span>Speak with Senior Concierge</span>
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 5: Travel Costs */}
-        {activeTab === 'costs' && (
-          <div className="space-y-6 animate-in fade-in max-w-4xl">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-[#010048]">Travel Costs, Currencies & Commercial Transparency</h2>
-              <p className="text-sm text-slate-600">
-                Clear understanding of pricing bases, seasonal peaks, and local expenditure expectations.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <h3 className="text-base font-bold text-[#010048]">Preserving Original Currencies</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  In our catalogue, prices are displayed strictly in their contract currency (INR, USD, EUR, SGD) without synthetic conversion algorithms that misrepresent market exchange variations.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <h3 className="text-base font-bold text-[#010048]">Room Sharing Basis</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Unless explicitly noted as twin sharing (such as our Jordan circuit) or single supplement, package rates reflect double sharing occupancy.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <h3 className="text-base font-bold text-[#010048]">Group Minimum Thresholds</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Selected specialized packages require minimum delegate sizes (e.g., 4 Pax for safari vehicles, or 20/30 Pax for corporate summits in Dubai or Bahrain) to unlock published group rates.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-xs space-y-3">
-                <h3 className="text-base font-bold text-[#010048]">Local City & Tourism Levies</h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Certain municipalities (e.g. Dubai Tourism Dirham, Malaysia Tourism Tax, Bali Provincial Tax) mandate direct guest payment in local currency upon hotel checkout. We disclose these transparently prior to departure.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 6: Things to Do */}
-        {activeTab === 'things-to-do' && (
-          <div className="space-y-6 animate-in fade-in max-w-4xl">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-[#010048]">Curated Highlights & Seasonal Wonders</h2>
-              <p className="text-sm text-slate-600">
-                Memorable experiences from the desert to the ocean across our 17 destinations.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#c8a97e] block">
-                  Island Sanctuaries
-                </span>
-                <h4 className="text-base font-bold text-[#010048]">Lagoon Plunge & Reefs</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Manta ray encounters in Maldives atolls, catamaran sailing in Mauritius, and granite boulder walks in Seychelles.
-                </p>
-              </div>
-
-              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#c8a97e] block">
-                  Imperial & Desert
-                </span>
-                <h4 className="text-base font-bold text-[#010048]">Bosphorus & Rose Cliffs</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Private sunset cruises in Istanbul, ballooning over Cappadocia, and walking through the narrow Siq to Petra.
-                </p>
-              </div>
-
-              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#c8a97e] block">
-                  Caucasus & Far East
-                </span>
-                <h4 className="text-base font-bold text-[#010048]">Qvevri Wine & Karsts</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  8,000-year winemaking heritage in Georgia, Ha Long Bay overnight junk cruises, and Ubud stepped terraces.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+            </article>
+          );
+        })}
+      </section>
 
       <CTASection />
     </div>

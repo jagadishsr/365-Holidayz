@@ -1,21 +1,24 @@
-/**
- * 365Holidayz - Domain Type Definitions
- * Source of truth for packages, destinations, holiday types, enquiries and slider slides.
- */
-
-export type Region = 
-  | 'Islands' 
-  | 'Far East Asian' 
-  | 'Middle East & Mediterranean' 
+export type Region =
+  | 'Islands'
+  | 'Far East Asian'
+  | 'Middle East & Mediterranean'
   | 'Other Countries';
 
-export type HolidayTypeCategory = 
-  | 'Honeymoon' 
-  | 'Family & Group' 
-  | 'Adventure' 
-  | 'Luxury Escapes' 
-  | 'Women Solo' 
+export type HolidayCategory =
+  | 'Honeymoon'
+  | 'Family & Group'
+  | 'Adventure'
+  | 'Luxury Escapes'
+  | 'Women Solo'
+  | 'Wellness & Retreats'
+  | 'Culture & Heritage'
   | 'MICE & Corporate';
+
+export type HolidayTypeCategory = HolidayCategory;
+
+export type CurrencyCode = 'INR' | 'USD' | 'SGD' | 'EUR';
+
+export type PackageDisplayStatus = 'Active' | 'Hidden';
 
 export interface Package {
   id: string;
@@ -24,44 +27,52 @@ export interface Package {
   destination: string;
   destinationSlug: string;
   region: Region;
-  holidayType: HolidayTypeCategory;
+  holidayType: HolidayCategory;
   duration: string;
   durationNights: number;
   durationDays: number;
-  persons: string; // e.g. "Min 2 Pax", "Min 4 Pax", "Min 20 Pax", "Min 30 Pax"
+  persons: string;
   minPax: number;
-  roomBasis: string; // e.g. "Double sharing", "Twin sharing"
+  roomBasis: 'Double sharing' | 'Twin sharing' | 'Single / Triple' | string;
   stayPeriod: string;
   bookingValidity: string;
-  isUrgentValidity: boolean; // Flagged for "by 31 Oct 2026"
-  currency: 'INR' | 'USD' | 'SGD' | 'EUR';
+  isUrgentValidity?: boolean;
+  currency: CurrencyCode;
   priceValue: number;
   priceDisplay: string;
-  priceBasisNote: string; // "Price shown in client sheet — confirm basis at enquiry"
+  originalCurrency?: CurrencyCode;
+  originalPrice?: number;
+  inrPrice?: number;
+  inrPriceDisplay?: string;
+  priceBasisNote: string;
+  advanceBookingConditions?: string;
   description: string;
   stayDetails: string;
   features: string[];
-  exclusions: string[] | null;
-  itineraryStatus: string; // "Detailed day-wise itinerary available on request"
-  dataReviewNotes: string[];
+  exclusions?: string[];
+  itineraryStatus: string;
+  dataReviewNotes?: string[];
   imageSubject: string;
   gallerySubjects?: string[];
   isFeatured?: boolean;
+  displayStatus?: PackageDisplayStatus;
+  isFlashOffer?: boolean;
 }
 
 export interface Destination {
   id: string;
   slug: string;
   name: string;
-  region: Region;
+  displayLabel?: string;
   country: string;
+  region: Region;
   tagline: string;
   heroImageSubject: string;
   description: string;
   whyVisit: string[];
   keyExperiences: string[];
   bestTimeToVisit: string;
-  bestTimeEditorialLabel: string; // Explicitly marked verified editorial guidance
+  bestTimeEditorialLabel: string;
   practicalInfo: {
     currency: string;
     language: string;
@@ -70,9 +81,13 @@ export interface Destination {
     highlights: string;
   };
   travelStyles: string[];
-  isFeatured: boolean;
-  isInspirationOnly?: boolean; // E.g., Hong Kong & Macau
-  faqs: { question: string; answer: string }[];
+  isFeatured?: boolean;
+  featuredOrder?: number;
+  isInspirationOnly?: boolean;
+  faqs: {
+    question: string;
+    answer: string;
+  }[];
 }
 
 export interface HolidayType {
@@ -80,27 +95,39 @@ export interface HolidayType {
   slug: string;
   title: string;
   subtitle: string;
+  badge: string;
   description: string;
   suitableTraveller: string;
   signatureExperiences: string[];
   recommendedDestinations: string[];
-  badge: string;
   imageSubject: string;
   accentQuote: string;
 }
 
 export interface SliderSlide {
   id: string;
-  eyebrow: string;
-  title: string;
-  summary: string;
-  destination: string;
-  destinationSlug: string;
+  holidayCategory?: HolidayCategory;
+  eyebrow?: string;
+  title?: string;
+  heading?: string;
+  subtitle?: string;
+  summary?: string;
+  destination?: string;
+  destinationSlug?: string;
+  tag?: string;
   packageId?: string;
-  imageSubject: string;
-  tag: string;
-  ctaText: string;
+  ctaLabel?: string;
+  ctaText?: string;
   ctaLink: string;
+  videoUrl?: string;
+  posterUrl?: string;
+  mobileFallbackUrl?: string;
+  visualStoryNote?: string;
+  isTemporaryMedia?: boolean;
+  categoryBadge?: string;
+  locationLabel?: string;
+  imageSubject?: string;
+  durationNote?: string;
 }
 
 export interface EnquiryData {
@@ -110,7 +137,7 @@ export interface EnquiryData {
   departureCity: string;
   destination: string;
   approxDate: string;
-  durationDays?: string;
+  durationDays: string;
   adultsCount: number;
   childrenCount: number;
   budgetPerPerson: string;

@@ -1,78 +1,252 @@
-import React, { useState } from 'react';
-import { Compass, Sparkles, Filter } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { RefreshCw, RotateCcw } from 'lucide-react';
 import { ALL_DESTINATIONS } from '../data/destinations';
+import { ALL_HOLIDAY_TYPES } from '../data/holidayTypes';
+import { PackageCard } from '../components/cards/PackageCard';
 import { DestinationCard } from '../components/cards/DestinationCard';
-import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { CTASection } from '../components/common/CTASection';
-import { Region } from '../types';
+import { GENERATED_ASSETS } from '../data/stockImages';
+import { Package } from '../types';
+import { filterActivePackages, SheetSyncStatus } from '../services/googleSheetsPackages';
 
-export const DestinationsPage: React.FC = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('All');
+interface DestinationsPageProps {
+  packages: Package[];
+  packagesLoading: boolean;
+  sheetStatus: SheetSyncStatus;
+  onRefreshPackages: () => void;
+}
 
-  const regions: (string | Region)[] = [
-    'All',
-    'Islands',
-    'Far East Asian',
-    'Middle East & Mediterranean',
-    'Other Countries'
-  ];
+export const DestinationsPage: React.FC<DestinationsPageProps> = ({
+  packages,
+  packagesLoading,
+  sheetStatus,
+  onRefreshPackages
+}) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedDestination, setSelectedDestination] = useState<string>(
+    searchParams.get('destination') || ''
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    searchParams.get('category') || searchParams.get('holidayType') || ''
+  );
 
-  const filteredDestinations = selectedRegion === 'All'
-    ? ALL_DESTINATIONS
-    : ALL_DESTINATIONS.filter((d) => d.region === selectedRegion);
+  useEffect(() => {
+    const dest = searchParams.get('destination') || '';
+    const cat = searchParams.get('category') || searchParams.get('holidayType') || '';
+    setSelectedDestination(dest);
+    setSelectedCategory(cat);
+  }, [searchParams]);
+
+  const activePackages = useMemo(() => filterActivePackages(packages), [packages]);
+
+  const destinationOptions = useMemo(() => {
+    const names = new Set(activePackages.map((p) => p.destination));
+    return Array.from(names).sort();
+  }, [activePackages]);
+
+  const filteredPackages = useMemo(() => {
+    return activePackages.filter((pkg) => {
+      if (
+        selectedDestination &&
+        pkg.destination.toLowerCase() !== selectedDestination.toLowerCase()
+      ) {
+        return false;
+      }
+      if (
+        selectedCategory &&
+        pkg.holidayType.toLowerCase() !== selectedCategory.toLowerCase()
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }, [activePackages, selectedDestination, selectedCategory]);
+
+  const handleUpdateFilter = (dest: string, cat: string) => {
+    setSelectedDestination(dest);
+    setSelectedCategory(cat);
+    const next = new URLSearchParams();
+    if (dest) next.set('destination', dest);
+    if (cat) next.set('category', cat);
+    setSearchParams(next);
+  };
+
+  const resetFilters = () => {
+    handleUpdateFilter('', '');
+  };
 
   return (
-    <div className="pt-24 pb-16 space-y-12">
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-[#eff6ff] via-[#f0fdf4] to-[#f8fafc] text-slate-900 py-12 sm:py-16 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <Breadcrumbs items={[{ label: 'Destinations' }]} className="text-slate-500" />
+    <div className="bg-[#FAF9F6]">
+      {/* Expansive Destination Hero Banner */}
+      <section className="relative h-[52vh] min-h-[380px] bg-[#111827] text-white overflow-hidden">
+        <img
+          src={GENERATED_ASSETS.maldivesLuxury}
+          alt="365Holidayz International Destinations"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/45" />
+        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12 sm:pb-16">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/80 mb-3 block">
+            Destinations &amp; Curated Packages
+          </span>
+          <h1 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-white">
+            DESTINATIONS
+          </h1>
+          <p className="text-sm sm:text-lg text-white/90 max-w-2xl mt-3">
+            Browse curated international destinations and live active travel packages priced transparently in INR.
+          </p>
+        </div>
+      </section>
 
-          <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#ff5a36] flex items-center gap-1.5">
-              <Compass className="w-3.5 h-3.5 text-[#ff5a36]" />
-              <span>Worldwide Curations</span>
-            </span>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900">
-              Destinations
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
-              Explore 17 handpicked geographical sanctuaries across four distinct global regions. Each destination is chosen for its cultural soul, natural drama, and bespoke travel possibilities.
-            </p>
+      {/* Main Content: Simple 2-Control Filter + Active Packages */}
+      <section className="py-16 sm:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* Clean Filter Strip: Only Destination & Holiday Category */}
+        <div className="bg-white border border-[#E5E2DC] rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+            <div>
+              <label
+                htmlFor="filter-destination"
+                className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6B7280] mb-1.5"
+              >
+                Destination
+              </label>
+              <select
+                id="filter-destination"
+                value={selectedDestination}
+                onChange={(e) => handleUpdateFilter(e.target.value, selectedCategory)}
+                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E2DC] bg-[#FAF9F6] text-sm font-medium text-[#111827] focus:outline-hidden focus:border-[#010048]"
+              >
+                <option value="">All Destinations</option>
+                {destinationOptions.map((destName) => (
+                  <option key={destName} value={destName}>
+                    {destName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="filter-category"
+                className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6B7280] mb-1.5"
+              >
+                Holiday Category
+              </label>
+              <select
+                id="filter-category"
+                value={selectedCategory}
+                onChange={(e) => handleUpdateFilter(selectedDestination, e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg border border-[#E5E2DC] bg-[#FAF9F6] text-sm font-medium text-[#111827] focus:outline-hidden focus:border-[#010048]"
+              >
+                <option value="">All Holiday Categories</option>
+                {ALL_HOLIDAY_TYPES.map((ht) => (
+                  <option key={ht.id} value={ht.title}>
+                    {ht.title}
+                  </option>
+                ))}
+                <option value="MICE & Corporate">MICE &amp; Corporate</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {(selectedDestination || selectedCategory) && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#E5E2DC] text-xs font-semibold text-[#111827] hover:bg-[#F3F1EC] cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Clear Filters</span>
+              </button>
+            )}
+
+            {sheetStatus.configured && (
+              <button
+                type="button"
+                onClick={onRefreshPackages}
+                title="Refresh packages from Google Sheets"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#E5E2DC] text-xs font-semibold text-[#111827] hover:bg-[#F3F1EC] cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${packagesLoading ? 'animate-spin' : ''}`} />
+                <span>Sync</span>
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Main Listing Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Region Filter Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          <span className="text-xs font-black text-slate-500 uppercase tracking-wider mr-2 hidden sm:inline">
-            Filter Region:
-          </span>
-          {regions.map((reg) => (
-            <button
-              key={reg}
-              type="button"
-              onClick={() => setSelectedRegion(reg)}
-              className={`px-4 py-2 rounded-full text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
-                selectedRegion === reg
-                  ? 'bg-[#ff5a36] text-white shadow-md shadow-orange-500/20'
-                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-              }`}
-            >
-              {reg === 'All' ? 'All 17 Destinations' : reg}
-            </button>
-          ))}
+        {/* Active Packages Grid */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-[#E5E2DC] pb-4">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#111827]">
+              Available Packages
+            </h2>
+            <span className="font-mono-tabular text-xs font-semibold text-[#6B7280]">
+              {filteredPackages.length} Active {filteredPackages.length === 1 ? 'Package' : 'Packages'}
+            </span>
+          </div>
+
+          {packagesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="h-[440px] rounded-2xl bg-white border border-[#E5E2DC] animate-pulse"
+                />
+              ))}
+            </div>
+          ) : filteredPackages.length === 0 ? (
+            <div className="p-12 rounded-2xl bg-white border border-[#E5E2DC] text-center space-y-4">
+              <p className="font-display text-lg font-bold text-[#111827]">
+                No Active Packages Match This Selection
+              </p>
+              <p className="text-sm text-[#4B5563] max-w-md mx-auto">
+                We tailor bespoke holidays across all global destinations even when fixed packages are not currently listed.
+              </p>
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="px-6 py-2.5 rounded-full border border-[#E5E2DC] text-xs font-semibold text-[#111827] hover:bg-[#F3F1EC] cursor-pointer"
+                >
+                  Show All Packages
+                </button>
+                <Link
+                  to="/contact"
+                  className="px-6 py-2.5 rounded-full bg-[#010048] text-white text-xs font-semibold hover:bg-[#D94E28]"
+                >
+                  Request Custom Trip
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPackages.map((pkg) => (
+                <PackageCard key={pkg.id} pkg={pkg} />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Destination Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredDestinations.map((dest) => (
-            <DestinationCard key={dest.id} destination={dest} />
-          ))}
+        {/* Explore Destination Guides Directory */}
+        <div className="pt-12 border-t border-[#E5E2DC] space-y-8">
+          <div className="space-y-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D94E28] block">
+              Destination Dossiers
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-[#111827]">
+              Explore By Destination
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {ALL_DESTINATIONS.map((dest) => (
+              <DestinationCard key={dest.id} destination={dest} />
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
       <CTASection />
     </div>
