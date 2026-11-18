@@ -17,7 +17,7 @@ function parseYouTubeEmbed(url?: string): { id: string; embedUrl: string } | nul
   const id = match[1];
   const startMatch = trimmed.match(/[?&#](?:t|start)=(\d+)/i);
   const startParam = startMatch ? `&start=${startMatch[1]}` : '';
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=${id}&playsinline=1${startParam}`;
+  const embedUrl = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&loop=1&playlist=${id}&iv_load_policy=3&disablekb=1&fs=0${startParam}`;
 
   return { id, embedUrl };
 }
@@ -232,26 +232,18 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
               className={`absolute inset-0 w-full h-full object-cover ${isCurrent ? dramaticClass : ''}`}
             />
 
-            {/* YouTube Full-Bleed Muted Background Loop (mounted on active + exiting slide for smooth crossfade) */}
+            {/* YouTube Full-Bleed Muted Background Loop (kept visible inside active/exiting slide so browsers immediately permit autoplay) */}
             {yt && shouldMountVideo && (
               <div
                 key={`${slide.id}-yt-wrap`}
-                className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-700 ${
-                  isCurrent ? 'animate-hero-video' : ''
-                } ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}
+                className="absolute inset-0 overflow-hidden pointer-events-none opacity-100"
               >
                 <iframe
                   key={`${slide.id}-yt-${yt.id}`}
                   src={yt.embedUrl}
                   title={slide.heading || 'Holiday preview video'}
-                  allow="autoplay; encrypted-media; picture-in-picture"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  onLoad={() =>
-                    setReadyVideos((prev) => ({
-                      ...prev,
-                      [slide.id]: true
-                    }))
-                  }
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  referrerPolicy="origin-when-cross-origin"
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full scale-[1.18] border-0 pointer-events-none"
                 />
               </div>
