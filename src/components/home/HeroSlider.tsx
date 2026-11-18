@@ -172,7 +172,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ heroVideos = [] }) => {
 
   useEffect(() => {
     if (prevIndex === null) return;
-    const clearExit = window.setTimeout(() => setPrevIndex(null), 900);
+    const clearExit = window.setTimeout(() => setPrevIndex(null), 960);
     return () => window.clearTimeout(clearExit);
   }, [prevIndex, transitionKey]);
 
