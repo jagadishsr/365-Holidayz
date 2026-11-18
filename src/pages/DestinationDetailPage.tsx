@@ -27,9 +27,7 @@ export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ pa
   }
 
   const relatedPackages = activePackages.filter(
-    (p) =>
-      p.destinationSlug === destination.slug ||
-      p.destination.toLowerCase().includes(destination.name.toLowerCase())
+    (p) => p.destinationSlug === destination.slug
   );
 
   const heroImage = resolveStockImage(
@@ -37,13 +35,15 @@ export const DestinationDetailPage: React.FC<DestinationDetailPageProps> = ({ pa
     undefined,
     undefined,
     destination.slug,
-    destination.imageUrl || DESTINATION_STOCK_IMAGES[destination.slug]
+    destination.imageUrl || destination.galleryImages?.[0] || DESTINATION_STOCK_IMAGES[destination.slug]
   );
 
   const albumImages =
     destination.galleryImages && destination.galleryImages.length > 0
       ? destination.galleryImages
-      : getDefaultGalleryImages(destination.slug, heroImage);
+      : destination.imageUrl
+        ? [destination.imageUrl]
+        : getDefaultGalleryImages(destination.slug, heroImage);
 
   return (
     <div className="bg-[#FAF9F6]">

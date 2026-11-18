@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import { Package } from '../../types';
 import { ImagePlaceholder } from '../common/ImagePlaceholder';
-import { PACKAGE_STOCK_IMAGES } from '../../data/stockImages';
+import { DESTINATION_STOCK_IMAGES } from '../../data/stockImages';
 import { splitPackageTitle } from '../../utils/packageTitle';
 
 interface PackageCardProps {
@@ -14,6 +14,7 @@ interface PackageCardProps {
 export const PackageCard: React.FC<PackageCardProps> = ({ pkg, className = '' }) => {
   const displayPrice = pkg.inrPriceDisplay || pkg.priceDisplay;
   const { mainTitle, subTitle } = splitPackageTitle(pkg.title);
+  const rowImage = pkg.imageUrl || pkg.galleryImages?.[0] || DESTINATION_STOCK_IMAGES[pkg.destinationSlug];
 
   return (
     <article
@@ -22,8 +23,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg, className = '' })
       {/* Clean Borderless Photography */}
       <Link to={`/packages/${pkg.slug}`} className="block relative overflow-hidden">
         <ImagePlaceholder
-          src={pkg.imageUrl || PACKAGE_STOCK_IMAGES[pkg.id]}
-          packageId={pkg.id}
+          src={rowImage}
           destinationSlug={pkg.destinationSlug}
           category={pkg.holidayType}
           subject={pkg.imageSubject}

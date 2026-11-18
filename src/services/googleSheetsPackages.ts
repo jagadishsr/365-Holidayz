@@ -37,7 +37,7 @@ export interface SheetSyncStatus {
   errorMessage: string | null;
 }
 
-const CACHE_KEY = '365holidayz_sheets_packages_v5';
+const CACHE_KEY = '365holidayz_sheets_packages_v6';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function filterActivePackages(packages: Package[]): Package[] {
@@ -60,6 +60,17 @@ function collectDestinationGallery(matchingPkgs: Package[]): string[] | undefine
     }
   }
 
+  // If no img1..img8 slots were populated yet on this destination's rows, include its coverimg URLs
+  if (collected.length === 0) {
+    for (const p of matchingPkgs) {
+      if (p.imageUrl && !seen.has(p.imageUrl)) {
+        seen.add(p.imageUrl);
+        collected.push(p.imageUrl);
+        if (collected.length >= 8) return collected;
+      }
+    }
+  }
+
   return collected.length > 0 ? collected : undefined;
 }
 
@@ -69,39 +80,29 @@ export function getPublishedDestinations(packages: Package[]): Destination[] {
   const synthesized: Destination[] = [];
 
   const matchedKnown = ALL_DESTINATIONS.filter((dest) => {
-    const hasMatch = active.some(
-      (pkg) =>
-        pkg.destinationSlug === dest.slug ||
-        pkg.destination.toLowerCase().includes(dest.name.toLowerCase())
-    );
+    const hasMatch = active.some((pkg) => pkg.destinationSlug === dest.slug);
     if (hasMatch) matchedSlugs.add(dest.slug);
     return hasMatch;
   }).map((dest) => {
-    const matchingPkgs = active.filter(
-      (pkg) =>
-        pkg.destinationSlug === dest.slug ||
-        pkg.destination.toLowerCase().includes(dest.name.toLowerCase())
-    );
+    const matchingPkgs = active.filter((pkg) => pkg.destinationSlug === dest.slug);
     const pkgWithImage = matchingPkgs.find((pkg) => pkg.imageUrl);
     const galleryImages = collectDestinationGallery(matchingPkgs);
+    const primaryImageUrl = pkgWithImage?.imageUrl || galleryImages?.[0];
     return {
       ...dest,
-      ...(pkgWithImage?.imageUrl ? { imageUrl: pkgWithImage.imageUrl } : {}),
+      ...(primaryImageUrl ? { imageUrl: primaryImageUrl } : {}),
       ...(galleryImages ? { galleryImages } : {})
     };
   });
 
   active.forEach((pkg) => {
-    if (
-      matchedSlugs.has(pkg.destinationSlug) ||
-      ALL_DESTINATIONS.some((d) => pkg.destination.toLowerCase().includes(d.name.toLowerCase()))
-    ) {
+    if (matchedSlugs.has(pkg.destinationSlug)) {
       return;
     }
     matchedSlugs.add(pkg.destinationSlug);
     const matchingPkgs = active.filter((p) => p.destinationSlug === pkg.destinationSlug);
-    const explicitImageUrl = matchingPkgs.find((p) => p.imageUrl)?.imageUrl;
     const galleryImages = collectDestinationGallery(matchingPkgs);
+    const explicitImageUrl = matchingPkgs.find((p) => p.imageUrl)?.imageUrl || galleryImages?.[0];
     synthesized.push({
       id: `dest-${pkg.destinationSlug}`,
       slug: pkg.destinationSlug,
@@ -215,9 +216,10 @@ function formatInr(amount: number): string {
   return `₹${Math.round(amount).toLocaleString('en-IN')}`;
 }
 
-function normalizeDestination(raw: string): { name: string; slug: string } {
+function detectExplicitDestination(raw: string): { name: string; slug: string } | null {
   const upper = cleanText(raw).toUpperCase();
-  if (upper.includes('MALDIVES')) return { name: 'Maldives', slug: 'maldives' };
+  if (!upper) return null;
+  if (upper.includes('MALDIVES') || upper.includes('MAAFUSHI')) return { name: 'Maldives', slug: 'maldives' };
   if (upper.includes('SRILANKA') || upper.includes('SRI LANKA')) {
     return { name: 'Sri Lanka', slug: 'sri-lanka' };
   }
@@ -227,8 +229,10 @@ function normalizeDestination(raw: string): { name: string; slug: string } {
   }
   if (upper.includes('SEYCHELLES')) return { name: 'Seychelles', slug: 'seychelles' };
   if (upper.includes('SINGAPORE')) return { name: 'Singapore', slug: 'singapore' };
-  if (upper.includes('MALAYSIA')) return { name: 'Malaysia', slug: 'malaysia' };
-  if (upper.includes('THAILAND')) return { name: 'Thailand', slug: 'thailand' };
+  if (upper.includes('MALAYSIA') || upper.includes('KUALA LUMPUR')) return { name: 'Malaysia', slug: 'malaysia' };
+  if (upper.includes('THAILAND') || upper.includes('PHUKET') || upper.includes('KRABI')) {
+    return { name: 'Thailand', slug: 'thailand' };
+  }
   if (upper.includes('VIETNAM')) return { name: 'Vietnam', slug: 'vietnam' };
   if (upper.includes('DUBAI') || upper.includes('UAE')) {
     return { name: 'Dubai & UAE', slug: 'dubai' };
@@ -240,7 +244,7 @@ function normalizeDestination(raw: string): { name: string; slug: string } {
   if (upper.includes('JORDAN')) return { name: 'Jordan', slug: 'jordan' };
   if (upper.includes('OMAN')) return { name: 'Sultanate of Oman', slug: 'oman' };
   if (upper.includes('GEORGIA')) return { name: 'Georgia', slug: 'georgia' };
-  if (upper.includes('AZERBAIJAN')) return { name: 'Azerbaijan', slug: 'azerbaijan' };
+  if (upper.includes('AZERBAIJAN') || upper.includes('BAKU')) return { name: 'Azerbaijan', slug: 'azerbaijan' };
   if (upper.includes('KAZAKHSTAN')) return { name: 'Kazakhstan', slug: 'kazakhstan' };
   if (upper.includes('UZBEKISTAN')) return { name: 'Uzbekistan', slug: 'uzbekistan' };
   if (upper.includes('GREECE')) return { name: 'Greece', slug: 'greece' };
@@ -256,6 +260,12 @@ function normalizeDestination(raw: string): { name: string; slug: string } {
   }
   if (upper.includes('JAPAN')) return { name: 'Japan', slug: 'japan' };
   if (upper.includes('AUSTRALIA')) return { name: 'Australia', slug: 'australia' };
+  return null;
+}
+
+function normalizeDestination(raw: string): { name: string; slug: string } {
+  const detected = detectExplicitDestination(raw);
+  if (detected) return detected;
 
   const titleCased = cleanText(raw)
     .toLowerCase()
@@ -286,7 +296,7 @@ function parseRegionFromSection(raw: string): Region | null {
 
 function normalizeImageUrl(raw?: string): string | undefined {
   const val = cleanText(raw);
-  if (!val || !/^https?:\/\//i.test(val)) return undefined;
+  if (!val || !/^https?:\/\//i.test(val) || isLikelyVideoUrl(val)) return undefined;
 
   // Auto-convert Google Drive file share URLs into directly embeddable image URLs
   const driveFileMatch = val.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -613,7 +623,7 @@ export function mapCsvToPackages(csvText: string): Package[] {
     const fallbackUrlCell = r.find((cell, cellIdx) => {
       if (reservedMediaIndices.has(cellIdx)) return false;
       const val = cleanText(cell);
-      return /^https?:\/\/\S+$/i.test(val) && !/\.(mp4|webm|mov)(\?|$)/i.test(val);
+      return /^https?:\/\/\S+$/i.test(val) && !isLikelyVideoUrl(val);
     });
     const rowImageUrl = normalizeImageUrl(get(idxImageUrl) || fallbackUrlCell);
 
@@ -635,15 +645,20 @@ export function mapCsvToPackages(csvText: string): Package[] {
     }
     const rowGalleryImages = Array.from(rowGallerySet).slice(0, 8);
 
-    if (!hasTitleOrPrice && nonEmptyCells.length <= 2) {
-      const sectionLabel = nonEmptyCells[0];
+    const isSectionHeaderRow =
+      !hasTitleOrPrice &&
+      !get(idxPkgName) &&
+      !firstCell.match(/^\d+$/);
+
+    if (isSectionHeaderRow) {
+      const sectionLabel = cleanText(r[0]) || nonEmptyCells[0];
       const detectedRegion = parseRegionFromSection(sectionLabel);
       if (detectedRegion) {
         currentRegion = detectedRegion;
         awaitingDestinationAfterRegion = true;
         currentDestinationImageUrl = undefined;
         currentDestinationGalleryImages = [];
-      } else {
+      } else if (sectionLabel) {
         currentDestination = normalizeDestination(sectionLabel);
         awaitingDestinationAfterRegion = false;
         currentDestinationImageUrl = rowImageUrl;
@@ -657,11 +672,21 @@ export function mapCsvToPackages(csvText: string): Package[] {
     if (!rawPkgName && !rawPkgTitle) continue;
 
     const destColVal = get(idxDestination);
-    let destInfo = destColVal ? normalizeDestination(destColVal) : currentDestination;
+    const inferredPkgDest = detectExplicitDestination(rawPkgName) || detectExplicitDestination(rawPkgTitle);
+    let destInfo = destColVal
+      ? normalizeDestination(destColVal)
+      : inferredPkgDest || currentDestination;
+
     if (!destColVal && awaitingDestinationAfterRegion && rawPkgName) {
       destInfo = normalizeDestination(rawPkgName);
       currentDestination = destInfo;
       awaitingDestinationAfterRegion = false;
+      currentDestinationImageUrl = undefined;
+      currentDestinationGalleryImages = [];
+    } else if (destInfo.slug !== currentDestination.slug) {
+      currentDestination = destInfo;
+      currentDestinationImageUrl = undefined;
+      currentDestinationGalleryImages = [];
     }
 
     const regionColVal = get(idxRegion);

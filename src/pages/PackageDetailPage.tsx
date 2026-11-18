@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, Check, XCircle, Phone, MessageCircle } from 'lucide-react';
 import {
-  PACKAGE_STOCK_IMAGES,
   DESTINATION_STOCK_IMAGES,
   CLIENT_ASSETS,
   getDefaultGalleryImages
@@ -39,15 +38,17 @@ export const PackageDetailPage: React.FC<PackageDetailPageProps> = ({ packages }
   const heroImage = resolveStockImage(
     pkg.imageSubject,
     pkg.holidayType,
-    pkg.id,
+    undefined,
     pkg.destinationSlug,
-    pkg.imageUrl || PACKAGE_STOCK_IMAGES[pkg.id] || DESTINATION_STOCK_IMAGES[pkg.destinationSlug]
+    pkg.imageUrl || pkg.galleryImages?.[0] || DESTINATION_STOCK_IMAGES[pkg.destinationSlug]
   );
 
   const albumImages =
     pkg.galleryImages && pkg.galleryImages.length > 0
       ? pkg.galleryImages
-      : getDefaultGalleryImages(pkg.destinationSlug, heroImage);
+      : pkg.imageUrl
+        ? [pkg.imageUrl]
+        : getDefaultGalleryImages(pkg.destinationSlug, heroImage);
 
   return (
     <div className="bg-[#FAF9F6] pt-24 sm:pt-28 pb-12">

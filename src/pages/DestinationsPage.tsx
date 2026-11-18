@@ -5,7 +5,7 @@ import { ALL_HOLIDAY_TYPES } from '../data/holidayTypes';
 import { PackageCard } from '../components/cards/PackageCard';
 import { DestinationCard } from '../components/cards/DestinationCard';
 import { CTASection } from '../components/common/CTASection';
-import { GENERATED_ASSETS } from '../data/stockImages';
+import { DESTINATION_STOCK_IMAGES, GENERATED_ASSETS } from '../data/stockImages';
 import { Package } from '../types';
 import {
   filterActivePackages,
@@ -79,13 +79,34 @@ export const DestinationsPage: React.FC<DestinationsPageProps> = ({
     handleUpdateFilter('', '');
   };
 
+  const publishedDestinations = useMemo(
+    () => getPublishedDestinations(activePackages),
+    [activePackages]
+  );
+
+  const activeFilterDestination = useMemo(() => {
+    if (!selectedDestination) return undefined;
+    return publishedDestinations.find(
+      (d) =>
+        d.name.toLowerCase() === selectedDestination.toLowerCase() ||
+        d.slug === selectedDestination.toLowerCase()
+    );
+  }, [publishedDestinations, selectedDestination]);
+
+  const bannerImage =
+    activeFilterDestination?.imageUrl ||
+    activeFilterDestination?.galleryImages?.[0] ||
+    (activeFilterDestination ? DESTINATION_STOCK_IMAGES[activeFilterDestination.slug] : undefined) ||
+    GENERATED_ASSETS.introSeAsia;
+
   return (
     <div className="bg-[#FAF9F6]">
       {/* Expansive Destination Hero Banner */}
       <section className="relative h-[52vh] min-h-[380px] bg-[#111827] text-white overflow-hidden">
         <img
-          src={GENERATED_ASSETS.maldivesLuxury}
-          alt="365Holidayz International Destinations"
+          src={bannerImage}
+          alt={activeFilterDestination?.name || '365Holidayz International Destinations'}
+          referrerPolicy="no-referrer"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/45" />

@@ -22,7 +22,8 @@ export const DestinationGallery: React.FC<DestinationGalleryProps> = ({
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [title, cappedImages.length]);
+    setBrokenUrls({});
+  }, [title, cappedImages.join('|')]);
 
   useEffect(() => {
     if (selectedIndex >= visibleImages.length && visibleImages.length > 0) {
