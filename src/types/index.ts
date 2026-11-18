@@ -141,6 +141,14 @@ export interface HeroSheetSlideMedia {
   fallbackImageUrl?: string;
 }
 
+export interface HappyClientGalleryItem {
+  id: string;
+  slotLabel?: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+}
+
 export interface EnquiryData {
   fullName: string;
   email: string;
