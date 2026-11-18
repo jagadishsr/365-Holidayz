@@ -121,8 +121,8 @@
     transform: translate3d(0, 0, 0) scale(1);
   }
   100% {
-    opacity: 0;
-    transform: translate3d(-2%, 0, 0) scale(0.98);
+    opacity: 1;
+    transform: translate3d(-1.5%, 0, 0) scale(0.985);
   }
 }
 
@@ -166,6 +166,21 @@
 .animate-hero-text-bounce {
   animation: heroTextGlideIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
+}
+
+@keyframes heroMildZoomInOut {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.075);
+  }
+}
+
+.animate-hero-mild-zoom {
+  animation: heroMildZoomInOut 11s ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes flashOffersPulse {

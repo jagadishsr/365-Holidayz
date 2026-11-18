@@ -22,6 +22,7 @@ import { ALL_DESTINATIONS } from '../data/destinations';
 import {
   CurrencyCode,
   Destination,
+  HeroSheetSlideMedia,
   HolidayCategory,
   Package,
   PackageDisplayStatus,
@@ -36,7 +37,7 @@ export interface SheetSyncStatus {
   errorMessage: string | null;
 }
 
-const CACHE_KEY = '365holidayz_sheets_packages_v4';
+const CACHE_KEY = '365holidayz_sheets_packages_v5';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function filterActivePackages(packages: Package[]): Package[] {
@@ -393,7 +394,22 @@ function resolveNumberedColumnIndices(
   return slots;
 }
 
-export function extractHeroVideosFromCsv(csvText: string): string[] {
+function isLikelyVideoUrl(val: string): boolean {
+  if (!/^https?:\/\//i.test(val)) return false;
+  if (/youtu\.be\/|youtube\.com\//i.test(val)) return true;
+  if (/pexels\.com\/(?:download\/)?video\//i.test(val)) return true;
+  if (/mixkit\.co\/free-stock-video\//i.test(val)) return true;
+  if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(val)) return true;
+  return false;
+}
+
+function isLikelyImageUrl(val: string): boolean {
+  if (!/^https?:\/\//i.test(val)) return false;
+  if (isLikelyVideoUrl(val)) return false;
+  return true;
+}
+
+export function extractHeroMediaFromCsv(csvText: string): HeroSheetSlideMedia[] {
   const rows = parseCsvRows(csvText);
   if (rows.length < 2) return [];
 
@@ -403,21 +419,50 @@ export function extractHeroVideosFromCsv(csvText: string): string[] {
 
   if (vidSlots.every((idx) => idx === -1)) return [];
 
-  const result = new Array<string>(7).fill('');
+  const result: HeroSheetSlideMedia[] = [];
   for (let slotIdx = 0; slotIdx < vidSlots.length; slotIdx++) {
     const colIdx = vidSlots[slotIdx];
-    if (colIdx === -1) continue;
+    if (colIdx === -1) {
+      result.push({});
+      continue;
+    }
+
+    let videoUrl: string | undefined;
+    let fallbackImageUrl: string | undefined;
 
     for (let rowIndex = headerRowIdx + 1; rowIndex < rows.length; rowIndex++) {
-      const candidate = normalizeVideoUrl(rows[rowIndex]?.[colIdx]);
-      if (candidate) {
-        result[slotIdx] = candidate;
-        break;
+      const rawCell = cleanText(rows[rowIndex]?.[colIdx]);
+      if (!rawCell) continue;
+
+      if (!videoUrl && isLikelyVideoUrl(rawCell)) {
+        videoUrl = normalizeVideoUrl(rawCell);
+        continue;
       }
+
+      if (!fallbackImageUrl && isLikelyImageUrl(rawCell)) {
+        fallbackImageUrl = normalizeImageUrl(rawCell);
+      }
+
+      if (videoUrl && fallbackImageUrl) break;
     }
+
+    result.push({ videoUrl, fallbackImageUrl });
+  }
+
+  // Trim trailing empty slots so active slide count matches populated sheet columns
+  while (
+    result.length > 0 &&
+    !result[result.length - 1].videoUrl &&
+    !result[result.length - 1].fallbackImageUrl
+  ) {
+    result.pop();
   }
 
   return result;
+}
+
+export function extractHeroVideosFromCsv(csvText: string): string[] {
+  return extractHeroMediaFromCsv(csvText).map((m) => m.videoUrl || '');
 }
 
 function inferDuration(text: string): { duration: string; nights: number; days: number } {
@@ -780,7 +825,7 @@ function getConfiguredSheetUrl(): string {
 
 export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
   packages: Package[];
-  heroVideos: string[];
+  heroMedia: HeroSheetSlideMedia[];
   status: SheetSyncStatus;
 }> {
   const configuredUrl = getConfiguredSheetUrl();
@@ -790,7 +835,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
     const activeBaseline = filterActivePackages(ALL_PACKAGES);
     return {
       packages: activeBaseline,
-      heroVideos: [],
+      heroMedia: [],
       status: {
         configured: false,
         mode: 'verified-local-baseline',
@@ -812,14 +857,14 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
       }
       const csvText = await response.text();
       const parsed = mapCsvToPackages(csvText);
-      const heroVideos = extractHeroVideosFromCsv(csvText);
+      const heroMedia = extractHeroMediaFromCsv(csvText);
       const activeOnly = filterActivePackages(parsed);
 
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem(
             CACHE_KEY,
-            JSON.stringify({ timestamp: Date.now(), url: endpoint, packages: parsed, heroVideos })
+            JSON.stringify({ timestamp: Date.now(), url: endpoint, packages: parsed, heroMedia })
           );
         } catch {
           // Ignore storage quota issues
@@ -828,7 +873,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
 
       return {
         packages: activeOnly,
-        heroVideos,
+        heroMedia,
         status: {
           configured: true,
           mode: 'live-google-sheet',
@@ -851,12 +896,12 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
           timestamp: number;
           url: string;
           packages: Package[];
-          heroVideos?: string[];
+          heroMedia?: HeroSheetSlideMedia[];
         };
         if (candidates.includes(cached.url) && cached.packages.length > 0) {
           return {
             packages: filterActivePackages(cached.packages),
-            heroVideos: cached.heroVideos || [],
+            heroMedia: cached.heroMedia || [],
             status: {
               configured: true,
               mode: 'sheet-error-fallback',
@@ -875,7 +920,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
   const message = lastError instanceof Error ? lastError.message : 'Unable to reach Google Sheet CSV';
   return {
     packages: filterActivePackages(ALL_PACKAGES),
-    heroVideos: [],
+    heroMedia: [],
     status: {
       configured: true,
       mode: 'sheet-error-fallback',
@@ -888,7 +933,7 @@ export async function fetchPackagesWithStatus(_forceRefresh = false): Promise<{
 
 export function usePackagesData() {
   const [packages, setPackages] = useState<Package[]>(() => filterActivePackages(ALL_PACKAGES));
-  const [heroVideos, setHeroVideos] = useState<string[]>([]);
+  const [heroMedia, setHeroMedia] = useState<HeroSheetSlideMedia[]>([]);
   const [loading, setLoading] = useState<boolean>(() => Boolean(getConfiguredSheetUrl()));
   const [status, setStatus] = useState<SheetSyncStatus>({
     configured: Boolean(getConfiguredSheetUrl()),
@@ -902,7 +947,7 @@ export function usePackagesData() {
     if (getConfiguredSheetUrl()) setLoading(true);
     const result = await fetchPackagesWithStatus(force);
     setPackages(result.packages);
-    setHeroVideos(result.heroVideos);
+    setHeroMedia(result.heroMedia);
     setStatus(result.status);
     setLoading(false);
   }, []);
@@ -919,7 +964,7 @@ export function usePackagesData() {
 
   return {
     packages,
-    heroVideos,
+    heroMedia,
     loading,
     status,
     refresh: () => load(true)

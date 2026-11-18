@@ -136,6 +136,11 @@ export interface SliderSlide {
   durationNote?: string;
 }
 
+export interface HeroSheetSlideMedia {
+  videoUrl?: string;
+  fallbackImageUrl?: string;
+}
+
 export interface EnquiryData {
   fullName: string;
   email: string;

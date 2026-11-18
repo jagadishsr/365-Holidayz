@@ -49,7 +49,7 @@ export function App() {
   const [enquiryPackageContext, setEnquiryPackageContext] = useState<Package | undefined>(undefined);
   const {
     packages,
-    heroVideos,
+    heroMedia,
     loading: packagesLoading,
     status: sheetStatus,
     refresh: refreshPackages
@@ -80,7 +80,8 @@ export function App() {
               element={
                 <HomePage
                   packages={packages}
-                  heroVideos={heroVideos}
+                  heroMedia={heroMedia}
+                  sheetLoading={packagesLoading}
                   onOpenEnquiry={() => handleOpenEnquiry()}
                 />
               }

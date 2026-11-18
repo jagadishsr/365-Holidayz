@@ -5,7 +5,7 @@ import { HeroSlider } from '../components/home/HeroSlider';
 import { DestinationCard } from '../components/cards/DestinationCard';
 import { CTASection } from '../components/common/CTASection';
 import { GENERATED_ASSETS, HAPPY_CLIENT_STORIES } from '../data/stockImages';
-import { Destination, Package } from '../types';
+import { Destination, HeroSheetSlideMedia, Package } from '../types';
 import {
   filterActivePackages,
   getPublishedDestinations
@@ -13,7 +13,8 @@ import {
 
 interface HomePageProps {
   packages: Package[];
-  heroVideos?: string[];
+  heroMedia?: HeroSheetSlideMedia[];
+  sheetLoading?: boolean;
   onOpenEnquiry: () => void;
 }
 
@@ -65,7 +66,12 @@ function getLowestInrLabel(dest: Destination, activePackages: Package[]): string
   return `₹${Math.round(lowest).toLocaleString('en-IN')}`;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ packages, heroVideos, onOpenEnquiry }) => {
+export const HomePage: React.FC<HomePageProps> = ({
+  packages,
+  heroMedia,
+  sheetLoading,
+  onOpenEnquiry
+}) => {
   const [showAllDestinations, setShowAllDestinations] = useState(false);
 
   const activePackages = useMemo(() => filterActivePackages(packages), [packages]);
@@ -96,7 +102,7 @@ export const HomePage: React.FC<HomePageProps> = ({ packages, heroVideos, onOpen
   return (
     <div className="bg-[#FAF9F6]">
       {/* A. Cinematic Hero Video Slider (Title, Subtitle & CTA Button Only) */}
-      <HeroSlider heroVideos={heroVideos} />
+      <HeroSlider heroMedia={heroMedia} loading={sheetLoading} />
 
       {/* B. Intro Section with Southeast Asia Visual */}
       <section className="py-20 sm:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
